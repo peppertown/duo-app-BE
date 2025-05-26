@@ -70,12 +70,18 @@ export class AuthService {
       throw new BadRequestException('비밀번호가 올바르지 않습니다.');
     }
 
+    const accessToken = await this.generateAccessToken(user.id);
+    const refreshToken = await this.generateRefreshToken(user.id);
+
     return {
-      message: '로그인 성공',
-      user: {
-        id: user.id,
-        userId: user.userId,
-        nickname: user.nickname,
+      success: true,
+      message: {
+        code: 200,
+        text: '로그인이 완료됐습니다.',
+      },
+      jwt: {
+        accessToken,
+        refreshToken,
       },
     };
   }
