@@ -83,6 +83,10 @@ export class AuthService {
         code: 200,
         text: '로그인이 완료됐습니다.',
       },
+      user: {
+        nickname: user.nickname,
+        role: user.role,
+      },
       jwt: {
         accessToken,
         refreshToken,
