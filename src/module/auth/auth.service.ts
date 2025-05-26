@@ -1,14 +1,20 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+  ) {}
 
   async register(data: {
     id: string;
@@ -72,5 +78,35 @@ export class AuthService {
         nickname: user.nickname,
       },
     };
+  }
+
+  async generateAccessToken(userId: number): Promise<string> {
+    try {
+      return await this.jwt.signAsync(
+        { userId },
+        { expiresIn: '1h' }, // 액세스 토큰 1시간
+      );
+    } catch (err) {
+      console.error('액세스 토큰 생성 실패:', err);
+      throw new HttpException(
+        '액세스 토큰 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async generateRefreshToken(userId: number): Promise<string> {
+    try {
+      return this.jwt.signAsync(
+        { userId },
+        { expiresIn: '7d' }, // 리프레시 토큰 7일
+      );
+    } catch (err) {
+      console.error('리프레시 토큰 생성 실패:', err);
+      throw new HttpException(
+        '리프레시 토큰 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
