@@ -8,12 +8,14 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly redis: RedisService,
   ) {}
 
   async register(data: {
@@ -73,6 +75,8 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(user.id);
     const refreshToken = await this.generateRefreshToken(user.id);
 
+    await this.saveServerRefreshToken(user.id, refreshToken);
+
     return {
       success: true,
       message: {
@@ -111,6 +115,20 @@ export class AuthService {
       console.error('리프레시 토큰 생성 실패:', err);
       throw new HttpException(
         '리프레시 토큰 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async saveServerRefreshToken(userId: number, refreshToken: string) {
+    try {
+      const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
+      const ttlSeconds = 7 * 24 * 60 * 60; // 7일
+      await this.redis.set(key, refreshToken, ttlSeconds);
+    } catch (err) {
+      console.error('JWT 리프레시 토큰 레디스 저장 실패', err);
+      throw new HttpException(
+        'JWT 리프레시 토큰 레디스 저장 중 오류가 발생했습니다.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
