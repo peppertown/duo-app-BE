@@ -15,4 +15,13 @@ export class UserController {
   ) {
     return await this.userService.setUserNickname(userId, body.nickname);
   }
+
+  @Post('role')
+  @UseGuards(AuthGuard('jwt'))
+  async setUserRole(
+    @CurrentUserId() userId: number,
+    @Body() body: { role: string },
+  ) {
+    return await this.userService.setUserRole(userId, body.role);
+  }
 }
