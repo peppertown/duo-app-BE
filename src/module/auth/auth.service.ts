@@ -194,6 +194,10 @@ export class AuthService {
       await this.saveServerRefreshToken(user.id, refreshToken);
 
       return {
+        message: {
+          code: 200,
+          text: '구글 로그인이 완료되었습니다.',
+        },
         jwt: {
           accessToken,
           refreshToken,

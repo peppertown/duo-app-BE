@@ -3,7 +3,10 @@ import { AuthService } from './auth.service';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { googleCallbackDocs, handleRefreshDocs } from './docs/auth.docs';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -27,12 +30,19 @@ export class AuthController {
   }
 
   @Post('google/callback')
+  @googleCallbackDocs.operation
+  @googleCallbackDocs.body
+  @googleCallbackDocs.response
   async googleCallback(@Body() body: GoogleAuthDto) {
     return await this.authService.googleLogin(body.code);
   }
 
   @Post('refresh')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @handleRefreshDocs.operation
+  @handleRefreshDocs.body
+  @handleRefreshDocs.response
   async handleRefresh(
     @CurrentUserId() userId: number,
     @Body() body: { code: string },
