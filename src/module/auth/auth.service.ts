@@ -174,22 +174,14 @@ export class AuthService {
 
       // 3. 유저 회원가입/로그인 처리
       const { sub, email, name, picture } = decoded;
-
-      let user = await this.prisma.user.findUnique({
-        where: { sub },
-      });
-
-      if (!user) {
-        user = await this.prisma.user.create({
-          data: {
-            sub,
-            email,
-            nickname: name,
-            profileUrl: picture,
-            authProvider: 'Google',
-          },
-        });
-      }
+      const userData = {
+        sub,
+        email,
+        nickname: name,
+        profileUrl: picture,
+        authProvider: 'Google',
+      };
+      const user = await this.findOrCreateAccount(userData);
 
       // 4. JWT 발급 및 레디스 저장
       const accessToken = await this.generateAccessToken(user.id);
@@ -209,7 +201,51 @@ export class AuthService {
         },
       };
     } catch (err) {
-      console.error('❌ 구글 토큰 요청 실패:', err.response?.data || err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      console.error('구글 로그인 중 에러 발생', err);
+      throw new HttpException(
+        '구글 로그인 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findOrCreateAccount(data: {
+    sub: string;
+    email: string;
+    nickname: string;
+    profileUrl: string;
+    authProvider: string;
+  }) {
+    try {
+      const { sub, email, nickname, profileUrl, authProvider } = data;
+
+      let user = await this.prisma.user.findUnique({
+        where: { sub },
+      });
+
+      if (!user) {
+        user = await this.prisma.user.create({
+          data: {
+            sub,
+            email,
+            nickname,
+            profileUrl,
+            authProvider,
+          },
+        });
+      }
+
+      return user;
+    } catch (err) {
+      console.error('계정 조회 및 생성 중 에러 발생', err);
+      throw new HttpException(
+        '계정 조회 및 생성 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
