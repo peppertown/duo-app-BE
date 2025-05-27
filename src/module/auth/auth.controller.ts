@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,10 @@ export class AuthController {
     },
   ) {
     return await this.authService.register(body);
+  }
+
+  @Post('google/callback')
+  async googleCallback(@Body() body: GoogleAuthDto) {
+    return await this.authService.googleLogin(body.code);
   }
 }
