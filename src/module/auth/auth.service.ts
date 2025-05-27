@@ -19,17 +19,12 @@ export class AuthService {
     private readonly redis: RedisService,
   ) {}
 
-  async register(data: {
-    id: string;
-    password: string;
-    nickname: string;
-    role: string;
-  }) {
-    const { id, password, nickname, role } = data;
+  async register(data: { email: string; password: string }) {
+    const { email, password } = data;
 
     // 중복 확인
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: id },
+      where: { email },
     });
     if (existingUser) {
       throw new BadRequestException('이미 존재하는 사용자 ID입니다.');
@@ -39,10 +34,8 @@ export class AuthService {
 
     const newUser = await this.prisma.user.create({
       data: {
-        email: id,
+        email,
         password: hashedPassword,
-        nickname,
-        role,
       },
     });
 
@@ -57,11 +50,11 @@ export class AuthService {
   }
 
   // 로그인
-  async login(data: { id: string; password: string }) {
-    const { id, password } = data;
+  async login(data: { email: string; password: string }) {
+    const { email, password } = data;
 
     const user = await this.prisma.user.findUnique({
-      where: { email: id },
+      where: { email },
     });
 
     if (!user) {
