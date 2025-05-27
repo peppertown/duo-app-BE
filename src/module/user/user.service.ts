@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserRoleDto } from './dto/user-role.dto';
 
 @Injectable()
 export class UserService {
@@ -26,11 +27,11 @@ export class UserService {
   }
 
   // 유저 롤 설정
-  async setUserRole(userId: number, role: string) {
+  async setUserRole(userId: number, userRoleDto: UserRoleDto) {
     try {
       await this.prisma.user.update({
         where: { id: userId },
-        data: { role },
+        data: { role: userRoleDto.role },
       });
 
       return {
@@ -38,7 +39,7 @@ export class UserService {
           code: 200,
           text: 'role 설정이 완료되었습니다.',
         },
-        user: { role },
+        user: { role: userRoleDto.role },
       };
     } catch (err) {
       console.error('롤 설정 중 에러 발생', err);

@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { setUserNicknameDocs, setUserRoleDocs } from './docs/user.docs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserRoleDto } from './dto/user-role.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -31,8 +32,8 @@ export class UserController {
   @setUserRoleDocs.response
   async setUserRole(
     @CurrentUserId() userId: number,
-    @Body() body: { role: string },
+    @Body() body: { userRoleDto: UserRoleDto },
   ) {
-    return await this.userService.setUserRole(userId, body.role);
+    return await this.userService.setUserRole(userId, body.userRoleDto);
   }
 }

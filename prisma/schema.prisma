@@ -20,7 +20,7 @@ model User {
   password     String?
   nickname     String?
   profileUrl   String?
-  role         Role
+  role         Role?
   authProvider String?
 
   createdAt DateTime @default(now())
