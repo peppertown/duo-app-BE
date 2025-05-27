@@ -18,11 +18,16 @@ model User {
   sub          String? @unique
   email        String  @unique
   password     String?
-  nickname     String
+  nickname     String?
   profileUrl   String?
-  role         String?
+  role         Role
   authProvider String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  bf
+  gf
 }
