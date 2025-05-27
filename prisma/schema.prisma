@@ -14,11 +14,14 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  userId   String @unique
-  password String
-  nickname String
-  role     String
+  id           Int     @id @default(autoincrement())
+  sub          String? @unique
+  email        String  @unique
+  password     String?
+  nickname     String
+  profileUrl   String?
+  role         String?
+  authProvider String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
