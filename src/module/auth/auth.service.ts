@@ -95,6 +95,7 @@ export class AuthService {
     };
   }
 
+  // 액세스 토큰 발급
   async generateAccessToken(userId: number): Promise<string> {
     try {
       return await this.jwt.signAsync(
@@ -110,6 +111,7 @@ export class AuthService {
     }
   }
 
+  // 리프레시 토큰 발급
   async generateRefreshToken(userId: number): Promise<string> {
     try {
       return this.jwt.signAsync(
@@ -125,6 +127,7 @@ export class AuthService {
     }
   }
 
+  // 리프레시 토큰 저장
   async saveServerRefreshToken(userId: number, refreshToken: string) {
     try {
       const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
@@ -139,6 +142,7 @@ export class AuthService {
     }
   }
 
+  // 구글 Oauth 로그인
   async googleLogin(code: string) {
     try {
       // 1. 구글 토큰 요청
@@ -213,6 +217,7 @@ export class AuthService {
     }
   }
 
+  // 계정 조회 or 생성
   async findOrCreateAccount(data: {
     sub: string;
     email: string;
