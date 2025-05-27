@@ -1,6 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleAuthDto } from './dto/google-auth.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -27,5 +29,14 @@ export class AuthController {
   @Post('google/callback')
   async googleCallback(@Body() body: GoogleAuthDto) {
     return await this.authService.googleLogin(body.code);
+  }
+
+  @Post('refresh')
+  @UseGuards(AuthGuard('jwt'))
+  async handleRefresh(
+    @CurrentUserId() userId: number,
+    @Body() body: { code: string },
+  ) {
+    return await this.authService.handleRefresh(userId, body.code);
   }
 }

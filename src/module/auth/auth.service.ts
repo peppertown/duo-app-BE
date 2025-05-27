@@ -253,4 +253,34 @@ export class AuthService {
       );
     }
   }
+
+  // 토큰 재발급
+  async handleRefresh(userId: number, refreshToken: string) {
+    const originRefreshToken = await this.redis.get(
+      `${process.env.REFRESH_KEY_JWT}:${userId}`,
+    );
+
+    if (originRefreshToken !== refreshToken) {
+      throw new HttpException(
+        '잘못된 리프레시 토큰입니다',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const newAccessToken = await this.generateAccessToken(userId);
+    const newRefreshToken = await this.generateRefreshToken(userId);
+
+    await this.saveServerRefreshToken(userId, refreshToken);
+
+    return {
+      message: {
+        code: 200,
+        text: '토큰 재발급이 완료되었습니다',
+      },
+      jwt: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    };
+  }
 }
