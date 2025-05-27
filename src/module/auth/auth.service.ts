@@ -23,7 +23,7 @@ export class AuthService {
     const { email, password } = data;
 
     // 중복 확인
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findFirst({
       where: { email },
     });
     if (existingUser) {
