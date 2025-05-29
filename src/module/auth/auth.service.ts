@@ -178,7 +178,7 @@ export class AuthService {
         profileUrl: picture,
         authProvider: 'Google',
       };
-      const user = await this.findOrCreateAccount(userData);
+      const { user, isNew } = await this.findOrCreateAccount(userData);
 
       // 4. JWT 발급 및 레디스 저장
       const accessToken = await this.generateAccessToken(user.id);
@@ -200,6 +200,7 @@ export class AuthService {
           nickname: user.nickname,
           profileUrl: user.profileUrl,
         },
+        isNew,
       };
     } catch (err) {
       if (err instanceof HttpException) {
@@ -225,6 +226,8 @@ export class AuthService {
     try {
       const { sub, email, nickname, profileUrl, authProvider } = data;
 
+      let isNew: boolean;
+
       let user = await this.prisma.user.findUnique({
         where: { sub },
       });
@@ -239,9 +242,10 @@ export class AuthService {
             authProvider,
           },
         });
+        isNew = true;
       }
 
-      return user;
+      return { user, isNew };
     } catch (err) {
       console.error('계정 조회 및 생성 중 에러 발생', err);
       throw new HttpException(
