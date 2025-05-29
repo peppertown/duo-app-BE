@@ -20,14 +20,8 @@ model User {
   password     String?
   nickname     String?
   profileUrl   String?
-  role         Role?
   authProvider String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-enum Role {
-  bf
-  gf
 }
