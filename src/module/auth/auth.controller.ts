@@ -1,6 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { GoogleAuthDto } from './dto/google-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -31,7 +30,7 @@ export class AuthController {
   @googleCallbackDocs.operation
   @googleCallbackDocs.body
   @googleCallbackDocs.response
-  async googleCallback(@Body() body: GoogleAuthDto) {
+  async googleCallback(@Body() body: { code: string }) {
     return await this.authService.googleLogin(body.code);
   }
 
