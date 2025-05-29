@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserRoleDto } from './dto/user-role.dto';
 
 @Injectable()
 export class UserService {
@@ -27,26 +26,26 @@ export class UserService {
   }
 
   // 유저 롤 설정
-  async setUserRole(userId: number, userRoleDto: UserRoleDto) {
-    try {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { role: userRoleDto.role },
-      });
+  // async setUserRole(userId: number, userRoleDto: UserRoleDto) {
+  //   try {
+  //     await this.prisma.user.update({
+  //       where: { id: userId },
+  //       data: { role: userRoleDto.role },
+  //     });
 
-      return {
-        message: {
-          code: 200,
-          text: 'role 설정이 완료되었습니다.',
-        },
-        user: { role: userRoleDto.role },
-      };
-    } catch (err) {
-      console.error('롤 설정 중 에러 발생', err);
-      throw new HttpException(
-        '롤 설정 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+  //     return {
+  //       message: {
+  //         code: 200,
+  //         text: 'role 설정이 완료되었습니다.',
+  //       },
+  //       user: { role: userRoleDto.role },
+  //     };
+  //   } catch (err) {
+  //     console.error('롤 설정 중 에러 발생', err);
+  //     throw new HttpException(
+  //       '롤 설정 중 오류가 발생했습니다.',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
 }
