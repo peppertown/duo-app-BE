@@ -41,12 +41,21 @@ export class AuthService {
       },
     });
 
+    const accessToken = await this.generateAccessToken(newUser.id);
+    const refreshToken = await this.generateRefreshToken(newUser.id);
+
+    await this.saveServerRefreshToken(newUser.id, refreshToken);
+
     return {
       message: '회원가입 성공',
       user: {
         id: newUser.id,
         email: newUser.email,
         nickname: newUser.nickname,
+      },
+      jwt: {
+        accessToken,
+        refreshToken,
       },
     };
   }
