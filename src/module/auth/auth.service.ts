@@ -79,7 +79,6 @@ export class AuthService {
       },
       user: {
         nickname: user.nickname,
-        role: user.role,
       },
       jwt: {
         accessToken,
