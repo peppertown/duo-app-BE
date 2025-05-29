@@ -21,6 +21,7 @@ export class AuthService {
 
   async register(data: { email: string; password: string }) {
     const { email, password } = data;
+    const nickname = email.split('@')[0];
 
     // 중복 확인
     const existingUser = await this.prisma.user.findFirst({
@@ -36,6 +37,7 @@ export class AuthService {
       data: {
         email,
         password: hashedPassword,
+        nickname,
       },
     });
 
