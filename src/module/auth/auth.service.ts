@@ -92,7 +92,7 @@ export class AuthService {
     try {
       return await this.jwt.signAsync(
         { userId },
-        { expiresIn: '10s' }, // 액세스 토큰 1시간
+        { expiresIn: '1h' }, // 액세스 토큰 1시간
       );
     } catch (err) {
       console.error('액세스 토큰 생성 실패:', err);
