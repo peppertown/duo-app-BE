@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import axios from 'axios';
+import { generateRandomString } from 'src/common/utils/random.util';
 
 @Injectable()
 export class AuthService {
@@ -135,7 +136,7 @@ export class AuthService {
     try {
       const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
       const ttlSeconds = 7 * 24 * 60 * 60; // 7일
-      await this.redis.set(key, refreshToken, ttlSeconds);
+      await this.redis.set(key, refreshToken, 'EX', ttlSeconds);
     } catch (err) {
       console.error('JWT 리프레시 토큰 레디스 저장 실패', err);
       throw new HttpException(
@@ -223,6 +224,49 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async generateGoogleLoginCode(code: string) {
+    // 1. 구글 토큰 요청
+    const decodedCode = decodeURIComponent(code);
+    const tokenResponse = await axios.post(
+      'https://oauth2.googleapis.com/token',
+      {
+        code: decodedCode,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      },
+      { headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const { id_token } = tokenResponse.data;
+
+    // 2. id_token 디코딩 (검증 포함 가능)
+    const decoded = this.jwt.decode(id_token) as {
+      sub: string;
+      email: string;
+      name: string;
+      picture: string;
+    };
+
+    if (!decoded?.sub) {
+      throw new HttpException(
+        '유효하지 않은 Google ID Token 입니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    // 3. 유저 데이터 추출 및 보안 코드 생성
+    const { sub, email, name, picture } = decoded;
+    const userData = { sub, email, nickname: name, profileUrl: picture };
+    const securityCode = generateRandomString();
+
+    // 4. 보안 코드와 유저 데이터 레디스에 저장
+    await this.redis.set(securityCode, JSON.stringify(userData), 'EX', 300);
+
+    return securityCode;
   }
 
   // 계정 조회 or 생성
