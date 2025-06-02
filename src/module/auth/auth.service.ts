@@ -295,6 +295,9 @@ export class AuthService {
         );
       }
 
+      // 유저 데이터 확인 후 redis에서 제거
+      await this.redis.del(securityCode);
+
       // 유저 데이터 파싱 후 DB 저장
       const userData = { ...JSON.parse(data), authProvider: 'Google' };
       const { user, isNew } = await this.findOrCreateAccount(userData);
