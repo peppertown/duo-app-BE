@@ -269,6 +269,46 @@ export class AuthService {
     return securityCode;
   }
 
+  async verifyGoogleSecurityCode(securityCode: string) {
+    // redis에서 보안 코드와 일치하는 값 확인
+    const data = await this.redis.get(securityCode);
+
+    if (!data) {
+      throw new HttpException(
+        '유효하지 않은 구글 보안 코드 입니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    // 유저 데이터 파싱 후 DB 저장
+    const userData = { ...JSON.parse(data), authProvider: 'Google' };
+    const { user, isNew } = await this.findOrCreateAccount(userData);
+
+    // 토큰 발급
+    const accessToken = await this.generateAccessToken(user.id);
+    const refreshToken = await this.generateRefreshToken(user.id);
+
+    // 리프레시 토큰 redis 저장
+    await this.saveServerRefreshToken(user.id, refreshToken);
+
+    return {
+      message: {
+        code: 200,
+        text: '구글 로그인이 완료되었습니다.',
+      },
+      jwt: {
+        accessToken,
+        refreshToken,
+      },
+      user: {
+        email: user.email,
+        nickname: user.nickname,
+        profileUrl: user.profileUrl,
+      },
+      isNew,
+    };
+  }
+
   // 계정 조회 or 생성
   async findOrCreateAccount(data: {
     sub: string;
