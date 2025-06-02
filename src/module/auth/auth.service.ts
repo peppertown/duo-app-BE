@@ -349,7 +349,7 @@ export class AuthService {
     try {
       const { sub, email, nickname, profileUrl, authProvider } = data;
 
-      let isNew: boolean;
+      let isNew: boolean = false;
 
       let user = await this.prisma.user.findUnique({
         where: { sub },
