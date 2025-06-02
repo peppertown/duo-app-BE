@@ -136,7 +136,7 @@ export class AuthService {
     try {
       const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
       const ttlSeconds = 7 * 24 * 60 * 60; // 7일
-      await this.redis.set(key, refreshToken, 'EX', ttlSeconds);
+      await this.redis.set(key, refreshToken, ttlSeconds);
     } catch (err) {
       console.error('JWT 리프레시 토큰 레디스 저장 실패', err);
       throw new HttpException(
@@ -264,7 +264,7 @@ export class AuthService {
     const securityCode = generateRandomString();
 
     // 4. 보안 코드와 유저 데이터 레디스에 저장
-    await this.redis.set(securityCode, JSON.stringify(userData), 'EX', 300);
+    await this.redis.set(securityCode, JSON.stringify(userData), 300);
 
     return securityCode;
   }
