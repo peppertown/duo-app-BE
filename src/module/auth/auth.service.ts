@@ -240,7 +240,7 @@ export class AuthService {
           redirect_uri: process.env.GOOGLE_REDIRECT_URI,
           grant_type: 'authorization_code',
         },
-        { headers: { 'Content-Type': 'application/json' } },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
       );
 
       const { id_token } = tokenResponse.data;
