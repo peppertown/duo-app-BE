@@ -1,9 +1,19 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { googleCallbackDocs, handleRefreshDocs } from './docs/auth.docs';
+import { handleRefreshDocs } from './docs/auth.docs';
+import { Response } from 'express';
+import { buildGoogleOAuthUrl } from './utils/oauth.utils';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -26,12 +36,25 @@ export class AuthController {
     return await this.authService.register(body);
   }
 
-  @Post('google/callback')
-  @googleCallbackDocs.operation
-  @googleCallbackDocs.body
-  @googleCallbackDocs.response
-  async googleCallback(@Body() body: { code: string }) {
-    return await this.authService.googleLogin(body.code);
+  @Get('google')
+  redirectToGoogle(@Res() res: Response) {
+    const authUrl = buildGoogleOAuthUrl();
+    return res.redirect(authUrl);
+  }
+
+  @Get('google/callback')
+  async handleGoogleCallback(
+    @Query('code') code: string,
+    @Res() res: Response,
+  ) {
+    const securityCode = await this.authService.generateGoogleLoginCode(code);
+    const redirectUrl = `${process.env.DEEPLINK_URL}?securityCode=${securityCode}`;
+    return res.redirect(redirectUrl);
+  }
+
+  @Post('google/verify')
+  async verifyGoogleSecurityCode(@Body('securityCode') securityCode: string) {
+    return await this.authService.verifyGoogleSecurityCode(securityCode);
   }
 
   @Post('refresh')
