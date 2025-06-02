@@ -226,87 +226,113 @@ export class AuthService {
     }
   }
 
+  // 구글 로그인 후 보안 코드 생성
   async generateGoogleLoginCode(code: string) {
-    // 1. 구글 토큰 요청
-    const decodedCode = decodeURIComponent(code);
-    const tokenResponse = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      {
-        code: decodedCode,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-        grant_type: 'authorization_code',
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    );
+    try {
+      // 1. 구글 토큰 요청
+      const decodedCode = decodeURIComponent(code);
+      const tokenResponse = await axios.post(
+        'https://oauth2.googleapis.com/token',
+        {
+          code: decodedCode,
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+          grant_type: 'authorization_code',
+        },
+        { headers: { 'Content-Type': 'application/json' } },
+      );
 
-    const { id_token } = tokenResponse.data;
+      const { id_token } = tokenResponse.data;
 
-    // 2. id_token 디코딩 (검증 포함 가능)
-    const decoded = this.jwt.decode(id_token) as {
-      sub: string;
-      email: string;
-      name: string;
-      picture: string;
-    };
+      // 2. id_token 디코딩 (검증 포함 가능)
+      const decoded = this.jwt.decode(id_token) as {
+        sub: string;
+        email: string;
+        name: string;
+        picture: string;
+      };
 
-    if (!decoded?.sub) {
+      if (!decoded?.sub) {
+        throw new HttpException(
+          '유효하지 않은 Google ID Token 입니다.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // 3. 유저 데이터 추출 및 보안 코드 생성
+      const { sub, email, name, picture } = decoded;
+      const userData = { sub, email, nickname: name, profileUrl: picture };
+      const securityCode = generateRandomString();
+
+      // 4. 보안 코드와 유저 데이터 레디스에 저장
+      await this.redis.set(securityCode, JSON.stringify(userData), 300);
+
+      return securityCode;
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      console.error('구글 로그인 보안 코드 생성 중 에러 발생', err);
       throw new HttpException(
-        '유효하지 않은 Google ID Token 입니다.',
-        HttpStatus.UNAUTHORIZED,
+        '구글 로그인 보안 코드 생성 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
-    // 3. 유저 데이터 추출 및 보안 코드 생성
-    const { sub, email, name, picture } = decoded;
-    const userData = { sub, email, nickname: name, profileUrl: picture };
-    const securityCode = generateRandomString();
-
-    // 4. 보안 코드와 유저 데이터 레디스에 저장
-    await this.redis.set(securityCode, JSON.stringify(userData), 300);
-
-    return securityCode;
   }
 
+  // 구글 보안 코드 인증 후 유저 데이터 반환
   async verifyGoogleSecurityCode(securityCode: string) {
-    // redis에서 보안 코드와 일치하는 값 확인
-    const data = await this.redis.get(securityCode);
+    try {
+      // redis에서 보안 코드와 일치하는 값 확인
+      const data = await this.redis.get(securityCode);
 
-    if (!data) {
+      if (!data) {
+        throw new HttpException(
+          '유효하지 않은 구글 보안 코드 입니다.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // 유저 데이터 파싱 후 DB 저장
+      const userData = { ...JSON.parse(data), authProvider: 'Google' };
+      const { user, isNew } = await this.findOrCreateAccount(userData);
+
+      // 토큰 발급
+      const accessToken = await this.generateAccessToken(user.id);
+      const refreshToken = await this.generateRefreshToken(user.id);
+
+      // 리프레시 토큰 redis 저장
+      await this.saveServerRefreshToken(user.id, refreshToken);
+
+      return {
+        message: {
+          code: 200,
+          text: '구글 로그인이 완료되었습니다.',
+        },
+        jwt: {
+          accessToken,
+          refreshToken,
+        },
+        user: {
+          email: user.email,
+          nickname: user.nickname,
+          profileUrl: user.profileUrl,
+        },
+        isNew,
+      };
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      console.error('구글 보안 코드 인증 중 에러 발생', err);
       throw new HttpException(
-        '유효하지 않은 구글 보안 코드 입니다.',
-        HttpStatus.UNAUTHORIZED,
+        '구글 보안 코드 인증 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
-    // 유저 데이터 파싱 후 DB 저장
-    const userData = { ...JSON.parse(data), authProvider: 'Google' };
-    const { user, isNew } = await this.findOrCreateAccount(userData);
-
-    // 토큰 발급
-    const accessToken = await this.generateAccessToken(user.id);
-    const refreshToken = await this.generateRefreshToken(user.id);
-
-    // 리프레시 토큰 redis 저장
-    await this.saveServerRefreshToken(user.id, refreshToken);
-
-    return {
-      message: {
-        code: 200,
-        text: '구글 로그인이 완료되었습니다.',
-      },
-      jwt: {
-        accessToken,
-        refreshToken,
-      },
-      user: {
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-      },
-      isNew,
-    };
   }
 
   // 계정 조회 or 생성
