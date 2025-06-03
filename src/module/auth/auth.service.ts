@@ -85,6 +85,12 @@ export class AuthService {
 
     await this.saveServerRefreshToken(user.id, refreshToken);
 
+    const couple = await this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: user.id }, { bId: user.id }],
+      },
+    });
+
     return {
       success: true,
       message: {
@@ -94,6 +100,7 @@ export class AuthService {
       user: {
         nickname: user.nickname,
         code: user.code,
+        coupleId: couple.id,
       },
       jwt: {
         accessToken,
@@ -312,6 +319,12 @@ export class AuthService {
       // 리프레시 토큰 redis 저장
       await this.saveServerRefreshToken(user.id, refreshToken);
 
+      const couple = await this.prisma.couple.findFirst({
+        where: {
+          OR: [{ aId: user.id }, { bId: user.id }],
+        },
+      });
+
       return {
         message: {
           code: 200,
@@ -326,6 +339,7 @@ export class AuthService {
           nickname: user.nickname,
           profileUrl: user.profileUrl,
           code: user.code,
+          coupleId: couple.id,
         },
         isNew,
       };
@@ -395,6 +409,12 @@ export class AuthService {
 
     await this.saveServerRefreshToken(userId, refreshToken);
 
+    const couple = await this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: userId }, { bId: userId }],
+      },
+    });
+
     return {
       message: {
         code: 200,
@@ -403,6 +423,9 @@ export class AuthService {
       jwt: {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
+      },
+      user: {
+        coupleId: couple.id,
       },
     };
   }
