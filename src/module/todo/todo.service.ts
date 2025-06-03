@@ -38,10 +38,7 @@ export class TodoService {
 
   async todoDoneHandler(userId: number, todoId: number) {
     try {
-      const auth = await this.prisma.todo.findUnique({ where: { id: todoId } });
-      if (auth.writerId !== userId) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
+      const auth = await this.confirmTodoAuth(userId, todoId);
 
       const result = await this.prisma.todo.update({
         where: { id: todoId },
@@ -67,10 +64,7 @@ export class TodoService {
 
   async deleteTodo(userId: number, todoId: number) {
     try {
-      const auth = await this.prisma.todo.findUnique({ where: { id: todoId } });
-      if (auth.writerId !== userId) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
+      await this.confirmTodoAuth(userId, todoId);
 
       await this.prisma.todo.delete({ where: { id: todoId } });
 
@@ -88,5 +82,14 @@ export class TodoService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async confirmTodoAuth(userId: number, todoId: number) {
+    const todo = await this.prisma.todo.findUnique({ where: { id: todoId } });
+    if (todo.writerId !== userId) {
+      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    return todo;
   }
 }
