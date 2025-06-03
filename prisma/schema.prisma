@@ -21,7 +21,37 @@ model User {
   nickname     String?
   profileUrl   String?
   authProvider String?
+  code         String  @unique
+
+  couplesAsA Couple[] @relation("CoupleA")
+  couplesAsB Couple[] @relation("CoupleB")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Todo      Todo[]
+}
+
+model Couple {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  aId         Int
+  bId         Int
+  a           User      @relation("CoupleA", fields: [aId], references: [id])
+  b           User      @relation("CoupleB", fields: [bId], references: [id])
+  createdAt   DateTime  @default(now())
+  anniversary DateTime?
+  Todo        Todo[]
+}
+
+model Todo {
+  id        Int      @id @default(autoincrement())
+  coupleId  Int
+  writerId  Int
+  content   String
+  isDone    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  couple Couple @relation(fields: [coupleId], references: [id])
+  writer User   @relation(fields: [writerId], references: [id])
 }
