@@ -17,7 +17,7 @@ export class TodoService {
     };
   }
 
-  async getTodos(userId: number, coupleId: number) {
+  async getTodos(coupleId: number) {
     const todos = await this.prisma.todo.findMany({
       where: { coupleId },
     });

@@ -31,11 +31,8 @@ export class TodoController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getTodos(
-    @CurrentUserId() userId: number,
-    @Query('coupleId') coupleId: number,
-  ) {
-    return await this.todoService.getTodos(userId, coupleId);
+  async getTodos(@Query('coupleId') coupleId: number) {
+    return await this.todoService.getTodos(coupleId);
   }
 
   @Delete(':todoId')
