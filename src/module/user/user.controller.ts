@@ -23,6 +23,12 @@ export class UserController {
     return await this.userService.setUserNickname(userId, body.nickname);
   }
 
+  @Post('match')
+  @UseGuards(AuthGuard('jwt'))
+  async matchUser(@CurrentUserId() userId: number, @Body('code') code: string) {
+    return await this.userService.matchUser(userId, code);
+  }
+
   // @Post('role')
   // @UseGuards(AuthGuard('jwt'))
   // @ApiBearerAuth()

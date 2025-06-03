@@ -25,6 +25,46 @@ export class UserService {
     }
   }
 
+  // 커플 연결
+  async matchUser(userId: number, code: string) {
+    try {
+      const partner = await this.prisma.user.findUnique({
+        where: { code },
+      });
+
+      if (!partner) {
+        throw new HttpException('잘못된 코드 입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const couple = await this.prisma.couple.create({
+        data: {
+          aId: userId,
+          bId: partner.id,
+        },
+      });
+
+      return {
+        message: {
+          code: 200,
+          text: '커플 연결이 완료되었습니다',
+        },
+        couple: {
+          id: couple.id,
+        },
+      };
+    } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      console.error('커플 연결 중 에러 발생', err);
+      throw new HttpException(
+        '커플 연결 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 유저 롤 설정
   // async setUserRole(userId: number, userRoleDto: UserRoleDto) {
   //   try {
