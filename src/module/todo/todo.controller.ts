@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,5 +18,14 @@ export class TodoController {
       body.coupleId,
       body.content,
     );
+  }
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  async getTodos(
+    @CurrentUserId() userId: number,
+    @Query('coupleId') coupleId: number,
+  ) {
+    return await this.todoService.getTodos(userId, coupleId);
   }
 }
