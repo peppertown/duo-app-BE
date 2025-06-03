@@ -35,6 +35,15 @@ export class TodoController {
     return await this.todoService.getTodos(coupleId);
   }
 
+  @Post(':todoId')
+  @UseGuards(AuthGuard('jwt'))
+  async todoDoneHandler(
+    @CurrentUserId() userId: number,
+    @Param('todoId') todoId: number,
+  ) {
+    return await this.todoService.todoDoneHandler(userId, todoId);
+  }
+
   @Delete(':todoId')
   @UseGuards(AuthGuard('jwt'))
   async deleteTodo(

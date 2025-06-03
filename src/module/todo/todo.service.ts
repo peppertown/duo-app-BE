@@ -36,6 +36,35 @@ export class TodoService {
     return { todosByUser };
   }
 
+  async todoDoneHandler(userId: number, todoId: number) {
+    try {
+      const auth = await this.prisma.todo.findUnique({ where: { id: todoId } });
+      if (auth.writerId !== userId) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const result = await this.prisma.todo.update({
+        where: { id: todoId },
+        data: { isDone: !auth.isDone },
+      });
+
+      return {
+        messsage: { code: 200, text: '투두 완료 상태가 변경되었습니다.' },
+        todo: result,
+      };
+    } catch (err) {
+      console.error('투두 완료 상태 변경 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '투두 완료 상태 변경 중 에러가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async deleteTodo(userId: number, todoId: number) {
     try {
       const auth = await this.prisma.todo.findUnique({ where: { id: todoId } });
