@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getCoupleUsersIds } from 'src/common/utils/couple.util';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -34,5 +34,30 @@ export class TodoService {
     }
 
     return { todosByUser };
+  }
+
+  async deleteTodo(userId: number, todoId: number) {
+    try {
+      const auth = await this.prisma.todo.findUnique({ where: { id: todoId } });
+      if (auth.writerId !== userId) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.todo.delete({ where: { id: todoId } });
+
+      return {
+        messsage: { code: 200, text: '투두가 삭제되었습니다.' },
+      };
+    } catch (err) {
+      console.error('투두 삭제 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '투두 삭제 중 에러가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
