@@ -32,7 +32,7 @@ export class UserService {
         where: { code },
       });
 
-      if (!partner) {
+      if (!partner || partner.id == userId) {
         throw new HttpException('잘못된 코드 입니다.', HttpStatus.BAD_REQUEST);
       }
 
