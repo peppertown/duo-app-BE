@@ -33,12 +33,13 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const randomCode = generateRandomString();
     const newUser = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         nickname,
+        code: randomCode,
       },
     });
 
@@ -53,6 +54,7 @@ export class AuthService {
         id: newUser.id,
         email: newUser.email,
         nickname: newUser.nickname,
+        code: newUser.code,
       },
       jwt: {
         accessToken,
@@ -91,6 +93,7 @@ export class AuthService {
       },
       user: {
         nickname: user.nickname,
+        code: user.code,
       },
       jwt: {
         accessToken,
@@ -322,6 +325,7 @@ export class AuthService {
           email: user.email,
           nickname: user.nickname,
           profileUrl: user.profileUrl,
+          code: user.code,
         },
         isNew,
       };
@@ -347,7 +351,7 @@ export class AuthService {
     authProvider: string;
   }) {
     try {
-      const { sub, email, nickname, profileUrl, authProvider } = data;
+      const { sub } = data;
 
       let isNew: boolean = false;
 
@@ -356,14 +360,9 @@ export class AuthService {
       });
 
       if (!user) {
+        const randomCode = generateRandomString();
         user = await this.prisma.user.create({
-          data: {
-            sub,
-            email,
-            nickname,
-            profileUrl,
-            authProvider,
-          },
+          data: { ...data, code: randomCode },
         });
         isNew = true;
       }
