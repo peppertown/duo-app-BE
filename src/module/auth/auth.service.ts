@@ -103,6 +103,7 @@ export class AuthService {
       user: {
         id: user.id,
         nickname: user.nickname,
+        profileUrl: user.profileUrl,
         code: user.code,
         coupleId,
       },
