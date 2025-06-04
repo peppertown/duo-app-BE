@@ -43,6 +43,28 @@ export class CoupleService {
     };
   }
 
+  // 커플 이름 설정
+  async setCoupleName(userId: number, coupleId: number, name: string) {
+    const auth = await this.confirmCoupleAuth(userId, coupleId);
+    if (!auth) {
+      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    const couple = await this.prisma.couple.update({
+      where: { id: coupleId },
+      data: { name },
+    });
+
+    return {
+      message: { code: 200, text: '커플 이름 설정이 완료되었습니다.' },
+      couple: {
+        id: couple.id,
+        name: couple.name,
+        anniversary: couple.anniversary,
+      },
+    };
+  }
+
   // 커플 관련 api 권한 확인
   async confirmCoupleAuth(userId: number, coupleId: number) {
     const coupleIds = await this.prisma.couple.findUnique({

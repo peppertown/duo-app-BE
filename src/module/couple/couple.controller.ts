@@ -26,4 +26,14 @@ export class CoupleController {
       anniversary,
     );
   }
+
+  @Post(':coupleId/name')
+  @UseGuards(AuthGuard('jwt'))
+  async setCoupleName(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Body('name') name: string,
+  ) {
+    return await this.coupleService.setCoupleName(userId, coupleId, name);
+  }
 }
