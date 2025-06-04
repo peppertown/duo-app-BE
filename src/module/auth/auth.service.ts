@@ -40,6 +40,7 @@ export class AuthService {
         password: hashedPassword,
         nickname,
         code: randomCode,
+        profileUrl: process.env.DEFAULT_PROFILE_URL,
       },
     });
 
