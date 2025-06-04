@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -13,7 +13,33 @@ export class CoupleService {
 
     return {
       message: { code: 200, text: '커플 데이터 조회에 성공했습니다.' },
-      couple: { id: couple.id, name: couple.name, anniversary: couple.aId },
+      couple: {
+        id: couple.id,
+        name: couple.name,
+        anniversary: couple.anniversary,
+      },
+    };
+  }
+
+  // 기념일 설정
+  async setAnniversary(userId: number, coupleId: number, anniversary: string) {
+    const auth = await this.confirmCoupleAuth(userId, coupleId);
+    if (!auth) {
+      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    const couple = await this.prisma.couple.update({
+      where: { id: coupleId },
+      data: { anniversary: new Date(anniversary) },
+    });
+
+    return {
+      message: { code: 200, text: '기념일 설정이 완료되었습니다.' },
+      couple: {
+        id: couple.id,
+        name: couple.name,
+        anniversary: couple.anniversary,
+      },
     };
   }
 
