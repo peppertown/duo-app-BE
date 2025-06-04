@@ -50,7 +50,6 @@ model Todo {
   content   String
   isDone    Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   couple Couple @relation(fields: [coupleId], references: [id])
   writer User   @relation(fields: [writerId], references: [id])
