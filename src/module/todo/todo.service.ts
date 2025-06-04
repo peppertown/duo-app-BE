@@ -17,7 +17,11 @@ export class TodoService {
     };
   }
 
-  async getTodos(coupleId: number) {
+  async getTodos(userId: number, coupleId: number) {
+    if (!coupleId) {
+      return await this.getSoloTodo(userId);
+    }
+
     const todos = await this.prisma.todo.findMany({
       where: { coupleId },
     });
@@ -32,6 +36,26 @@ export class TodoService {
         todos: todos.filter((todo) => todo.writerId === user.id),
       };
     }
+
+    return {
+      message: { code: 200, text: '투두 조회에 성공했습니다.' },
+      todosByUser,
+    };
+  }
+
+  async getSoloTodo(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    const todos = await this.prisma.todo.findMany({
+      where: { writerId: userId },
+    });
+
+    const todosByUser = {
+      [userId]: {
+        nickname: user.nickname,
+        todos,
+      },
+    };
 
     return {
       message: { code: 200, text: '투두 조회에 성공했습니다.' },

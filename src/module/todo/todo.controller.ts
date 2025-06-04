@@ -47,8 +47,11 @@ export class TodoController {
   @getTodosDocs.operation
   @getTodosDocs.query
   @getTodosDocs.response
-  async getTodos(@Query('coupleId') coupleId: number) {
-    return await this.todoService.getTodos(coupleId);
+  async getTodos(
+    @CurrentUserId() userId: number,
+    @Query('coupleId') coupleId: number,
+  ) {
+    return await this.todoService.getTodos(userId, coupleId);
   }
 
   @Post(':todoId')
