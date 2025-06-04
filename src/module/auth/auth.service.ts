@@ -91,7 +91,7 @@ export class AuthService {
       },
     });
 
-    const coupleId = couple ? couple.id : 0;
+    const coupleId = couple ? couple.id : null;
 
     return {
       success: true,
@@ -328,7 +328,7 @@ export class AuthService {
         },
       });
 
-      const coupleId = couple ? couple.id : 0;
+      const coupleId = couple ? couple.id : null;
 
       return {
         message: {
