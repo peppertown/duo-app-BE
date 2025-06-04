@@ -422,6 +422,8 @@ export class AuthService {
       },
     });
 
+    const coupleId = couple ? couple.id : null;
+
     return {
       message: {
         code: 200,
@@ -432,7 +434,7 @@ export class AuthService {
         refreshToken: newRefreshToken,
       },
       user: {
-        coupleId: couple.id,
+        coupleId,
       },
     };
   }
