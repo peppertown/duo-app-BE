@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import axios from 'axios';
 import { generateRandomString } from 'src/common/utils/random.util';
+import { getPartnerData } from 'src/common/utils/couple.util';
 
 @Injectable()
 export class AuthService {
@@ -94,6 +95,8 @@ export class AuthService {
 
     const coupleId = couple ? couple.id : null;
 
+    const partner = await getPartnerData(user.id, coupleId);
+
     return {
       success: true,
       message: {
@@ -107,6 +110,7 @@ export class AuthService {
         code: user.code,
         coupleId,
       },
+      partner,
       jwt: {
         accessToken,
         refreshToken,
@@ -332,6 +336,8 @@ export class AuthService {
 
       const coupleId = couple ? couple.id : null;
 
+      const partner = await getPartnerData(user.id, coupleId);
+
       return {
         message: {
           code: 200,
@@ -349,6 +355,7 @@ export class AuthService {
           code: user.code,
           coupleId,
         },
+        partner,
         isNew,
       };
     } catch (err) {
