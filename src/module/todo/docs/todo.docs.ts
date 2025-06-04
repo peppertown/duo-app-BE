@@ -112,6 +112,16 @@ export const getTodosDocs = {
         },
       },
       example: {
+        messsage: {
+          type: 'object',
+          properties: {
+            code: { type: 'number', example: '응답 코드(200) | number' },
+            text: {
+              type: 'string',
+              example: '투두 조회에 성공했습니다. | string',
+            },
+          },
+        },
         todosByUser: {
           '유저 아이디1': {
             nickname: '유저1 닉네임 | string',

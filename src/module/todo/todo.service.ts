@@ -33,7 +33,10 @@ export class TodoService {
       };
     }
 
-    return { todosByUser };
+    return {
+      message: { code: 200, text: '투두 조회에 성공했습니다.' },
+      todosByUser,
+    };
   }
 
   async todoDoneHandler(userId: number, todoId: number) {
