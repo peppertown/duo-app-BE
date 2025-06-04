@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getCoupleUsersIds } from 'src/common/utils/couple.util';
+import { getCoupleUsersData } from 'src/common/utils/couple.util';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class TodoService {
       where: { coupleId },
     });
 
-    const users = await getCoupleUsersIds(coupleId);
+    const users = await getCoupleUsersData(coupleId);
 
     const todosByUser: Record<number, { nickname: string; todos: any[] }> = {};
     for (const key of ['a', 'b']) {
