@@ -16,4 +16,14 @@ export class CoupleService {
       couple: { id: couple.id, name: couple.name, anniversary: couple.aId },
     };
   }
+
+  // 커플 관련 api 권한 확인
+  async confirmCoupleAuth(userId: number, coupleId: number) {
+    const coupleIds = await this.prisma.couple.findUnique({
+      where: { id: coupleId },
+    });
+
+    const isValid = coupleIds.aId == userId || coupleIds.bId == userId;
+    return isValid;
+  }
 }
