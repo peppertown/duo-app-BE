@@ -91,3 +91,50 @@ export const setUserRoleDocs = {
     },
   }),
 };
+
+export const matchUserDocs = {
+  operation: ApiOperation({
+    summary: '커플 연결(매칭)',
+    description: '코드(code)로 두 사용자를 커플로 연결합니다. (JWT 필요)',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        code: { type: 'string', example: '상대방 코드' },
+      },
+      required: ['code'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '커플 연결 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'object',
+          properties: {
+            code: { type: 'number', example: '응답 코드(200)' },
+            text: { type: 'string', example: '커플 연결이 완료되었습니다' },
+          },
+        },
+        couple: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: '생성된 커플 id' },
+          },
+        },
+      },
+      example: {
+        message: {
+          code: '응답 코드(200)',
+          text: '커플 연결이 완료되었습니다',
+        },
+        couple: {
+          id: '생성된 커플 id | number',
+        },
+      },
+    },
+  }),
+};

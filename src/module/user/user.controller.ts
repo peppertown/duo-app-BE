@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
-import { setUserNicknameDocs } from './docs/user.docs';
+import { matchUserDocs, setUserNicknameDocs } from './docs/user.docs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('user')
@@ -25,6 +25,10 @@ export class UserController {
 
   @Post('match')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @matchUserDocs.operation
+  @matchUserDocs.body
+  @matchUserDocs.response
   async matchUser(@CurrentUserId() userId: number, @Body('code') code: string) {
     return await this.userService.matchUser(userId, code);
   }
