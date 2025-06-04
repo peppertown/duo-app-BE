@@ -11,7 +11,11 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { handleRefreshDocs } from './docs/auth.docs';
+import {
+  handleRefreshDocs,
+  loginDocs,
+  verifyGoogleSecurityCodeDocs,
+} from './docs/auth.docs';
 import { Response } from 'express';
 import { buildGoogleOAuthUrl } from './utils/oauth.utils';
 
@@ -21,6 +25,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @loginDocs.operation
+  @loginDocs.body
+  @loginDocs.response
   async login(@Body() body: { email: string; password: string }) {
     return await this.authService.login(body);
   }
@@ -53,6 +60,9 @@ export class AuthController {
   }
 
   @Post('google/verify')
+  @verifyGoogleSecurityCodeDocs.operation
+  @verifyGoogleSecurityCodeDocs.body
+  @verifyGoogleSecurityCodeDocs.response
   async verifyGoogleSecurityCode(@Body('securityCode') securityCode: string) {
     return await this.authService.verifyGoogleSecurityCode(securityCode);
   }

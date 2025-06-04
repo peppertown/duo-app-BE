@@ -100,3 +100,143 @@ export const handleRefreshDocs = {
     },
   }),
 };
+
+export const verifyGoogleSecurityCodeDocs = {
+  operation: ApiOperation({
+    summary: '구글 로그인 보안 코드 인증',
+    description:
+      '딥링크로 전달받은 securityCode를 검증해 로그인 처리를 완료합니다.',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        securityCode: { type: 'string', example: '구글 보안 코드 | string' },
+      },
+      required: ['securityCode'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '구글 로그인 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'object',
+          properties: {
+            code: { type: 'number', example: '응답 코드(200) | number' },
+            text: {
+              type: 'string',
+              example: '구글 로그인이 완료되었습니다. | string',
+            },
+          },
+        },
+        jwt: {
+          type: 'object',
+          properties: {
+            accessToken: { type: 'string', example: '액세스 토큰 | string' },
+            refreshToken: { type: 'string', example: '리프레시 토큰 | string' },
+          },
+        },
+        user: {
+          type: 'object',
+          properties: {
+            email: { type: 'string', example: '유저 이메일 | string' },
+            nickname: { type: 'string', example: '유저 닉네임 | string' },
+            profileUrl: { type: 'string', example: '프로필 URL | string' },
+            code: { type: 'string', example: '유저 코드 | string' },
+            coupleId: { type: 'number', example: '커플 id | number' },
+          },
+        },
+        isNew: { type: 'boolean', example: '신규 가입 여부 | boolean' },
+      },
+      example: {
+        message: {
+          code: '응답 코드(200) | number',
+          text: '구글 로그인이 완료되었습니다. | string',
+        },
+        jwt: {
+          accessToken: '액세스 토큰 | string',
+          refreshToken: '리프레시 토큰 | string',
+        },
+        user: {
+          email: '유저 이메일 | string',
+          nickname: '유저 닉네임 | string',
+          profileUrl: '프로필 URL | string',
+          code: '유저 코드 | string',
+          coupleId: '커플 id | number',
+        },
+        isNew: '신규 가입 여부 | boolean',
+      },
+    },
+  }),
+};
+
+export const loginDocs = {
+  operation: ApiOperation({
+    summary: '자체 로그인',
+    description: '이메일/비밀번호로 로그인합니다.',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: '유저 이메일 | string' },
+        password: { type: 'string', example: '비밀번호 | string' },
+      },
+      required: ['email', 'password'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '로그인 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: '로그인 성공 여부 | boolean' },
+        message: {
+          type: 'object',
+          properties: {
+            code: { type: 'number', example: '응답 코드(200) | number' },
+            text: {
+              type: 'string',
+              example: '로그인이 완료됐습니다. | string',
+            },
+          },
+        },
+        user: {
+          type: 'object',
+          properties: {
+            nickname: { type: 'string', example: '유저 닉네임 | string' },
+            code: { type: 'string', example: '유저 코드 | string' },
+            coupleId: { type: 'number', example: '커플 id | number' },
+          },
+        },
+        jwt: {
+          type: 'object',
+          properties: {
+            accessToken: { type: 'string', example: '액세스 토큰 | string' },
+            refreshToken: { type: 'string', example: '리프레시 토큰 | string' },
+          },
+        },
+      },
+      example: {
+        success: '로그인 성공 여부 | boolean',
+        message: {
+          code: '응답 코드(200) | number',
+          text: '로그인이 완료됐습니다. | string',
+        },
+        user: {
+          nickname: '유저 닉네임 | string',
+          code: '유저 코드 | string',
+          coupleId: '커플 id | number',
+        },
+        jwt: {
+          accessToken: '액세스 토큰 | string',
+          refreshToken: '리프레시 토큰 | string',
+        },
+      },
+    },
+  }),
+};

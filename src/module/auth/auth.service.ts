@@ -91,6 +91,8 @@ export class AuthService {
       },
     });
 
+    const coupleId = couple ? couple.id : 0;
+
     return {
       success: true,
       message: {
@@ -100,7 +102,7 @@ export class AuthService {
       user: {
         nickname: user.nickname,
         code: user.code,
-        coupleId: couple.id,
+        coupleId,
       },
       jwt: {
         accessToken,
@@ -325,6 +327,8 @@ export class AuthService {
         },
       });
 
+      const coupleId = couple ? couple.id : 0;
+
       return {
         message: {
           code: 200,
@@ -339,7 +343,7 @@ export class AuthService {
           nickname: user.nickname,
           profileUrl: user.profileUrl,
           code: user.code,
-          coupleId: couple.id,
+          coupleId,
         },
         isNew,
       };
