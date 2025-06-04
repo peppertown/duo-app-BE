@@ -161,6 +161,7 @@ export const verifyGoogleSecurityCodeDocs = {
           refreshToken: '리프레시 토큰 | string',
         },
         user: {
+          id: '유저 아이디 | number',
           email: '유저 이메일 | string',
           nickname: '유저 닉네임 | string',
           profileUrl: '프로필 URL | string',
@@ -228,6 +229,7 @@ export const loginDocs = {
           text: '로그인이 완료됐습니다. | string',
         },
         user: {
+          id: '유저 아이디 | number',
           nickname: '유저 닉네임 | string',
           code: '유저 코드 | string',
           coupleId: '커플 id | number',

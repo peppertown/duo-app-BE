@@ -100,6 +100,7 @@ export class AuthService {
         text: '로그인이 완료됐습니다.',
       },
       user: {
+        id: user.id,
         nickname: user.nickname,
         code: user.code,
         coupleId,
@@ -339,6 +340,7 @@ export class AuthService {
           refreshToken,
         },
         user: {
+          id: user.id,
           email: user.email,
           nickname: user.nickname,
           profileUrl: user.profileUrl,
