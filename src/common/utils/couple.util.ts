@@ -2,14 +2,30 @@ import { PrismaClient } from '@prisma/client';
 
 const primsa = new PrismaClient();
 
-export const getCoupleUsersIds = async (coupleId: number) => {
+export const getCoupleUsersData = async (coupleId: number) => {
   const couple = await primsa.couple.findUnique({
     where: { id: coupleId },
     select: {
-      a: { select: { id: true, nickname: true } },
-      b: { select: { id: true, nickname: true } },
+      a: true,
+      b: true,
     },
   });
 
   return { a: couple.a, b: couple.b };
+};
+
+export const getPartnerData = async (userId: number, coupleId: number) => {
+  if (!coupleId) return null;
+  const couple = await getCoupleUsersData(coupleId);
+
+  let partner = null;
+
+  for (const user in couple) {
+    if (couple[user].id !== userId) {
+      const { id, nickname, profileUrl, code } = couple[user];
+      partner = { id, nickname, profileUrl, code };
+    }
+  }
+
+  return partner;
 };
