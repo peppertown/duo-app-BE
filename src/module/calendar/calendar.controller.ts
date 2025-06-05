@@ -2,13 +2,23 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import {
+  createScheduleDocs,
+  getMonthlyScheduleDocs,
+} from './docs/calendar.docs';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('calendar')
 @Controller('calendar')
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @createScheduleDocs.operation
+  @createScheduleDocs.body
+  @createScheduleDocs.response
   async createSchedule(
     @CurrentUserId() userId: number,
     @Body()
@@ -28,8 +38,14 @@ export class CalendarController {
     );
   }
 
-  @Get('')
+  @Get()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @getMonthlyScheduleDocs.operation
+  @getMonthlyScheduleDocs.query1
+  @getMonthlyScheduleDocs.query2
+  @getMonthlyScheduleDocs.query3
+  @getMonthlyScheduleDocs.response
   async getMonthlySchedule(
     @CurrentUserId() userId: number,
     @Query('coupleId') coupleId: number,
