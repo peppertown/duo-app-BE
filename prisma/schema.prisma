@@ -58,11 +58,12 @@ model Todo {
 }
 
 model Schedule {
-  id       Int      @id @default(autoincrement())
-  userId   Int
-  coupleId Int?
-  date     DateTime
-  content  String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  coupleId  Int?
+  title     String
+  start     DateTime
+  end       DateTime
   createdAt DateTime @default(now())
 
   user   User    @relation(fields: [userId], references: [id])
