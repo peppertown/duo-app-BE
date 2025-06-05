@@ -12,17 +12,36 @@ export class CalendarService {
     start: string,
     end: string,
   ) {
-    const res = await this.prisma.schedule.create({
-      data: {
-        userId,
-        coupleId,
-        title,
-        start: new Date(start),
-        end: new Date(end),
-      },
-    });
+    try {
+      const schedule = await this.prisma.schedule.create({
+        data: {
+          userId,
+          coupleId,
+          title,
+          start: new Date(start),
+          end: new Date(end),
+        },
+      });
 
-    return res;
+      return {
+        message: {
+          code: 200,
+          text: '캘린더 일정 등록이 완료되었습니다.',
+          schedule: {
+            userId: schedule.userId,
+            title: schedule.title,
+            start: schedule.start,
+            end: schedule.end,
+          },
+        },
+      };
+    } catch (err) {
+      console.error('캘린더 일정 등록 중 에러 발생', err);
+      throw new HttpException(
+        '캘린더 일정 등록 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getMonthlySchedule(
