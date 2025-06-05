@@ -26,21 +26,23 @@ model User {
   couplesAsA Couple[] @relation("CoupleA")
   couplesAsB Couple[] @relation("CoupleB")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   Todo      Todo[]
+  Schedule  Schedule[]
 }
 
 model Couple {
-  id          Int       @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String?
   aId         Int
   bId         Int
-  a           User      @relation("CoupleA", fields: [aId], references: [id])
-  b           User      @relation("CoupleB", fields: [bId], references: [id])
-  createdAt   DateTime  @default(now())
+  a           User       @relation("CoupleA", fields: [aId], references: [id])
+  b           User       @relation("CoupleB", fields: [bId], references: [id])
+  createdAt   DateTime   @default(now())
   anniversary DateTime?
   Todo        Todo[]
+  Schedule    Schedule[]
 }
 
 model Todo {
@@ -53,4 +55,16 @@ model Todo {
 
   couple Couple? @relation(fields: [coupleId], references: [id])
   writer User    @relation(fields: [writerId], references: [id])
+}
+
+model Schedule {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  coupleId Int?
+  date     DateTime
+  content  String
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id])
 }
