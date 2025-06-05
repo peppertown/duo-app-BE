@@ -7,6 +7,7 @@ import { UserModule } from './module/user/user.module';
 import { TodoModule } from './module/todo/todo.module';
 import { S3Module } from './s3/s3.module';
 import { CoupleModule } from './module/couple/couple.module';
+import { CalendarModule } from './module/calendar/calendar.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CoupleModule } from './module/couple/couple.module';
     TodoModule,
     S3Module,
     CoupleModule,
+    CalendarModule,
   ],
   controllers: [AppController],
   providers: [AppService],
