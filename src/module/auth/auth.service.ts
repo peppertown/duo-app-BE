@@ -386,6 +386,63 @@ export class AuthService {
     }
   }
 
+  // 카카오 로그인
+  async kakaoLogin(accessToken: string) {
+    const userRes = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const kakaoData = userRes.data;
+
+    const { id } = kakaoData;
+    const { nickname, profile_image, email } = kakaoData.properties;
+
+    const { user, isNew } = await this.findOrCreateAccount({
+      sub: id.toString(),
+      email,
+      nickname,
+      profileUrl: profile_image,
+      authProvider: 'Kakao',
+    });
+
+    // 토큰 발급
+    const jwtAccessToken = await this.generateAccessToken(user.id);
+    const jwtRefreshToken = await this.generateRefreshToken(user.id);
+
+    // 리프레시 토큰 redis 저장
+    await this.saveServerRefreshToken(user.id, jwtRefreshToken);
+
+    const couple = await this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: user.id }, { bId: user.id }],
+      },
+    });
+
+    const coupleId = couple ? couple.id : null;
+    let partner = null;
+    if (coupleId) partner = await getPartnerData(user.id, coupleId);
+
+    return {
+      message: {
+        code: 200,
+        text: '카카오 로그인에 성공했습니다.',
+      },
+      jwt: {
+        accessToken: jwtAccessToken,
+        refreshToken: jwtRefreshToken,
+      },
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileUrl: user.profileUrl,
+        code: user.code,
+        coupleId,
+      },
+      partner,
+      isNew,
+    };
+  }
+
   // 계정 조회 or 생성
   async findOrCreateAccount(data: {
     sub: string;

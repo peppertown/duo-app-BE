@@ -58,6 +58,11 @@ export class AuthController {
     return await this.authService.verifyGoogleSecurityCode(securityCode);
   }
 
+  @Post('kakao')
+  async kakaoLogin(@Body('accessToken') accessToken: string) {
+    return await this.authService.kakaoLogin(accessToken);
+  }
+
   @Post('refresh')
   @handleRefreshDocs.operation
   @handleRefreshDocs.body
