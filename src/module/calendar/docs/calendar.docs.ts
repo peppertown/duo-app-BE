@@ -14,7 +14,7 @@ export const createScheduleDocs = {
         title: { type: 'string', example: '일정 제목 | string' },
         start: {
           type: 'string',
-          example: '일정 시작 (ex. 2025-06-05) | string',
+          example: '일정 시작 (ex. 2025-06-05T10:00) | string',
         },
         end: { type: 'string', example: '일정 종료  | string' },
       },
