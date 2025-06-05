@@ -4,6 +4,7 @@ import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import {
   handleRefreshDocs,
+  kakaoLoginDocs,
   loginDocs,
   verifyGoogleSecurityCodeDocs,
 } from './docs/auth.docs';
@@ -59,6 +60,9 @@ export class AuthController {
   }
 
   @Post('kakao')
+  @kakaoLoginDocs.operation
+  @kakaoLoginDocs.body
+  @kakaoLoginDocs.response
   async kakaoLogin(@Body('accessToken') accessToken: string) {
     return await this.authService.kakaoLogin(accessToken);
   }

@@ -256,3 +256,96 @@ export const loginDocs = {
     },
   }),
 };
+
+export const kakaoLoginDocs = {
+  operation: ApiOperation({
+    summary: '카카오 로그인',
+    description: '카카오 accessToken으로 로그인 처리를 완료합니다.',
+  }),
+
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string', example: '카카오 accessToken | string' },
+      },
+      required: ['accessToken'],
+    },
+  }),
+
+  response: ApiResponse({
+    status: 200,
+    description: '카카오 로그인 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'object',
+          properties: {
+            code: { type: 'number', example: '응답 코드(200) | number' },
+            text: {
+              type: 'string',
+              example: '카카오 로그인이 완료되었습니다. | string',
+            },
+          },
+        },
+        jwt: {
+          type: 'object',
+          properties: {
+            accessToken: { type: 'string', example: '액세스 토큰 | string' },
+            refreshToken: { type: 'string', example: '리프레시 토큰 | string' },
+          },
+        },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: '유저 아이디 | number' },
+            email: { type: 'string', example: '유저 이메일 | string' },
+            nickname: { type: 'string', example: '유저 닉네임 | string' },
+            profileUrl: { type: 'string', example: '프로필 URL | string' },
+            code: { type: 'string', example: '유저 코드 | string' },
+            coupleId: { type: 'number', example: '커플 id | number' },
+          },
+        },
+        partner: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: '상대방 아이디 | number' },
+            nickname: { type: 'string', example: '상대방 닉네임 | string' },
+            profileUrl: {
+              type: 'string',
+              example: '상대방 프로필 url | string',
+            },
+            code: { type: 'string', example: '상대방 코드 | string' },
+          },
+        },
+        isNew: { type: 'boolean', example: '신규 가입 여부 | boolean' },
+      },
+      example: {
+        message: {
+          code: 200,
+          text: '카카오 로그인이 완료되었습니다. | string',
+        },
+        jwt: {
+          accessToken: '액세스 토큰 | string',
+          refreshToken: '리프레시 토큰 | string',
+        },
+        user: {
+          id: '유저 아이디 | number',
+          email: '유저 이메일 | string',
+          nickname: '닉네임 | string',
+          profileUrl: '프로필 URL | string',
+          code: '유저 코드 | string',
+          coupleId: '커플 아이디 | number',
+        },
+        partner: {
+          id: '상대방 아이디 | number',
+          nickname: '상대방 닉네임 | string',
+          profileUrl: '상대방 프로필 url | string',
+          code: '상대방 코드 | string',
+        },
+        isNew: '신규 가입 여부 | boolean',
+      },
+    },
+  }),
+};
