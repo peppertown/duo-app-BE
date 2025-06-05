@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import {
   handleRefreshDocs,
   loginDocs,
@@ -68,8 +59,6 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
   @handleRefreshDocs.operation
   @handleRefreshDocs.body
   @handleRefreshDocs.response
@@ -77,6 +66,6 @@ export class AuthController {
     @CurrentUserId() userId: number,
     @Body() body: { code: string },
   ) {
-    return await this.authService.handleRefresh(userId, body.code);
+    return await this.authService.handleRefresh(body.code);
   }
 }

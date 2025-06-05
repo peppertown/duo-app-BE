@@ -12,6 +12,7 @@ import { RedisService } from 'src/redis/redis.service';
 import axios from 'axios';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,19 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly redis: RedisService,
   ) {}
+
+  private verifyRefreshToken(token: string): any {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      return decoded;
+    } catch (error) {
+      console.error('리프레시 토큰 검증 실패:', error.message);
+      throw new HttpException(
+        '유효하지 않은 리프레시 토큰입니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
 
   async register(data: { email: string; password: string }) {
     const { email, password } = data;
@@ -408,7 +422,9 @@ export class AuthService {
   }
 
   // 토큰 재발급
-  async handleRefresh(userId: number, refreshToken: string) {
+  async handleRefresh(refreshToken: string) {
+    const userId = this.verifyRefreshToken(refreshToken).userId;
+
     const originRefreshToken = await this.redis.get(
       `${process.env.REFRESH_KEY_JWT}:${userId}`,
     );
@@ -423,7 +439,7 @@ export class AuthService {
     const newAccessToken = await this.generateAccessToken(userId);
     const newRefreshToken = await this.generateRefreshToken(userId);
 
-    await this.saveServerRefreshToken(userId, refreshToken);
+    await this.saveServerRefreshToken(userId, newRefreshToken);
 
     const couple = await this.prisma.couple.findFirst({
       where: {
