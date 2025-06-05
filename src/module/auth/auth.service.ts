@@ -105,6 +105,7 @@ export class AuthService {
       },
       user: {
         id: user.id,
+        email: user.email,
         nickname: user.nickname,
         profileUrl: user.profileUrl,
         code: user.code,

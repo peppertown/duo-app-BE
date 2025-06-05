@@ -168,6 +168,12 @@ export const verifyGoogleSecurityCodeDocs = {
           code: '유저 코드 | string',
           coupleId: '커플 id | number',
         },
+        parter: {
+          id: '상대방 아이디 | number',
+          nickname: '상대방 닉네임 | string',
+          profileUlr: '상대방 프로필 url | string',
+          code: '상대방 코드 | string',
+        },
         isNew: '신규 가입 여부 | boolean',
       },
     },
@@ -231,8 +237,16 @@ export const loginDocs = {
         user: {
           id: '유저 아이디 | number',
           nickname: '유저 닉네임 | string',
+          profileUlr: '유저 프로필 url | string',
           code: '유저 코드 | string',
           coupleId: '커플 id | number',
+        },
+
+        parter: {
+          id: '상대방 아이디 | number',
+          nickname: '상대방 닉네임 | string',
+          profileUlr: '상대방 프로필 url | string',
+          code: '상대방 코드 | string',
         },
         jwt: {
           accessToken: '액세스 토큰 | string',
