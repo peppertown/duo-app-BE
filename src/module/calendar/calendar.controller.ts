@@ -11,13 +11,20 @@ export class CalendarController {
   @UseGuards(AuthGuard('jwt'))
   async createSchedule(
     @CurrentUserId() userId: number,
-    @Body() body: { coupleId: number; date: string; content: string },
+    @Body()
+    body: {
+      coupleId: number;
+      title: string;
+      start: string;
+      end: string;
+    },
   ) {
     return await this.calendarService.createSchdule(
       userId,
       body.coupleId,
-      body.date,
-      body.content,
+      body.title,
+      body.start,
+      body.end,
     );
   }
 

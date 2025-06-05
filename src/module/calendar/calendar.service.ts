@@ -8,11 +8,18 @@ export class CalendarService {
   async createSchdule(
     userId: number,
     coupleId: number,
-    date: string,
-    content: string,
+    title: string,
+    start: string,
+    end: string,
   ) {
     const res = await this.prisma.schedule.create({
-      data: { userId, date: new Date(date), content, coupleId },
+      data: {
+        userId,
+        coupleId,
+        title,
+        start: new Date(start),
+        end: new Date(end),
+      },
     });
 
     return res;
@@ -24,18 +31,20 @@ export class CalendarService {
     year: number,
     month: number,
   ) {
-    const start = new Date(year, month - 1, 1); // 해당 월 1일 00:00
-    const end = new Date(year, month, 1); // 다음 달 1일 00:00
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 1);
 
     const where: any = {
-      date: {
-        gte: start,
-        lt: end,
-      },
+      start: { gte: start, lte: end },
     };
 
-    where.coupleId = coupleId;
+    if (!coupleId) where.userId = userId;
+    else where.coupleId = coupleId;
 
-    return await this.prisma.schedule.findMany({ where });
+    const res = await this.prisma.schedule.findMany({
+      where,
+      orderBy: { start: 'asc' },
+    });
+    return res;
   }
 }
