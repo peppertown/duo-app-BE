@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
@@ -7,7 +7,7 @@ import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
 
-  @Post('')
+  @Post()
   @UseGuards(AuthGuard('jwt'))
   async createSchedule(
     @CurrentUserId() userId: number,
@@ -18,6 +18,22 @@ export class CalendarController {
       body.coupleId,
       body.date,
       body.content,
+    );
+  }
+
+  @Get('')
+  @UseGuards(AuthGuard('jwt'))
+  async getMonthlySchedule(
+    @CurrentUserId() userId: number,
+    @Query('coupleId') coupleId: number,
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ) {
+    return await this.calendarService.getMonthlySchedule(
+      userId,
+      coupleId,
+      year,
+      month,
     );
   }
 }
