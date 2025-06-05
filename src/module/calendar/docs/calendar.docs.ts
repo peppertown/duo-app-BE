@@ -31,12 +31,12 @@ export const createScheduleDocs = {
         message: {
           code: '응답 코드(200)',
           text: '캘린더 일정 등록이 완료되었습니다.',
-          schedule: {
-            userId: '등록자 id | number',
-            title: '일정 제목 | string',
-            start: '일정 시작 (ISO 문자열)',
-            end: '일정 종료 (ISO 문자열)',
-          },
+        },
+        schedule: {
+          userId: '등록자 id | number',
+          title: '일정 제목 | string',
+          start: '일정 시작 (ISO 문자열)',
+          end: '일정 종료 (ISO 문자열)',
         },
       },
     },
@@ -78,15 +78,15 @@ export const getMonthlyScheduleDocs = {
         message: {
           code: '응답 코드(200)',
           text: '캘린더 조회가 완료되었습니다',
-          schedule: [
-            {
-              userId: '유저 id | number',
-              title: '일정 제목 | string',
-              start: '시작일(ISO 문자열)',
-              end: '종료일(ISO 문자열)',
-            },
-          ],
         },
+        schedule: [
+          {
+            userId: '유저 id | number',
+            title: '일정 제목 | string',
+            start: '시작일(ISO 문자열)',
+            end: '종료일(ISO 문자열)',
+          },
+        ],
       },
     },
   }),

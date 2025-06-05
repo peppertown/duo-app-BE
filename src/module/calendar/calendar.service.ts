@@ -27,12 +27,12 @@ export class CalendarService {
         message: {
           code: 200,
           text: '캘린더 일정 등록이 완료되었습니다.',
-          schedule: {
-            userId: schedule.userId,
-            title: schedule.title,
-            start: schedule.start,
-            end: schedule.end,
-          },
+        },
+        schedule: {
+          userId: schedule.userId,
+          title: schedule.title,
+          start: schedule.start,
+          end: schedule.end,
         },
       };
     } catch (err) {
@@ -67,7 +67,8 @@ export class CalendarService {
         orderBy: { start: 'asc' },
       });
       return {
-        message: { code: 200, text: '캘린더 조회가 완료되었습니다', schedule },
+        message: { code: 200, text: '캘린더 조회가 완료되었습니다' },
+        schedule,
       };
     } catch (err) {
       console.error('캘린더 조회 중 에러 발생', err);
