@@ -115,4 +115,23 @@ export class CoupleService {
       );
     }
   }
+
+  getDDay(anniversary: string) {
+    // 오늘 날짜 (한국시간)
+    const today = new Date();
+    const koreaOffset = 9 * 60; // KST는 UTC+9
+    const todayKST = new Date(
+      today.getTime() + (koreaOffset - today.getTimezoneOffset()) * 60000,
+    );
+
+    const anniv = new Date(anniversary);
+
+    // 두 날짜의 차이 (밀리초)
+    const diffTime = todayKST.getTime() - anniv.getTime();
+
+    // 일 수 계산 (밀리초 → 일)
+    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    return days;
+  }
 }
