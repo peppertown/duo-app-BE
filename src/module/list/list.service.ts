@@ -11,12 +11,8 @@ export class ListService {
 
   // 리스트 조회
   async getList(userId: number, coupleId: number, listId: number) {
-    const coupleAuth = await this.coupleService.confirmCoupleAuth(
-      userId,
-      coupleId,
-    );
-    const listAuth = await this.confirmListAuth(coupleId, listId);
-    if (!coupleAuth || !listAuth) {
+    const auth = this.confirmAuth(userId, coupleId, listId);
+    if (!auth) {
       throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
     }
 
@@ -43,14 +39,8 @@ export class ListService {
     content: string,
   ) {
     try {
-      const coupleAuth = await this.coupleService.confirmCoupleAuth(
-        userId,
-        coupleId,
-      );
-
-      const listAuth = await this.confirmListAuth(coupleId, listId);
-
-      if (!coupleAuth || !listAuth) {
+      const auth = this.confirmAuth(userId, coupleId, listId);
+      if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
 
@@ -68,6 +58,16 @@ export class ListService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async confirmAuth(userId: number, coupleId: number, listId: number) {
+    const coupleAuth = await this.coupleService.confirmCoupleAuth(
+      userId,
+      coupleId,
+    );
+    const listAuth = await this.confirmListAuth(coupleId, listId);
+
+    return coupleAuth && listAuth;
   }
 
   // 리스트 권한 확인
