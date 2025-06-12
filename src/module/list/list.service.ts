@@ -35,6 +35,41 @@ export class ListService {
     };
   }
 
+  // 리스트 목록 추가
+  async createMemo(
+    userId: number,
+    coupleId: number,
+    listId: number,
+    content: string,
+  ) {
+    try {
+      const coupleAuth = await this.coupleService.confirmCoupleAuth(
+        userId,
+        coupleId,
+      );
+
+      const listAuth = await this.confirmListAuth(coupleId, listId);
+
+      if (!coupleAuth || !listAuth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.listContent.create({
+        data: { listId, writerId: userId, content },
+      });
+
+      return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
+    } catch (err) {
+      console.error('리스트 목록 생성 중 에러 발생', err);
+      if (err instanceof HttpException) throw err;
+
+      throw new HttpException(
+        '리스트 목록 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 리스트 권한 확인
   async confirmListAuth(coupleId: number, listId: number) {
     try {
