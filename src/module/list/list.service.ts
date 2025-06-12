@@ -92,6 +92,7 @@ export class ListService {
       writerId: i.writerId,
       content: i.content,
       createdAt: i.createdAt,
+      isDone: i.isDone,
     }));
   }
 }
