@@ -32,7 +32,7 @@ export class ListService {
   }
 
   // 리스트 목록 추가
-  async createMemo(
+  async createList(
     userId: number,
     coupleId: number,
     listId: number,
