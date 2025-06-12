@@ -9,6 +9,7 @@ import { S3Module } from './s3/s3.module';
 import { CoupleModule } from './module/couple/couple.module';
 import { CalendarModule } from './module/calendar/calendar.module';
 import { MemoModule } from './module/memo/memo.module';
+import { ListModule } from './module/list/list.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MemoModule } from './module/memo/memo.module';
     CoupleModule,
     CalendarModule,
     MemoModule,
+    ListModule,
   ],
   controllers: [AppController],
   providers: [AppService],
