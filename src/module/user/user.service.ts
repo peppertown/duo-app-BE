@@ -70,6 +70,10 @@ export class UserService {
         },
       });
 
+      const memo = await this.prisma.memo.create({
+        data: { coupleId: couple.id },
+      });
+
       return {
         message: {
           code: 200,
@@ -77,6 +81,9 @@ export class UserService {
         },
         couple: {
           id: couple.id,
+        },
+        memo: {
+          id: memo.id,
         },
       };
     } catch (err) {
