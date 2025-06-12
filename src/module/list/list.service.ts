@@ -60,6 +60,43 @@ export class ListService {
     }
   }
 
+  async listDoneHandler(
+    userId: number,
+    coupleId: number,
+    listId: number,
+    contentId: number,
+  ) {
+    try {
+      const auth = this.confirmAuth(userId, coupleId, listId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const listContent = await this.prisma.listContent.findUnique({
+        where: { id: contentId },
+      });
+
+      const isDone = listContent.isDone;
+
+      const condition = { where: { id: contentId }, data: { isDone: !isDone } };
+
+      await this.prisma.listContent.update(condition);
+
+      return {
+        message: { code: 200, text: '리스트 완료 여부 설정이 완료되었습니다.' },
+      };
+    } catch (err) {
+      console.error('리스트 완료 여부 설정 중 에러 발생', err);
+      if (err instanceof HttpException) throw err;
+
+      throw new HttpException(
+        '리스트 완료 여부 설정 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 권한 확인 (커플 & 리스트)
   async confirmAuth(userId: number, coupleId: number, listId: number) {
     const coupleAuth = await this.coupleService.confirmCoupleAuth(
       userId,

@@ -21,13 +21,28 @@ export class ListController {
   @UseGuards(AuthGuard('jwt'))
   async createMemo(
     @CurrentUserId() userId: number,
-    @Body() body: { coupleId: number; memoId: number; content: string },
+    @Body() body: { coupleId: number; listId: number; content: string },
   ) {
     return await this.listService.createMemo(
       userId,
       body.coupleId,
-      body.memoId,
+      body.listId,
       body.content,
+    );
+  }
+
+  @Post(':contentId')
+  @UseGuards(AuthGuard('jwt'))
+  async listDoneHandler(
+    @CurrentUserId() userId: number,
+    @Param('contentId') contentId: number,
+    @Body() body: { coupleId: number; listId: number },
+  ) {
+    return await this.listService.listDoneHandler(
+      userId,
+      body.coupleId,
+      body.listId,
+      contentId,
     );
   }
 }
