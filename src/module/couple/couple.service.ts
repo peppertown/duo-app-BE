@@ -116,7 +116,7 @@ export class CoupleService {
     }
   }
 
-  getDDay(anniversary: string) {
+  getDDay(anniversary: Date) {
     // 오늘 날짜 (한국시간)
     const today = new Date();
     const koreaOffset = 9 * 60; // KST는 UTC+9
@@ -133,5 +133,32 @@ export class CoupleService {
     const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return days;
+  }
+
+  getUpcommingAnniv(dday: number, anniversary: Date) {
+    const nextHundred = Math.ceil(dday / 100) * 100;
+    const hundredDiff = nextHundred - dday;
+    const nextHundredDate = new Date(
+      anniversary.getTime() + nextHundred * 24 * 60 * 60 * 1000,
+    );
+
+    const nextYear = Math.ceil(dday / 365);
+    const yearDiff = nextYear * 365 - dday;
+    const nextYearDate = new Date(anniversary);
+    nextYearDate.setFullYear(anniversary.getFullYear() + nextYear);
+
+    if (hundredDiff < yearDiff) {
+      return {
+        type: `${nextHundred}일`,
+        days: hundredDiff,
+        date: nextHundredDate,
+      };
+    } else {
+      return {
+        type: `${nextYear}주년`,
+        days: yearDiff,
+        date: nextYearDate,
+      };
+    }
   }
 }
