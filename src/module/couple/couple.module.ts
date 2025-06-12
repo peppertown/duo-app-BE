@@ -5,5 +5,6 @@ import { CoupleController } from './couple.controller';
 @Module({
   controllers: [CoupleController],
   providers: [CoupleService],
+  exports: [CoupleService],
 })
 export class CoupleModule {}
