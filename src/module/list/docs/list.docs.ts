@@ -13,14 +13,6 @@ export const getListDocs = {
     description: '커플 id',
     example: 1,
   }),
-  param2: ApiParam({
-    name: 'listId',
-    required: true,
-    type: Number,
-    description: '리스트 id',
-    example: 1,
-  }),
-
   response: ApiResponse({
     status: 200,
     description: '리스트 조회 성공',
@@ -34,7 +26,7 @@ export const getListDocs = {
         list: [
           {
             id: '아이템 id | number',
-            writerId: '작성자 id | number',
+            isOwn: '본인이 작성한 리스트인지 여부 | boolean',
             content: '리스트 내용 | string',
             createdAt: '생성일(ISO 문자열) | string',
             isDone: '완료 여부 | boolean',
@@ -56,7 +48,6 @@ export const createListDocs = {
       type: 'object',
       properties: {
         coupleId: { type: 'number', example: '커플 id | number' },
-        listId: { type: 'number', example: '리스트 id | number' },
         content: { type: 'string', example: '등록할 내용 | string' },
       },
       required: ['coupleId', 'listId', 'content'],
@@ -84,22 +75,18 @@ export const listDoneHandlerDocs = {
     description: '특정 버킷리스트 아이템의 완료 여부를 변경합니다.',
   }),
 
-  param: ApiParam({
+  param1: ApiParam({
+    name: 'coupleId',
+    type: 'number',
+    description: '커플 id',
+    example: '커플 id | number',
+  }),
+
+  param2: ApiParam({
     name: 'contentId',
     type: 'number',
     description: '완료 여부를 변경할 목록 id',
     example: '변경할 목록 id | number',
-  }),
-
-  body: ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        coupleId: { type: 'number', example: '커플 id | number' },
-        listId: { type: 'number', example: '리스트 id | number' },
-      },
-      required: ['coupleId', 'listId'],
-    },
   }),
 
   response: ApiResponse({

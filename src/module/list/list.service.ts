@@ -9,43 +9,20 @@ export class ListService {
     private readonly coupleService: CoupleService,
   ) {}
 
-  // 리스트 조회
-  async getList(userId: number, coupleId: number, listId: number) {
-    const auth = this.confirmAuth(userId, coupleId, listId);
-    if (!auth) {
-      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-    }
-
-    const items = await this.prisma.listContent.findMany({
-      where: { listId },
-    });
-
-    const list = this.formatList(items);
-
-    return {
-      message: {
-        code: 200,
-        text: '리스트 조회가 완료되었습니다.',
-      },
-      list,
-    };
-  }
-
   // 리스트 목록 추가
-  async createList(
-    userId: number,
-    coupleId: number,
-    listId: number,
-    content: string,
-  ) {
+  async createList(userId: number, coupleId: number, content: string) {
     try {
-      const auth = this.confirmAuth(userId, coupleId, listId);
+      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
 
+      const coupleList = await this.prisma.list.findFirst({
+        where: { coupleId },
+      });
+
       await this.prisma.listContent.create({
-        data: { listId, writerId: userId, content },
+        data: { listId: coupleList.id, writerId: userId, content },
       });
 
       return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
@@ -60,14 +37,38 @@ export class ListService {
     }
   }
 
-  async listDoneHandler(
-    userId: number,
-    coupleId: number,
-    listId: number,
-    contentId: number,
-  ) {
+  // 리스트 조회
+  async getList(userId: number, coupleId: number) {
+    const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
+    if (!auth)
+      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+
+    const coupleList = await this.prisma.list.findFirst({
+      where: { coupleId },
+    });
+
+    const listData = await this.prisma.listContent.findMany({
+      where: { listId: coupleList.id },
+    });
+
+    const list = listData.map((i) => ({
+      id: i.id,
+      isOwn: i.writerId == userId,
+      content: i.content,
+      isDone: i.isDone,
+      createdAt: i.createdAt,
+    }));
+
+    return {
+      message: { code: 200, text: '버킷 리스트 조회가 완료되었습니다.' },
+      list,
+    };
+  }
+
+  // 리스트 목록 완료여부 토글
+  async listDoneHandler(userId: number, coupleId: number, contentId: number) {
     try {
-      const auth = this.confirmAuth(userId, coupleId, listId);
+      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
