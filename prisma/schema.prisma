@@ -96,6 +96,7 @@ model ListContent {
   listId    Int
   writerId  Int
   content   String
+  isDone    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   list   List @relation(fields: [listId], references: [id])
