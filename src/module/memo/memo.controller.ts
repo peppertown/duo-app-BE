@@ -10,19 +10,17 @@ import { createMemoDocs, getMemoDocs } from './docs/memo.docs';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
-  @Get(':coupleId/:memoId')
+  @Get(':coupleId')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @getMemoDocs.operation
   @getMemoDocs.param1
-  @getMemoDocs.param2
   @getMemoDocs.response
   async getMemo(
     @CurrentUserId() userId: number,
-    @Param('memoId') memoId: number,
     @Param('coupleId') coupleId: number,
   ) {
-    return await this.memoService.getMemo(userId, memoId, coupleId);
+    return await this.memoService.getMemo(userId, coupleId);
   }
 
   @Post()
@@ -33,12 +31,11 @@ export class MemoController {
   @createMemoDocs.response
   async createMemo(
     @CurrentUserId() userId: number,
-    @Body() body: { coupleId: number; memoId: number; content: string },
+    @Body() body: { coupleId: number; content: string },
   ) {
     return await this.memoService.createMemo(
       userId,
       body.coupleId,
-      body.memoId,
       body.content,
     );
   }

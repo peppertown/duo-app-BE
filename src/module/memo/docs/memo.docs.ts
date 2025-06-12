@@ -13,13 +13,6 @@ export const getMemoDocs = {
     example: 1,
   }),
 
-  param2: ApiParam({
-    name: 'memoId',
-    required: true,
-    description: '메모 id',
-    example: 1,
-  }),
-
   response: ApiResponse({
     status: 200,
     description: '메모 조회 성공',
@@ -33,7 +26,7 @@ export const getMemoDocs = {
         memo: [
           {
             id: '메모 content id | number',
-            writerId: '작성자 id | number',
+            isOwn: '본인이 작성한 메모인지 여부 | boolean',
             content: '메모 내용 | string',
             createdAt: '생성일(ISO 문자열)',
           },
@@ -46,7 +39,7 @@ export const getMemoDocs = {
 export const createMemoDocs = {
   operation: ApiOperation({
     summary: '메모 등록',
-    description: 'JWT 인증된 유저가 커플의 메모를 작성합니다.',
+    description: '유저가 커플의 메모를 작성합니다.',
   }),
 
   body: ApiBody({
@@ -54,10 +47,9 @@ export const createMemoDocs = {
       type: 'object',
       properties: {
         coupleId: { type: 'number', example: '커플 id | number' },
-        memoId: { type: 'number', example: '메모 id | number' },
         content: { type: 'string', example: '메모 내용 | string' },
       },
-      required: ['coupleId', 'memoId', 'content'],
+      required: ['coupleId', 'content'],
     },
   }),
 

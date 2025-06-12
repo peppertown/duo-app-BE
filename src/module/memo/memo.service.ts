@@ -10,26 +10,20 @@ export class MemoService {
   ) {}
 
   // 메모 작성
-  async createMemo(
-    userId: number,
-    coupleId: number,
-    memoId: number,
-    content: string,
-  ) {
+  async createMemo(userId: number, coupleId: number, content: string) {
     try {
-      const coupleAuth = await this.coupleService.confirmCoupleAuth(
-        userId,
-        coupleId,
-      );
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
 
-      const memoAuth = await this.confirmMemoAuth(coupleId, memoId);
-
-      if (!coupleAuth || !memoAuth) {
+      if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
 
+      const coupleMemo = await this.prisma.memo.findFirst({
+        where: { coupleId },
+      });
+
       await this.prisma.memoContent.create({
-        data: { memoId, writerId: userId, content },
+        data: { memoId: coupleMemo.id, writerId: userId, content },
       });
 
       return { message: { code: 200, text: '메모가 작성되었습니다.' } };
@@ -45,25 +39,27 @@ export class MemoService {
   }
 
   // 메모 조회
-  async getMemo(userId: number, coupleId: number, memoId: number) {
+  async getMemo(userId: number, coupleId: number) {
     try {
-      const coupleAuth = await this.coupleService.confirmCoupleAuth(
-        userId,
-        coupleId,
-      );
-
-      const memoAuth = await this.confirmMemoAuth(coupleId, memoId);
-
-      if (!coupleAuth || !memoAuth) {
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
 
-      const data = await this.prisma.memoContent.findMany({
-        where: { memoId },
-        orderBy: { id: 'desc' },
+      const coupleMemo = await this.prisma.memo.findFirst({
+        where: { coupleId },
       });
 
-      const memo = this.formatMemo(data);
+      const data = await this.prisma.memoContent.findMany({
+        where: { memoId: coupleMemo.id },
+      });
+
+      const memo = data.map((i) => ({
+        id: i.id,
+        isOwn: i.writerId == userId,
+        content: i.content,
+        createdAt: i.createdAt,
+      }));
 
       return {
         message: { code: 200, text: '메모 조회가 완료되었습니다.' },
@@ -92,15 +88,5 @@ export class MemoService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  // 메모 포매팅
-  formatMemo(memo: any) {
-    return memo.map((m) => ({
-      id: m.id,
-      writerId: m.writerId,
-      content: m.content,
-      createdAt: m.createdAt,
-    }));
   }
 }
