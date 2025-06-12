@@ -161,4 +161,32 @@ export class CoupleService {
       };
     }
   }
+
+  getDaysToNextBirthday(birthday: Date) {
+    const today = new Date();
+    const todayKST = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+
+    // 생일의 월/일만 고려해서 올해의 생일 날짜 객체 생성
+    const birth = new Date(birthday);
+    const nextBirthday = new Date(
+      todayKST.getFullYear(),
+      birth.getMonth(),
+      birth.getDate(),
+    );
+
+    // 오늘 생일이면 0, 지났으면 내년으로
+    if (todayKST.getTime() > nextBirthday.getTime()) {
+      nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+    }
+
+    // 차이 계산 (일 단위)
+    const diff =
+      (nextBirthday.getTime() - todayKST.getTime()) / (1000 * 60 * 60 * 24);
+
+    return { days: Math.round(diff), date: nextBirthday };
+  }
 }
