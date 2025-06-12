@@ -74,6 +74,10 @@ export class UserService {
         data: { coupleId: couple.id },
       });
 
+      const list = await this.prisma.list.create({
+        data: { coupleId: couple.id },
+      });
+
       return {
         message: {
           code: 200,
@@ -84,6 +88,9 @@ export class UserService {
         },
         memo: {
           id: memo.id,
+        },
+        list: {
+          id: list.id,
         },
       };
     } catch (err) {
