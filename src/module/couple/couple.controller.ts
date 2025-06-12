@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+  getCoupleAnniversariesDocs,
   getCoupleDataDocs,
   setAnniversaryDocs,
   setCoupleNameDocs,
@@ -22,6 +23,14 @@ export class CoupleController {
   @getCoupleDataDocs.response
   async getCoupleData(@Param('coupleId') coupleId: number) {
     return await this.coupleService.getCoupleData(coupleId);
+  }
+
+  @Get(':coupleId/anniversary')
+  @getCoupleAnniversariesDocs.operation
+  @getCoupleAnniversariesDocs.param
+  @getCoupleAnniversariesDocs.response
+  async getCoupleAnniversaries(@Param('coupleId') coupleId: number) {
+    return await this.coupleService.getCoupleAnniversaries(coupleId);
   }
 
   @Post(':coupleId/anniversary')

@@ -116,6 +116,43 @@ export class CoupleService {
     }
   }
 
+  // 커플 기념일 조회
+  async getCoupleAnniversaries(coupleId: number) {
+    try {
+      const data = await this.prisma.couple.findUnique({
+        where: { id: coupleId },
+        include: {
+          a: { select: { nickname: true, birthday: true } },
+          b: { select: { nickname: true, birthday: true } },
+        },
+      });
+      const dday = this.getDDay(data.anniversary);
+
+      const upcoming = this.getUpcommingAnniv(dday, data.anniversary);
+      const aBirth = this.getDaysToNextBirthday(data.a.birthday);
+      const bBirth = this.getDaysToNextBirthday(data.b.birthday);
+      const anniv = [
+        upcoming,
+        { type: `${data.a.nickname}님 생일`, ...aBirth },
+        { type: `${data.b.nickname}님 생일`, ...bBirth },
+      ];
+
+      return {
+        message: { code: 200, text: '커플 기념일 조회가 완료되었습니다.' },
+        dday,
+        anniv,
+      };
+    } catch (err) {
+      console.error('커플 기념일 조회 중 에러 발생', err);
+
+      throw new HttpException(
+        '커플 기념일 조회 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 커플 디데이 조회
   getDDay(anniversary: Date) {
     // 오늘 날짜 (한국시간)
     const today = new Date();
@@ -135,6 +172,7 @@ export class CoupleService {
     return days;
   }
 
+  // 다가오는 기념일 조회
   getUpcommingAnniv(dday: number, anniversary: Date) {
     const nextHundred = Math.ceil(dday / 100) * 100;
     const hundredDiff = nextHundred - dday;
@@ -162,6 +200,7 @@ export class CoupleService {
     }
   }
 
+  // 생일 디데이 조회
   getDaysToNextBirthday(birthday: Date) {
     const today = new Date();
     const todayKST = new Date(

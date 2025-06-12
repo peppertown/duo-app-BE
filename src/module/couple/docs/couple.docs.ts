@@ -188,3 +188,40 @@ export const setCoupleNameDocs = {
     },
   }),
 };
+
+export const getCoupleAnniversariesDocs = {
+  operation: ApiOperation({
+    summary: '커플 기념일 조회',
+    description: '커플의 기념일(D-day, 100일/주년, 각자 생일 등)을 조회합니다.',
+  }),
+
+  param: ApiParam({
+    name: 'coupleId',
+    type: 'number',
+    required: true,
+    description: '커플 id',
+    example: 1,
+  }),
+
+  response: ApiOkResponse({
+    status: 200,
+    description: '커플 기념일 조회 완료',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드(200) | number',
+          text: '커플 기념일 조회가 완료되었습니다. | string',
+        },
+        dday: '커플 D-day | number',
+        anniv: [
+          {
+            type: '기념일 종류 | string (ex: 300일, 1주년, test1님 생일, test2님 생일)',
+            days: '남은 일수 | number',
+            date: '기념일 날짜(ISO 문자열) | string',
+          },
+        ],
+      },
+    },
+  }),
+};
