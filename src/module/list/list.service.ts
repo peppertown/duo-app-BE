@@ -1,4 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CoupleService } from '../couple/couple.service';
 
 @Injectable()
-export class ListService {}
+export class ListService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly coupleService: CoupleService,
+  ) {}
+
+  // 리스트 조회
+  async getList(userId: number, coupleId: number, listId: number) {
+    const coupleAuth = await this.coupleService.confirmCoupleAuth(
+      userId,
+      coupleId,
+    );
+    const listAuth = await this.confirmListAuth(coupleId, listId);
+    if (!coupleAuth || !listAuth) {
+      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    const items = await this.prisma.listContent.findMany({
+      where: { listId },
+    });
+
+    const list = this.formatList(items);
+
+    return {
+      message: {
+        code: 200,
+        text: '리스트 조회가 완료되었습니다.',
+      },
+      list,
+    };
+  }
+
+  // 리스트 권한 확인
+  async confirmListAuth(coupleId: number, listId: number) {
+    try {
+      const list = await this.prisma.list.findUnique({
+        where: { id: listId },
+      });
+      return list.coupleId == coupleId;
+    } catch (err) {
+      console.error('리스트 권한 확인 중 에러 발생', err);
+      throw new HttpException(
+        '리스트 권한 확인 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  formatList(list: any) {
+    return list.map((i) => ({
+      id: i.id,
+      writerId: i.writerId,
+      content: i.content,
+      createdAt: i.createdAt,
+    }));
+  }
+}
