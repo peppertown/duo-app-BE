@@ -9,7 +9,11 @@ import {
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
-import { matchUserDocs, setUserNicknameDocs } from './docs/user.docs';
+import {
+  matchUserDocs,
+  setUserBirthdayDocs,
+  setUserNicknameDocs,
+} from './docs/user.docs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -29,6 +33,19 @@ export class UserController {
     @Body() body: { nickname: string },
   ) {
     return await this.userService.setUserNickname(userId, body.nickname);
+  }
+
+  @Post('birthday')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @setUserBirthdayDocs.operation
+  @setUserBirthdayDocs.body
+  @setUserBirthdayDocs.response
+  async setUserBirthday(
+    @CurrentUserId() userId: number,
+    @Body('birthday') birthday: string,
+  ) {
+    return await this.userService.setUserBirthDay(userId, birthday);
   }
 
   @Post('match')

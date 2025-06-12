@@ -138,3 +138,37 @@ export const matchUserDocs = {
     },
   }),
 };
+
+export const setUserBirthdayDocs = {
+  operation: ApiOperation({
+    summary: '유저 생일 설정',
+    description: 'JWT 인증된 유저가 자신의 생일을 등록/수정합니다.',
+  }),
+
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        birthday: { type: 'string', example: '생일(YYYY-MM-DD) | string' },
+      },
+      required: ['birthday'],
+    },
+  }),
+
+  response: ApiResponse({
+    status: 200,
+    description: '유저 생일 설정 성공',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드(200) | number',
+          text: '유저 생일 설정이 완료되었습니다. | string',
+        },
+        user: {
+          birthday: '생일(YYYY-MM-DD) | string',
+        },
+      },
+    },
+  }),
+};

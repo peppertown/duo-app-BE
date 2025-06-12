@@ -29,6 +29,29 @@ export class UserService {
     }
   }
 
+  async setUserBirthDay(userId: number, birthday: string) {
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { birthday: new Date(birthday) },
+      });
+
+      return {
+        message: {
+          code: 200,
+          text: '유저 생일 설정이 완료되었습니다.',
+        },
+        user: { birthday },
+      };
+    } catch (err) {
+      console.error('유저 생일 설정 중 에러 발생', err);
+      throw new HttpException(
+        '유저 생일 설정 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 커플 연결
   async matchUser(userId: number, code: string) {
     try {
