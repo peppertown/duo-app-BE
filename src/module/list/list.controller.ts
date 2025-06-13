@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -12,6 +13,7 @@ import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import {
   createListDocs,
+  deleteListDocs,
   getListDocs,
   listDoneHandlerDocs,
 } from './docs/list.docs';
@@ -65,5 +67,19 @@ export class ListController {
     @Param('contentId', ParseIntPipe) contentId: number,
   ) {
     return await this.listService.listDoneHandler(userId, coupleId, contentId);
+  }
+
+  @Delete(':coupleId/:contentId')
+  @UseGuards(AuthGuard('jwt'))
+  @deleteListDocs.operation
+  @deleteListDocs.param1
+  @deleteListDocs.param2
+  @deleteListDocs.response
+  async deleteList(
+    @CurrentUserId() userId: number,
+    @Param('coupleId', ParseIntPipe) coupleId: number,
+    @Param('contentId', ParseIntPipe) contentId: number,
+  ) {
+    return await this.listService.deleteList(userId, coupleId, contentId);
   }
 }

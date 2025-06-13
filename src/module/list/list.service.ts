@@ -97,40 +97,29 @@ export class ListService {
     }
   }
 
-  // 권한 확인 (커플 & 리스트)
-  async confirmAuth(userId: number, coupleId: number, listId: number) {
-    const coupleAuth = await this.coupleService.confirmCoupleAuth(
-      userId,
-      coupleId,
-    );
-    const listAuth = await this.confirmListAuth(coupleId, listId);
-
-    return coupleAuth && listAuth;
-  }
-
-  // 리스트 권한 확인
-  async confirmListAuth(coupleId: number, listId: number) {
+  // 리스트 목록 삭제
+  async deleteList(userId: number, coupleId: number, contentId: number) {
     try {
-      const list = await this.prisma.list.findUnique({
-        where: { id: listId },
+      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.listContent.delete({
+        where: { id: contentId },
       });
-      return list.coupleId == coupleId;
+
+      return {
+        message: { code: 200, text: '리스트 목록이 삭제 삭제되었습니다.' },
+      };
     } catch (err) {
-      console.error('리스트 권한 확인 중 에러 발생', err);
+      console.error('리스트 목록 삭제 중 에러 발생', err);
+      if (err instanceof HttpException) throw err;
+
       throw new HttpException(
-        '리스트 권한 확인 중 오류가 발생했습니다.',
+        '리스트 목록 삭제 중 오류가 발생했습니다.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  formatList(list: any) {
-    return list.map((i) => ({
-      id: i.id,
-      writerId: i.writerId,
-      content: i.content,
-      createdAt: i.createdAt,
-      isDone: i.isDone,
-    }));
   }
 }

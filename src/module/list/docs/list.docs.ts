@@ -103,3 +103,39 @@ export const listDoneHandlerDocs = {
     },
   }),
 };
+
+export const deleteListDocs = {
+  operation: ApiOperation({
+    summary: '리스트 목록 삭제',
+    description: 'JWT 인증된 유저가 리스트 목록을 삭제합니다.',
+  }),
+
+  param1: ApiParam({
+    name: 'coupleId',
+    type: 'number',
+    required: true,
+    description: '커플 id | number',
+    example: 1,
+  }),
+  param2: ApiParam({
+    name: 'contentId',
+    type: 'number',
+    required: true,
+    description: '리스트 content id | number',
+    example: 3,
+  }),
+
+  response: ApiResponse({
+    status: 200,
+    description: '리스트 목록 삭제 성공',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드(200) | number',
+          text: '리스트 목록이 삭제 삭제되었습니다. | string',
+        },
+      },
+    },
+  }),
+};
