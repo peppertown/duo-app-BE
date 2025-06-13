@@ -89,4 +89,29 @@ export class MemoService {
       );
     }
   }
+
+  // 메모 삭제
+  async deleteMemo(userId: number, coupleId: number, contentId: number) {
+    try {
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
+
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.memoContent.delete({
+        where: { id: contentId },
+      });
+
+      return { message: { code: 200, text: '메모 삭제가 완료되었습니다.' } };
+    } catch (err) {
+      console.error('메모 삭제 중 에러 발생', err);
+      if (err instanceof HttpException) throw err;
+
+      throw new HttpException(
+        '메모 삭제 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

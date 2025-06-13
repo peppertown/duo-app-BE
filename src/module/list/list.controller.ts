@@ -71,6 +71,7 @@ export class ListController {
 
   @Delete(':coupleId/:contentId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @deleteListDocs.operation
   @deleteListDocs.param1
   @deleteListDocs.param2
