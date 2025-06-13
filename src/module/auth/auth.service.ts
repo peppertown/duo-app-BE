@@ -126,6 +126,7 @@ export class AuthService {
         coupleId,
       },
       partner,
+      couple: { anniversary: couple ? couple.anniversary : null },
       jwt: {
         accessToken,
         refreshToken,
@@ -225,6 +226,16 @@ export class AuthService {
       };
       const { user, isNew } = await this.findOrCreateAccount(userData);
 
+      const couple = await this.prisma.couple.findFirst({
+        where: {
+          OR: [{ aId: user.id }, { bId: user.id }],
+        },
+      });
+
+      const coupleId = couple ? couple.id : null;
+
+      const partner = await getPartnerData(user.id, coupleId);
+
       // 4. JWT 발급 및 레디스 저장
       const accessToken = await this.generateAccessToken(user.id);
       const refreshToken = await this.generateRefreshToken(user.id);
@@ -245,6 +256,8 @@ export class AuthService {
           nickname: user.nickname,
           profileUrl: user.profileUrl,
         },
+        partner,
+        couple: { anniversary: couple ? couple.anniversary : null },
         isNew,
       };
     } catch (err) {
@@ -418,9 +431,8 @@ export class AuthService {
     });
 
     const coupleId = couple ? couple.id : null;
-    let partner = null;
-    if (coupleId) partner = await getPartnerData(user.id, coupleId);
 
+    const partner = await getPartnerData(user.id, coupleId);
     return {
       message: {
         code: 200,
@@ -436,9 +448,10 @@ export class AuthService {
         nickname: user.nickname,
         profileUrl: user.profileUrl,
         code: user.code,
-        coupleId,
+        coupleId: couple ? couple.id : null,
       },
       partner,
+      couple: { anniversary: couple ? couple.anniversary : null },
       isNew,
     };
   }
