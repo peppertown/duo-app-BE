@@ -50,6 +50,12 @@ export class MemoService {
         where: { coupleId },
       });
 
+      if (!coupleMemo)
+        throw new HttpException(
+          '공유 메모 사용 전 커플 연결이 필요합니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+
       const data = await this.prisma.memoContent.findMany({
         where: { memoId: coupleMemo.id },
       });

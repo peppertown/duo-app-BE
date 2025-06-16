@@ -47,6 +47,12 @@ export class ListService {
       where: { coupleId },
     });
 
+    if (!coupleList)
+      throw new HttpException(
+        '버킷리스트 사용 전 커플 연결이 필요합니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+
     const listData = await this.prisma.listContent.findMany({
       where: { listId: coupleList.id },
     });
