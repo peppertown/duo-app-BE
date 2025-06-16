@@ -476,7 +476,11 @@ export class AuthService {
       if (!user) {
         const randomCode = generateRandomString();
         user = await this.prisma.user.create({
-          data: { ...data, code: randomCode },
+          data: {
+            ...data,
+            profileUrl: process.env.DEFAULT_PROFILE_URL,
+            code: randomCode,
+          },
         });
         isNew = true;
       }
