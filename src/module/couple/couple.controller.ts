@@ -26,6 +26,7 @@ export class CoupleController {
   }
 
   @Get(':coupleId/anniversary')
+  @ApiBearerAuth()
   @getCoupleAnniversariesDocs.operation
   @getCoupleAnniversariesDocs.param
   @getCoupleAnniversariesDocs.response
@@ -54,6 +55,7 @@ export class CoupleController {
 
   @Post(':coupleId/name')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @setCoupleNameDocs.operation
   @setCoupleNameDocs.param
   @setCoupleNameDocs.body

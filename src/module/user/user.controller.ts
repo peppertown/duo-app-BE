@@ -61,6 +61,7 @@ export class UserController {
   @Post('image')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file'))
+  @ApiBearerAuth()
   async uploadProfileImage(
     @CurrentUserId() userId: number,
     @UploadedFile() file: Express.Multer.File,
