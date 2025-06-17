@@ -1,9 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class CoupleService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3: S3Service,
+  ) {}
 
   // 커플 데이터 조회
   async getCoupleData(coupleId: number) {
@@ -126,6 +130,42 @@ export class CoupleService {
 
       throw new HttpException(
         '커플 위젯 조회 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 커플 위젯 설정
+  async setCoupleWidget(
+    userId: number,
+    coupleId: number,
+    file: Express.Multer.File,
+  ) {
+    try {
+      const auth = await this.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const photo = await this.s3.uploadImageToS3(file, 'widget');
+
+      await this.prisma.widget.updateMany({
+        where: { coupleId: coupleId },
+        data: { photoUrl: photo.imageUrl },
+      });
+
+      return {
+        message: { code: 200, text: '커플 위젯 설정이 완료되었습니다.' },
+        widget: { photoUrl: photo.imageUrl },
+      };
+    } catch (err) {
+      console.error('커플 위젯 설정 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '커플 위젯 설정 중 오류가 발생했습니다',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

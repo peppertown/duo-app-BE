@@ -254,3 +254,45 @@ export const getCoupleWidgetDocs = {
     },
   }),
 };
+
+export const setCoupleWidgetDocs = {
+  operation: ApiOperation({
+    summary: '커플 위젯 이미지 업로드',
+    description: '커플 ID에 해당하는 위젯 이미지를 업로드합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          example: '업로드할 이미지 파일 | binary',
+        },
+      },
+      required: ['file'],
+    },
+  }),
+  response: ApiOkResponse({
+    status: 200,
+    description: '커플 위젯 이미지 업로드 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+        widget: {
+          photoUrl: '업로드된 위젯 이미지 URL | string',
+        },
+      },
+    },
+  }),
+};

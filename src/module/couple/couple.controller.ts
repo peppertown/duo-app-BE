@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CoupleService } from './couple.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
@@ -9,7 +18,9 @@ import {
   getCoupleWidgetDocs,
   setAnniversaryDocs,
   setCoupleNameDocs,
+  setCoupleWidgetDocs,
 } from './docs/couple.docs';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('couple')
 @Controller('couple')
@@ -80,5 +91,21 @@ export class CoupleController {
     @Param('coupleId') coupleId: number,
   ) {
     return await this.coupleService.getCoupleWidget(userId, coupleId);
+  }
+
+  @Post(':coupleId/widget')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBearerAuth()
+  @setCoupleWidgetDocs.operation
+  @setCoupleWidgetDocs.param
+  @setCoupleWidgetDocs.body
+  @setCoupleWidgetDocs.response
+  async setCoupleWidget(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return await this.coupleService.setCoupleWidget(userId, coupleId, file);
   }
 }
