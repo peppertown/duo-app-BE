@@ -97,6 +97,40 @@ export class CoupleService {
     }
   }
 
+  // 커플 위젯 조회
+  async getCoupleWidget(userId: number, coupleId: number) {
+    try {
+      const auth = await this.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const widget = await this.prisma.widget.findFirst({
+        where: {
+          coupleId: coupleId,
+        },
+      });
+
+      const photoUrl = widget.photoUrl
+        ? widget.photoUrl
+        : process.env.DEFAULT_WIDGET_URL;
+      return {
+        message: { code: 200, text: '커플 위젯 조회가 완료되었습니다.' },
+        widget: { photoUrl },
+      };
+    } catch (err) {
+      console.error('커플 위젯 조회 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '커플 위젯 조회 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 커플 관련 api 권한 확인
   async confirmCoupleAuth(userId: number, coupleId: number) {
     try {

@@ -67,4 +67,13 @@ export class CoupleController {
   ) {
     return await this.coupleService.setCoupleName(userId, coupleId, name);
   }
+
+  @Get(':coupleId/widget')
+  @UseGuards(AuthGuard('jwt'))
+  async getCoupleWidget(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+  ) {
+    return await this.coupleService.getCoupleWidget(userId, coupleId);
+  }
 }
