@@ -48,6 +48,7 @@ model Couple {
   Schedule    Schedule[]
   Memo        Memo[]
   List        List[]
+  Widget      Widget[]
 }
 
 model Todo {
@@ -113,5 +114,13 @@ model Schedule {
   createdAt DateTime @default(now())
 
   user   User    @relation(fields: [userId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id])
+}
+
+model Widget {
+  id       Int     @id @default(autoincrement())
+  coupleId Int?
+  photoUrl String?
+
   couple Couple? @relation(fields: [coupleId], references: [id])
 }
