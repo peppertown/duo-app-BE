@@ -55,44 +55,49 @@ export class UserService {
   // 커플 연결
   async matchUser(userId: number, code: string) {
     try {
-      const partner = await this.prisma.user.findUnique({
-        where: { code },
+      return await this.prisma.$transaction(async (tx) => {
+        const partner = await tx.user.findUnique({
+          where: { code },
+        });
+
+        if (!partner || partner.id == userId) {
+          throw new HttpException(
+            '잘못된 코드 입니다.',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        const couple = await tx.couple.create({
+          data: {
+            aId: userId,
+            bId: partner.id,
+          },
+        });
+
+        await tx.memo.create({
+          data: { coupleId: couple.id },
+        });
+
+        await tx.list.create({
+          data: { coupleId: couple.id },
+        });
+
+        await tx.widget.create({
+          data: {
+            coupleId: couple.id,
+            photoUrl: process.env.DEFAULT_WIDGET_URL,
+          },
+        });
+        return {
+          message: {
+            code: 200,
+            text: '커플 연결이 완료되었습니다',
+          },
+          couple: {
+            id: couple.id,
+          },
+        };
       });
-
-      if (!partner || partner.id == userId) {
-        throw new HttpException('잘못된 코드 입니다.', HttpStatus.BAD_REQUEST);
-      }
-
-      const couple = await this.prisma.couple.create({
-        data: {
-          aId: userId,
-          bId: partner.id,
-        },
-      });
-
-      const memo = await this.prisma.memo.create({
-        data: { coupleId: couple.id },
-      });
-
-      const list = await this.prisma.list.create({
-        data: { coupleId: couple.id },
-      });
-
-      return {
-        message: {
-          code: 200,
-          text: '커플 연결이 완료되었습니다',
-        },
-        couple: {
-          id: couple.id,
-        },
-        memo: {
-          id: memo.id,
-        },
-        list: {
-          id: list.id,
-        },
-      };
     } catch (err) {
       if (err instanceof HttpException) {
         throw err;
