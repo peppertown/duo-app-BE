@@ -225,3 +225,32 @@ export const getCoupleAnniversariesDocs = {
     },
   }),
 };
+
+export const getCoupleWidgetDocs = {
+  operation: ApiOperation({
+    summary: '커플 위젯 조회',
+    description: '커플 ID를 통해 위젯 이미지를 조회합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  response: ApiOkResponse({
+    status: 200,
+    description: '커플 위젯 조회 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+        widget: {
+          photoUrl: '위젯 이미지 URL | string',
+        },
+      },
+    },
+  }),
+};

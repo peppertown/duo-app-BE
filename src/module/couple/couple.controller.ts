@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   getCoupleAnniversariesDocs,
   getCoupleDataDocs,
+  getCoupleWidgetDocs,
   setAnniversaryDocs,
   setCoupleNameDocs,
 } from './docs/couple.docs';
@@ -70,6 +71,10 @@ export class CoupleController {
 
   @Get(':coupleId/widget')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @getCoupleWidgetDocs.operation
+  @getCoupleWidgetDocs.param
+  @getCoupleWidgetDocs.response
   async getCoupleWidget(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
