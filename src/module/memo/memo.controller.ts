@@ -45,4 +45,14 @@ export class MemoController {
   ) {
     return this.memoService.setWidgetMemo(userId, coupleId, memoId);
   }
+
+  @Delete(':coupleId/:memoId')
+  @UseGuards(AuthGuard('jwt'))
+  async deleteMemo(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Param('memoId') memoId: number,
+  ) {
+    return this.memoService.deleteMemo(userId, coupleId, memoId);
+  }
 }
