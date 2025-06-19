@@ -181,98 +181,6 @@ export class AuthService {
     }
   }
 
-  // 구글 Oauth 로그인
-  async googleLogin(code: string) {
-    try {
-      // 1. 구글 토큰 요청
-      const decodedCode = decodeURIComponent(code);
-      const tokenResponse = await axios.post(
-        'https://oauth2.googleapis.com/token',
-        {
-          code: decodedCode,
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-          grant_type: 'authorization_code',
-        },
-        { headers: { 'Content-Type': 'application/json' } },
-      );
-
-      const { id_token } = tokenResponse.data;
-
-      // 2. id_token 디코딩 (검증 포함 가능)
-      const decoded = this.jwt.decode(id_token) as {
-        sub: string;
-        email: string;
-        name: string;
-        picture: string;
-      };
-
-      if (!decoded?.sub) {
-        throw new HttpException(
-          'Invalid Google ID Token',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      // 3. 유저 회원가입/로그인 처리
-      const { sub, email, name, picture } = decoded;
-      const userData = {
-        sub,
-        email,
-        nickname: name,
-        profileUrl: picture,
-        authProvider: 'Google',
-      };
-      const { user, isNew } = await this.findOrCreateAccount(userData);
-
-      const couple = await this.prisma.couple.findFirst({
-        where: {
-          OR: [{ aId: user.id }, { bId: user.id }],
-        },
-      });
-
-      const coupleId = couple ? couple.id : null;
-
-      const partner = await getPartnerData(user.id, coupleId);
-
-      // 4. JWT 발급 및 레디스 저장
-      const accessToken = await this.generateAccessToken(user.id);
-      const refreshToken = await this.generateRefreshToken(user.id);
-
-      await this.saveServerRefreshToken(user.id, refreshToken);
-
-      return {
-        message: {
-          code: 200,
-          text: '구글 로그인이 완료되었습니다.',
-        },
-        jwt: {
-          accessToken,
-          refreshToken,
-        },
-        user: {
-          email,
-          nickname: user.nickname,
-          profileUrl: user.profileUrl,
-        },
-        partner,
-        couple: { anniversary: couple ? couple.anniversary : null },
-        isNew,
-      };
-    } catch (err) {
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      console.error('구글 로그인 중 에러 발생', err);
-      throw new HttpException(
-        '구글 로그인 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   // 구글 로그인 후 보안 코드 생성
   async generateGoogleLoginCode(code: string) {
     try {
@@ -537,4 +445,6 @@ export class AuthService {
       },
     };
   }
+
+  async getUserData(userId: number) {}
 }
