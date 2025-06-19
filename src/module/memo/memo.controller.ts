@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { MemoService } from './memo.service';
@@ -54,5 +55,16 @@ export class MemoController {
     @Param('memoId') memoId: number,
   ) {
     return this.memoService.deleteMemo(userId, coupleId, memoId);
+  }
+
+  @Put(':coupleId/:memoId')
+  @UseGuards(AuthGuard('jwt'))
+  async updateMemo(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Param('memoId') memoId: number,
+    @Body('content') content: string,
+  ) {
+    return this.memoService.updateMemo(userId, coupleId, memoId, content);
   }
 }
