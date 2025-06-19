@@ -23,10 +23,24 @@ export class MemoService {
           coupleId,
           content,
         },
+        include: {
+          writer: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+        },
       });
       return {
         message: { code: 200, text: '메모가 생성되었습니다.' },
-        memo: { id: memo.id },
+        memo: {
+          id: memo.id,
+          content: memo.content,
+          createdAt: memo.createdAt,
+          user: { id: memo.writer.id, nickname: memo.writer.nickname },
+          isWidgetMemo: false,
+        },
       };
     } catch (err) {
       console.error('메모 생성 중 에러 발생', err);
@@ -184,11 +198,32 @@ export class MemoService {
       const updatedMemo = await this.prisma.memo.update({
         where: { id: memoId },
         data: { content },
+        include: {
+          writer: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+        },
+      });
+
+      const widgetMemo = await this.prisma.couple.findUnique({
+        where: { id: coupleId },
       });
 
       return {
         message: { code: 200, text: '메모가 수정되었습니다.' },
-        memo: { id: updatedMemo.id, content: updatedMemo.content },
+        memo: {
+          id: updatedMemo.id,
+          content: updatedMemo.content,
+          createdAt: updatedMemo.createdAt,
+          user: {
+            id: updatedMemo.writer.id,
+            nickname: updatedMemo.writer.nickname,
+          },
+          isWidgetMemo: widgetMemo.widgetMemoId === updatedMemo.id,
+        },
       };
     } catch (err) {
       console.error('메모 수정 중 에러 발생', err);
