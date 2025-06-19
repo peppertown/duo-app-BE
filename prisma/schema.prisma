@@ -31,8 +31,8 @@ model User {
   updatedAt   DateTime      @updatedAt
   Todo        Todo[]
   Schedule    Schedule[]
-  MemoContent MemoContent[]
   ListContent ListContent[]
+  Memo        Memo[]
 }
 
 model Couple {
@@ -67,20 +67,11 @@ model Memo {
   id        Int      @id @default(autoincrement())
   coupleId  Int?
   createdAt DateTime @default(now())
-
-  couple      Couple?       @relation(fields: [coupleId], references: [id])
-  MemoContent MemoContent[]
-}
-
-model MemoContent {
-  id        Int      @id @default(autoincrement())
-  memoId    Int
+  content   String?
   writerId  Int
-  content   String
-  createdAt DateTime @default(now())
 
-  memo   Memo @relation(fields: [memoId], references: [id])
-  writer User @relation(fields: [writerId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id])
+  writer User    @relation(fields: [writerId], references: [id])
 }
 
 model List {
