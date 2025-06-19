@@ -54,9 +54,10 @@ export class UserService {
 
   // 커플 연결
   async matchUser(userId: number, code: string) {
+    let couple: any, partner: any;
     try {
-      return await this.prisma.$transaction(async (tx) => {
-        const partner = await tx.user.findUnique({
+      await this.prisma.$transaction(async (tx) => {
+        partner = await tx.user.findUnique({
           where: { code },
         });
 
@@ -67,7 +68,7 @@ export class UserService {
           );
         }
 
-        const couple = await tx.couple.create({
+        couple = await tx.couple.create({
           data: {
             aId: userId,
             bId: partner.id,
@@ -84,16 +85,35 @@ export class UserService {
             photoUrl: process.env.DEFAULT_WIDGET_URL,
           },
         });
-        return {
-          message: {
-            code: 200,
-            text: '커플 연결이 완료되었습니다',
-          },
-          couple: {
-            id: couple.id,
-          },
-        };
       });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      return {
+        message: {
+          code: 200,
+          text: '커플 연결이 완료되었습니다',
+        },
+        user: {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+          profileUrl: user.profileUrl,
+          code: user.code,
+          coupleId: couple.id,
+        },
+        partner: {
+          id: partner.id,
+          nickname: partner.nickname,
+          profileUrl: partner.profileUrl,
+          code: partner.code,
+        },
+        couple: {
+          id: couple.id,
+        },
+      };
     } catch (err) {
       if (err instanceof HttpException) {
         throw err;
@@ -107,6 +127,7 @@ export class UserService {
     }
   }
 
+  // 프로필 사진 업로드
   async uploadProfileImage(userId: number, file: Express.Multer.File) {
     try {
       const result = await this.s3.uploadImageToS3(file, 'profile');
@@ -132,28 +153,4 @@ export class UserService {
       );
     }
   }
-
-  // 유저 롤 설정
-  // async setUserRole(userId: number, userRoleDto: UserRoleDto) {
-  //   try {
-  //     await this.prisma.user.update({
-  //       where: { id: userId },
-  //       data: { role: userRoleDto.role },
-  //     });
-
-  //     return {
-  //       message: {
-  //         code: 200,
-  //         text: 'role 설정이 완료되었습니다.',
-  //       },
-  //       user: { role: userRoleDto.role },
-  //     };
-  //   } catch (err) {
-  //     console.error('롤 설정 중 에러 발생', err);
-  //     throw new HttpException(
-  //       '롤 설정 중 오류가 발생했습니다.',
-  //       HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
 }
