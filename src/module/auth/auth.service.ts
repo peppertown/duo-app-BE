@@ -401,13 +401,11 @@ export class AuthService {
 
     await this.saveServerRefreshToken(userId, newRefreshToken);
 
-    const couple = await this.prisma.couple.findFirst({
-      where: {
-        OR: [{ aId: userId }, { bId: userId }],
-      },
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    const coupleId = couple ? couple.id : null;
+    const { couple, partner } = await this.getUserData(userId);
 
     return {
       message: {
@@ -419,8 +417,15 @@ export class AuthService {
         refreshToken: newRefreshToken,
       },
       user: {
-        coupleId,
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileUrl: user.profileUrl,
+        code: user.code,
+        coupleId: couple ? couple.id : null,
       },
+      partner,
+      couple: { anniversary: couple ? couple.anniversary : null },
     };
   }
 
