@@ -101,15 +101,7 @@ export class AuthService {
 
     await this.saveServerRefreshToken(user.id, refreshToken);
 
-    const couple = await this.prisma.couple.findFirst({
-      where: {
-        OR: [{ aId: user.id }, { bId: user.id }],
-      },
-    });
-
-    const coupleId = couple ? couple.id : null;
-
-    const partner = await getPartnerData(user.id, coupleId);
+    const { couple, partner } = await this.getUserData(user.id);
 
     return {
       success: true,
@@ -123,7 +115,7 @@ export class AuthService {
         nickname: user.nickname,
         profileUrl: user.profileUrl,
         code: user.code,
-        coupleId,
+        coupleId: couple ? couple.id : null,
       },
       partner,
       couple: { anniversary: couple ? couple.anniversary : null },
@@ -264,15 +256,7 @@ export class AuthService {
       // 리프레시 토큰 redis 저장
       await this.saveServerRefreshToken(user.id, refreshToken);
 
-      const couple = await this.prisma.couple.findFirst({
-        where: {
-          OR: [{ aId: user.id }, { bId: user.id }],
-        },
-      });
-
-      const coupleId = couple ? couple.id : null;
-
-      const partner = await getPartnerData(user.id, coupleId);
+      const { couple, partner } = await this.getUserData(user.id);
 
       return {
         message: {
@@ -289,9 +273,10 @@ export class AuthService {
           nickname: user.nickname,
           profileUrl: user.profileUrl,
           code: user.code,
-          coupleId,
+          coupleId: couple ? couple.id : null,
         },
         partner,
+        couple: { anniversary: couple ? couple.anniversary : null },
         isNew,
       };
     } catch (err) {
@@ -332,15 +317,8 @@ export class AuthService {
     // 리프레시 토큰 redis 저장
     await this.saveServerRefreshToken(user.id, jwtRefreshToken);
 
-    const couple = await this.prisma.couple.findFirst({
-      where: {
-        OR: [{ aId: user.id }, { bId: user.id }],
-      },
-    });
+    const { couple, partner } = await this.getUserData(user.id);
 
-    const coupleId = couple ? couple.id : null;
-
-    const partner = await getPartnerData(user.id, coupleId);
     return {
       message: {
         code: 200,
@@ -446,5 +424,16 @@ export class AuthService {
     };
   }
 
-  async getUserData(userId: number) {}
+  // 사용자 데이터 조회
+  async getUserData(userId: number) {
+    const couple = await this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: userId }, { bId: userId }],
+      },
+    });
+
+    const partner = await getPartnerData(userId, couple.id);
+
+    return { couple, partner };
+  }
 }
