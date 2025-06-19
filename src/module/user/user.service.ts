@@ -74,10 +74,6 @@ export class UserService {
           },
         });
 
-        await tx.memo.create({
-          data: { coupleId: couple.id },
-        });
-
         await tx.list.create({
           data: { coupleId: couple.id },
         });
