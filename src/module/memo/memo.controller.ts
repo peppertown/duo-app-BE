@@ -26,4 +26,13 @@ export class MemoController {
   ) {
     return this.memoService.createMemo(userId, coupleId, content);
   }
+
+  @Get(':coupleId')
+  @UseGuards(AuthGuard('jwt'))
+  async getMemo(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+  ) {
+    return this.memoService.getMemo(userId, coupleId);
+  }
 }
