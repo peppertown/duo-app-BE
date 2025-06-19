@@ -72,6 +72,7 @@ export class UserService {
           data: {
             aId: userId,
             bId: partner.id,
+            anniversary: new Date(),
           },
         });
 
@@ -111,7 +112,7 @@ export class UserService {
           code: partner.code,
         },
         couple: {
-          id: couple.id,
+          anniversary: couple.anniversary,
         },
       };
     } catch (err) {
