@@ -36,19 +36,21 @@ model User {
 }
 
 model Couple {
-  id          Int        @id @default(autoincrement())
-  name        String?
-  aId         Int
-  bId         Int
-  a           User       @relation("CoupleA", fields: [aId], references: [id])
-  b           User       @relation("CoupleB", fields: [bId], references: [id])
-  createdAt   DateTime   @default(now())
-  anniversary DateTime?
-  Todo        Todo[]
-  Schedule    Schedule[]
-  Memo        Memo[]
-  List        List[]
-  Widget      Widget[]
+  id           Int       @id @default(autoincrement())
+  name         String?
+  aId          Int
+  bId          Int
+  a            User      @relation("CoupleA", fields: [aId], references: [id])
+  b            User      @relation("CoupleB", fields: [bId], references: [id])
+  createdAt    DateTime  @default(now())
+  anniversary  DateTime?
+  widgetMemoId Int?
+
+  Todo     Todo[]
+  Schedule Schedule[]
+  Memo     Memo[]
+  List     List[]
+  Widget   Widget[]
 }
 
 model Todo {
