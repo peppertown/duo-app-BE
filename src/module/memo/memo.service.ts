@@ -86,4 +86,40 @@ export class MemoService {
       );
     }
   }
+
+  // 위젯 메모 설정
+  async setWidgetMemo(userId: number, coupleId: number, memoId: number) {
+    try {
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const memo = await this.prisma.memo.findUnique({
+        where: { id: memoId },
+      });
+      if (!memo || memo.coupleId !== coupleId) {
+        throw new HttpException(
+          '존재하지 않는 메모입니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.prisma.couple.update({
+        where: { id: coupleId },
+        data: { widgetMemoId: memoId },
+      });
+
+      return { message: { code: 200, text: '위젯 메모 설정 완료' } };
+    } catch (err) {
+      console.error('위젯 메모 설정 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+      throw new HttpException(
+        '위젯 메모 설정 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

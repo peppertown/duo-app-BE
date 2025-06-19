@@ -35,4 +35,14 @@ export class MemoController {
   ) {
     return this.memoService.getMemo(userId, coupleId);
   }
+
+  @Post(':coupleId/widget/:memoId')
+  @UseGuards(AuthGuard('jwt'))
+  async setWidgetMemo(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Param('memoId') memoId: number,
+  ) {
+    return this.memoService.setWidgetMemo(userId, coupleId, memoId);
+  }
 }
