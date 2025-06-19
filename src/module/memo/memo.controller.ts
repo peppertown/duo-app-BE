@@ -12,6 +12,13 @@ import { MemoService } from './memo.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  createMemoDocs,
+  deleteMemoDocs,
+  getMemoDocs,
+  setWidgetMemoDocs,
+  updateMemoDocs,
+} from './docs/memo.docs';
 
 @ApiTags('memo')
 @Controller('memo')
@@ -20,6 +27,11 @@ export class MemoController {
 
   @Post(':coupleId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @createMemoDocs.operation
+  @createMemoDocs.param
+  @createMemoDocs.body
+  @createMemoDocs.response
   async createMemo(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -30,6 +42,10 @@ export class MemoController {
 
   @Get(':coupleId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @getMemoDocs.operation
+  @getMemoDocs.param
+  @getMemoDocs.response
   async getMemo(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -39,6 +55,11 @@ export class MemoController {
 
   @Post(':coupleId/widget/:memoId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @setWidgetMemoDocs.operation
+  @setWidgetMemoDocs.paramCoupleId
+  @setWidgetMemoDocs.paramMemoId
+  @setWidgetMemoDocs.response
   async setWidgetMemo(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -49,6 +70,11 @@ export class MemoController {
 
   @Delete(':coupleId/:memoId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @deleteMemoDocs.operation
+  @deleteMemoDocs.paramCoupleId
+  @deleteMemoDocs.paramMemoId
+  @deleteMemoDocs.response
   async deleteMemo(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -59,6 +85,12 @@ export class MemoController {
 
   @Put(':coupleId/:memoId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @updateMemoDocs.operation
+  @updateMemoDocs.paramCoupleId
+  @updateMemoDocs.paramMemoId
+  @updateMemoDocs.body
+  @updateMemoDocs.response
   async updateMemo(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
