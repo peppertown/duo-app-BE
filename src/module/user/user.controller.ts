@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Post,
   UploadedFile,
   UseGuards,
@@ -10,6 +11,7 @@ import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import {
+  deleteUserDocs,
   matchUserDocs,
   setUserBirthdayDocs,
   setUserNicknameDocs,
@@ -67,6 +69,15 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return await this.userService.uploadProfileImage(userId, file);
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @deleteUserDocs.operation
+  @deleteUserDocs.response
+  async deleteUser(@CurrentUserId() userId: number) {
+    return await this.userService.deleteUser(userId);
   }
 
   // @Post('role')

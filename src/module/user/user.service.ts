@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RedisService } from 'src/redis/redis.service';
 import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
@@ -7,6 +8,7 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
+    private readonly redis: RedisService,
   ) {}
   // 유저 닉네임 설정
   async setUserNickname(userId: number, nickname: string) {
@@ -136,6 +138,28 @@ export class UserService {
       console.error('커플 연결 중 에러 발생', err);
       throw new HttpException(
         '커플 연결 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 회원 탈퇴
+  async deleteUser(userId: number) {
+    try {
+      await this.prisma.user.delete({
+        where: { id: userId },
+      });
+      await this.redis.del(`${process.env.REFRESH_KEY_JWT}:${userId}`);
+      return {
+        message: {
+          code: 200,
+          text: '사용자 삭제가 완료되었습니다.',
+        },
+      };
+    } catch (err) {
+      console.error('사용자 삭제 중 에러 발생', err);
+      throw new HttpException(
+        '사용자 삭제 중 오류가 발생했습니다',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

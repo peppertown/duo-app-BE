@@ -172,3 +172,23 @@ export const setUserBirthdayDocs = {
     },
   }),
 };
+
+export const deleteUserDocs = {
+  operation: ApiOperation({
+    summary: '회원 탈퇴',
+    description: '현재 로그인한 사용자의 계정을 삭제합니다.',
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '회원 탈퇴 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+      },
+    },
+  }),
+};

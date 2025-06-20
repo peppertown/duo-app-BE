@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+  deleteCoupleDocs,
   getCoupleAnniversariesDocs,
   getCoupleDataDocs,
   getCoupleWidgetDocs,
@@ -113,9 +114,9 @@ export class CoupleController {
   @Delete(':coupleId')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @setCoupleWidgetDocs.operation
-  @setCoupleWidgetDocs.param
-  @setCoupleWidgetDocs.response
+  @deleteCoupleDocs.operation
+  @deleteCoupleDocs.param
+  @deleteCoupleDocs.response
   async deleteCouple(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
