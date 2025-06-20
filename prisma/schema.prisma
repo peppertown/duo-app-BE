@@ -40,8 +40,8 @@ model Couple {
   name         String?
   aId          Int
   bId          Int
-  a            User      @relation("CoupleA", fields: [aId], references: [id])
-  b            User      @relation("CoupleB", fields: [bId], references: [id])
+  a            User      @relation("CoupleA", fields: [aId], references: [id], onDelete: Cascade)
+  b            User      @relation("CoupleB", fields: [bId], references: [id], onDelete: Cascade)
   createdAt    DateTime  @default(now())
   anniversary  DateTime?
   widgetMemoId Int?
@@ -61,7 +61,7 @@ model Todo {
   isDone    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  couple Couple? @relation(fields: [coupleId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   writer User    @relation(fields: [writerId], references: [id])
 }
 
@@ -72,7 +72,7 @@ model Memo {
   content   String?
   writerId  Int
 
-  couple Couple? @relation(fields: [coupleId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   writer User    @relation(fields: [writerId], references: [id])
 }
 
@@ -81,7 +81,7 @@ model List {
   coupleId  Int?     @unique
   createdAt DateTime @default(now())
 
-  couple      Couple?       @relation(fields: [coupleId], references: [id])
+  couple      Couple?       @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   ListContent ListContent[]
 }
 
@@ -93,7 +93,7 @@ model ListContent {
   isDone    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  list   List @relation(fields: [listId], references: [id])
+  list   List @relation(fields: [listId], references: [id], onDelete: Cascade)
   writer User @relation(fields: [writerId], references: [id])
 }
 
@@ -107,7 +107,7 @@ model Schedule {
   createdAt DateTime @default(now())
 
   user   User    @relation(fields: [userId], references: [id])
-  couple Couple? @relation(fields: [coupleId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 }
 
 model Widget {
@@ -115,5 +115,5 @@ model Widget {
   coupleId Int?    @unique
   photoUrl String?
 
-  couple Couple? @relation(fields: [coupleId], references: [id])
+  couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 }
