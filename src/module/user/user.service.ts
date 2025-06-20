@@ -54,7 +54,20 @@ export class UserService {
 
   // 커플 연결
   async matchUser(userId: number, code: string) {
-    let couple: any, partner: any;
+    let couple = await this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: userId }, { bId: userId }],
+      },
+    });
+
+    if (couple) {
+      throw new HttpException(
+        '이미 커플이 연결되어 있습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let partner: any;
     try {
       await this.prisma.$transaction(async (tx) => {
         partner = await tx.user.findUnique({
