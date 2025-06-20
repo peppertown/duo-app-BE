@@ -78,7 +78,7 @@ model Memo {
 
 model List {
   id        Int      @id @default(autoincrement())
-  coupleId  Int?
+  coupleId  Int?     @unique
   createdAt DateTime @default(now())
 
   couple      Couple?       @relation(fields: [coupleId], references: [id])
@@ -112,7 +112,7 @@ model Schedule {
 
 model Widget {
   id       Int     @id @default(autoincrement())
-  coupleId Int?
+  coupleId Int?    @unique
   photoUrl String?
 
   couple Couple? @relation(fields: [coupleId], references: [id])
