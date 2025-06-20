@@ -296,3 +296,29 @@ export const setCoupleWidgetDocs = {
     },
   }),
 };
+
+export const deleteCoupleDocs = {
+  operation: ApiOperation({
+    summary: '커플 연결 해제',
+    description: '커플 ID를 통해 커플 연결을 해제합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  response: ApiOkResponse({
+    status: 200,
+    description: '커플 연결 해제 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+      },
+    },
+  }),
+};

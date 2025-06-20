@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -107,5 +108,18 @@ export class CoupleController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return await this.coupleService.setCoupleWidget(userId, coupleId, file);
+  }
+
+  @Delete(':coupleId')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @setCoupleWidgetDocs.operation
+  @setCoupleWidgetDocs.param
+  @setCoupleWidgetDocs.response
+  async deleteCouple(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+  ) {
+    return await this.coupleService.deleteCouple(userId, coupleId);
   }
 }

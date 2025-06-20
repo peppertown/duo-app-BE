@@ -171,6 +171,34 @@ export class CoupleService {
     }
   }
 
+  // 커플 연결 해제
+  async deleteCouple(userId: number, coupleId: number) {
+    try {
+      const auth = await this.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.couple.delete({
+        where: { id: coupleId },
+      });
+
+      return {
+        message: { code: 200, text: '커플 연결 해제가 완료되었습니다.' },
+      };
+    } catch (err) {
+      console.error('커플 삭제 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '커플 삭제 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 커플 관련 api 권한 확인
   async confirmCoupleAuth(userId: number, coupleId: number) {
     try {
