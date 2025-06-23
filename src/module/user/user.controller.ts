@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Post,
   UploadedFile,
   UseGuards,
@@ -58,6 +59,13 @@ export class UserController {
   @matchUserDocs.response
   async matchUser(@CurrentUserId() userId: number, @Body('code') code: string) {
     return await this.userService.matchUser(userId, code);
+  }
+
+  @Get('match')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async isMatched(@CurrentUserId() userId: number) {
+    return await this.userService.isMatched(userId);
   }
 
   @Post('image')
