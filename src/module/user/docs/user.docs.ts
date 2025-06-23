@@ -139,6 +139,59 @@ export const matchUserDocs = {
   }),
 };
 
+export const isMatchedDocs = {
+  operation: ApiOperation({
+    summary: '커플 매칭 상태 확인',
+    description: '현재 로그인한 사용자의 커플 매칭 상태를 확인합니다.',
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '매칭된 경우 응답',
+    schema: {
+      type: 'object',
+      example: {
+        success: true,
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+        user: {
+          id: '유저 ID | number',
+          email: '이메일 | string',
+          nickname: '닉네임 | string',
+          profileUrl: '프로필 이미지 URL | string',
+          code: '매칭 코드 | string',
+          coupleId: '커플 ID | number',
+        },
+        couple: {
+          anniversary: '기념일 | string (ISO 8601)',
+        },
+        partner: {
+          id: '상대 유저 ID | number',
+          email: '상대 이메일 | string',
+          nickname: '상대 닉네임 | string',
+          profileUrl: '상대 프로필 이미지 URL | string',
+          code: '상대 매칭 코드 | string',
+        },
+      },
+    },
+  }),
+  response404: ApiResponse({
+    status: 404,
+    description: '매칭되지 않은 경우 응답',
+    schema: {
+      type: 'object',
+      example: {
+        success: false,
+        message: {
+          code: '404 | number',
+          text: '커플이 연결되어 있지 않습니다. | string',
+        },
+      },
+    },
+  }),
+};
+
 export const setUserBirthdayDocs = {
   operation: ApiOperation({
     summary: '유저 생일 설정',

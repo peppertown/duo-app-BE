@@ -13,6 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import {
   deleteUserDocs,
+  isMatchedDocs,
   matchUserDocs,
   setUserBirthdayDocs,
   setUserNicknameDocs,
@@ -64,6 +65,9 @@ export class UserController {
   @Get('match')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @isMatchedDocs.operation
+  @isMatchedDocs.response
+  @isMatchedDocs.response404
   async isMatched(@CurrentUserId() userId: number) {
     return await this.userService.isMatched(userId);
   }
