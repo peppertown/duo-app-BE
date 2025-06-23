@@ -436,7 +436,12 @@ export class AuthService {
         OR: [{ aId: userId }, { bId: userId }],
       },
     });
-
+    if (!couple) {
+      return {
+        couple: null,
+        partner: null,
+      };
+    }
     const partner = await getPartnerData(userId, couple.id);
 
     return { couple, partner };
