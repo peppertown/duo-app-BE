@@ -11,6 +11,7 @@ import { CalendarModule } from './module/calendar/calendar.module';
 import { MemoModule } from './module/memo/memo.module';
 import { ListModule } from './module/list/list.module';
 import { SseModule } from './sse/sse.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SseModule } from './sse/sse.module';
     MemoModule,
     ListModule,
     SseModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
