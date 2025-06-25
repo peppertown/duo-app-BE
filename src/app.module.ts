@@ -12,6 +12,7 @@ import { MemoModule } from './module/memo/memo.module';
 import { ListModule } from './module/list/list.module';
 import { SseModule } from './sse/sse.module';
 import { CronModule } from './cron/cron.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CronModule } from './cron/cron.module';
     ListModule,
     SseModule,
     CronModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
