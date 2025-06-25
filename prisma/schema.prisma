@@ -27,12 +27,13 @@ model User {
   couplesAsA Couple[] @relation("CoupleA")
   couplesAsB Couple[] @relation("CoupleB")
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Todo        Todo[]
-  Schedule    Schedule[]
-  ListContent ListContent[]
-  Memo        Memo[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Todo         Todo[]
+  Schedule     Schedule[]
+  ListContent  ListContent[]
+  Memo         Memo[]
+  Notification Notification[]
 }
 
 model Couple {
@@ -116,4 +117,23 @@ model Widget {
   photoUrl String?
 
   couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  payload   Json
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum NotificationType {
+  MEMO_CREATED
+  LIST_CREATED
+  CONNECTION_REQUEST
+  CONNECTION_ACCEPTED
+  CONNECTION_BROKEN
 }
