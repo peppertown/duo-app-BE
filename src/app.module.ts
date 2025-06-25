@@ -10,6 +10,7 @@ import { CoupleModule } from './module/couple/couple.module';
 import { CalendarModule } from './module/calendar/calendar.module';
 import { MemoModule } from './module/memo/memo.module';
 import { ListModule } from './module/list/list.module';
+import { SseModule } from './sse/sse.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ListModule } from './module/list/list.module';
     CalendarModule,
     MemoModule,
     ListModule,
+    SseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
