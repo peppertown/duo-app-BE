@@ -52,7 +52,7 @@ export class SseService {
 
       const client = this.clients.get(userId);
       if (client) {
-        client.write(`data: ${JSON.stringify({ type, payload })}\n\n`);
+        client.write(JSON.stringify({ type, payload }));
       }
     } catch (err) {
       console.error('알림 생성 중 에러 발생', err);
