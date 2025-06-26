@@ -38,4 +38,35 @@ export class NotificationService {
       );
     }
   }
+
+  // 알림 삭제
+  async deleteNotification(userId: number, notificationId: number) {
+    try {
+      const notification = await this.prisma.notification.findUnique({
+        where: { id: notificationId, userId },
+      });
+
+      if (!notification) {
+        throw new HttpException(
+          '알림이 존재하지 않습니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.prisma.notification.delete({
+        where: { id: notificationId },
+      });
+
+      return {
+        success: true,
+        message: { code: 200, text: '알림이 삭제되었습니다.' },
+      };
+    } catch (error) {
+      console.error('알림 삭제 중 에러 발생', error);
+      throw new HttpException(
+        '알림 삭제 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
