@@ -13,6 +13,7 @@ import { ListModule } from './module/list/list.module';
 import { SseModule } from './sse/sse.module';
 import { CronModule } from './cron/cron.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationModule } from './module/notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     SseModule,
     CronModule,
     ScheduleModule.forRoot(),
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
