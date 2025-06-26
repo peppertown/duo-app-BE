@@ -1,13 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CoupleService } from '../couple/couple.service';
+import { SseService } from 'src/sse/sse.service';
 
 @Injectable()
 export class MemoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly coupleService: CoupleService,
+    private readonly sse: SseService, // SSE 서비스 주입
   ) {}
+
+  private readonly notificationType = 'MEMO_CREATED'; // 알림 타입 정의
 
   // 메모 생성
   async createMemo(userId: number, coupleId: number, content: string) {
@@ -30,8 +34,27 @@ export class MemoService {
               nickname: true,
             },
           },
+          couple: {
+            select: {
+              aId: true,
+              bId: true,
+            },
+          },
         },
       });
+
+      const partnerId =
+        memo.couple.aId === userId ? memo.couple.bId : memo.couple.aId;
+
+      // 알림 생성 및 전송
+      await this.sse.createNofication(
+        partnerId,
+        this.notificationType,
+        JSON.stringify({
+          memo: { id: memo.id },
+          content: '새로운 메모가 생성되었습니다.',
+        }),
+      );
       return {
         message: { code: 200, text: '메모가 생성되었습니다.' },
         memo: {
