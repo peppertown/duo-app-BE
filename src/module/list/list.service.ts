@@ -65,6 +65,7 @@ export class ListService {
     const list = listData.map((i) => ({
       id: i.id,
       isOwn: i.writerId == userId,
+      categoryId: i.categoryId,
       content: i.content,
       isDone: i.isDone,
       createdAt: i.createdAt,
