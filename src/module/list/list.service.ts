@@ -10,7 +10,12 @@ export class ListService {
   ) {}
 
   // 리스트 목록 추가
-  async createList(userId: number, coupleId: number, content: string) {
+  async createList(
+    userId: number,
+    coupleId: number,
+    categoryId: number,
+    content: string,
+  ) {
     try {
       const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
@@ -22,7 +27,7 @@ export class ListService {
       });
 
       await this.prisma.listContent.create({
-        data: { listId: coupleList.id, writerId: userId, content },
+        data: { listId: coupleList.id, writerId: userId, categoryId, content },
       });
 
       return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };

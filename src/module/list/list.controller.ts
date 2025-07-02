@@ -45,11 +45,12 @@ export class ListController {
   @createListDocs.response
   async createList(
     @CurrentUserId() userId: number,
-    @Body() body: { coupleId: number; content: string },
+    @Body() body: { coupleId: number; categoryId: number; content: string },
   ) {
     return await this.listService.createList(
       userId,
       body.coupleId,
+      body.categoryId,
       body.content,
     );
   }
