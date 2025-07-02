@@ -87,15 +87,23 @@ model List {
 }
 
 model ListContent {
-  id        Int      @id @default(autoincrement())
-  listId    Int
-  writerId  Int
-  content   String
-  isDone    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  listId     Int
+  writerId   Int
+  categoryId Int
+  content    String
+  isDone     Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  list   List @relation(fields: [listId], references: [id], onDelete: Cascade)
-  writer User @relation(fields: [writerId], references: [id])
+  list     List         @relation(fields: [listId], references: [id], onDelete: Cascade)
+  writer   User         @relation(fields: [writerId], references: [id])
+  category ListCategory @relation(fields: [categoryId], references: [id])
+}
+
+model ListCategory {
+  id          Int           @id @default(autoincrement())
+  name        String
+  ListContent ListContent[]
 }
 
 model Schedule {
