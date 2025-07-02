@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CoupleService } from '../couple/couple.service';
 
@@ -11,47 +11,78 @@ export class MypageService {
 
   // 마이페이지 조회
   async getMypage(userId: number) {
-    const data = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        couplesAsA: { include: { a: true, b: true } },
-        couplesAsB: { include: { a: true, b: true } },
-      },
-    });
+    try {
+      const data = await this.prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          couplesAsA: { include: { a: true, b: true } },
+          couplesAsB: { include: { a: true, b: true } },
+        },
+      });
 
-    const partnerData =
-      data.couplesAsA.length > 0 ? data.couplesAsA[0].b : data.couplesAsB[0].a;
-    const user = this.getMypageProfile(data);
-    const partner = this.getMypageProfile(partnerData);
+      const user = this.getMypageProfile(data);
 
-    const coupleId =
-      data.couplesAsA.length > 0
-        ? data.couplesAsA[0].id
-        : data.couplesAsB[0].id;
+      if (!data.couplesAsA.length && !data.couplesAsB.length) {
+        return {
+          message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
+          user,
+          partner: null,
+          anniv: null,
+        };
+      }
 
-    const anniv = (await this.coupleService.getCoupleAnniversaries(coupleId))
-      .anniv;
+      const partnerData =
+        data.couplesAsA.length > 0
+          ? data.couplesAsA[0].b
+          : data.couplesAsB[0].a;
+      const partner = this.getMypageProfile(partnerData);
 
-    return {
-      message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
-      user,
-      partner,
-      anniv,
-    };
+      const coupleId =
+        data.couplesAsA.length > 0
+          ? data.couplesAsA[0].id
+          : data.couplesAsB[0].id;
+
+      const anniv = (await this.coupleService.getCoupleAnniversaries(coupleId))
+        .anniv;
+
+      return {
+        message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
+        user,
+        partner,
+        anniv,
+      };
+    } catch (err) {
+      console.error('마이페이지 조회 중 에러 발생', err);
+      throw new HttpException(
+        '마이페이지 조회 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   // 프로필 메세지 업데이트
   async updateProfileBio(userId: number, bio: string) {
-    const result = await this.prisma.user.update({
-      where: { id: userId },
-      data: { bio },
-    });
+    try {
+      const result = await this.prisma.user.update({
+        where: { id: userId },
+        data: { bio },
+      });
 
-    const user = this.getMypageProfile(result);
-    return {
-      message: { code: 200, text: '프로필 메세지 업데이트가 완료되었습니다.' },
-      user,
-    };
+      const user = this.getMypageProfile(result);
+      return {
+        message: {
+          code: 200,
+          text: '프로필 메세지 업데이트가 완료되었습니다.',
+        },
+        user,
+      };
+    } catch (err) {
+      console.error('프로필 메세지 업데이트 중 에러 발생', err);
+      throw new HttpException(
+        '프로필 메세지 업데이트 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   getMypageProfile(user: any) {
