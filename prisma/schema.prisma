@@ -20,9 +20,11 @@ model User {
   password     String?
   nickname     String?
   profileUrl   String?
+  bio          String?
   authProvider String?
   code         String    @unique
   birthday     DateTime?
+  themeId      Int       @default(1)
 
   couplesAsA Couple[] @relation("CoupleA")
   couplesAsB Couple[] @relation("CoupleB")
@@ -34,6 +36,11 @@ model User {
   ListContent  ListContent[]
   Memo         Memo[]
   Notification Notification[]
+}
+
+model Theme {
+  id    Int    @id @default(autoincrement())
+  color String
 }
 
 model Couple {
