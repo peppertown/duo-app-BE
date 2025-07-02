@@ -27,6 +27,7 @@ export const getListDocs = {
           {
             id: '아이템 id | number',
             isOwn: '본인이 작성한 리스트인지 여부 | boolean',
+            categoryId: '카테고리 id | number',
             content: '리스트 내용 | string',
             createdAt: '생성일(ISO 문자열) | string',
             isDone: '완료 여부 | boolean',
@@ -48,6 +49,7 @@ export const createListDocs = {
       type: 'object',
       properties: {
         coupleId: { type: 'number', example: '커플 id | number' },
+        categoryId: { type: 'number', example: '카테고리 id | number' },
         content: { type: 'string', example: '등록할 내용 | string' },
       },
       required: ['coupleId', 'listId', 'content'],
