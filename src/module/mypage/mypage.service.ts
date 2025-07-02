@@ -40,6 +40,20 @@ export class MypageService {
     };
   }
 
+  // 프로필 메세지 업데이트
+  async updateProfileBio(userId: number, bio: string) {
+    const result = await this.prisma.user.update({
+      where: { id: userId },
+      data: { bio },
+    });
+
+    const user = this.getMypageProfile(result);
+    return {
+      message: { code: 200, text: '프로필 메세지 업데이트가 완료되었습니다.' },
+      user,
+    };
+  }
+
   getMypageProfile(user: any) {
     return {
       id: user.id,
