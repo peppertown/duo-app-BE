@@ -14,6 +14,7 @@ import { SseModule } from './sse/sse.module';
 import { CronModule } from './cron/cron.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationModule } from './module/notification/notification.module';
+import { MypageModule } from './module/mypage/mypage.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotificationModule } from './module/notification/notification.module';
     CronModule,
     ScheduleModule.forRoot(),
     NotificationModule,
+    MypageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
