@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CoupleService } from '../couple/couple.service';
 
 @Injectable()
 export class MypageService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly coupleService: CoupleService,
+  ) {}
 
   // 마이페이지 조회
   async getMypage(userId: number) {
@@ -20,7 +24,20 @@ export class MypageService {
     const user = this.getMypageProfile(data);
     const partner = this.getMypageProfile(partnerData);
 
-    return { user, partner };
+    const coupleId =
+      data.couplesAsA.length > 0
+        ? data.couplesAsA[0].id
+        : data.couplesAsB[0].id;
+
+    const anniv = (await this.coupleService.getCoupleAnniversaries(coupleId))
+      .anniv;
+
+    return {
+      message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
+      user,
+      partner,
+      anniv,
+    };
   }
 
   getMypageProfile(user: any) {
