@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { RedisModule } from 'src/redis/redis.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { CoupleModule } from '../couple/couple.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
       secret: process.env.JWT_SECRET,
     }),
     RedisModule,
+    CoupleModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

@@ -13,6 +13,7 @@ import axios from 'axios';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import * as jwt from 'jsonwebtoken';
+import { CoupleService } from '../couple/couple.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly redis: RedisService,
+    private readonly coupleService: CoupleService,
   ) {}
 
   private verifyRefreshToken(token: string): any {
@@ -118,7 +120,10 @@ export class AuthService {
         coupleId: couple ? couple.id : null,
       },
       partner,
-      couple: { anniversary: couple ? couple.anniversary : null },
+      couple: {
+        anniversary: couple ? couple.anniversary : null,
+        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
+      },
       jwt: {
         accessToken,
         refreshToken,
@@ -276,7 +281,10 @@ export class AuthService {
           coupleId: couple ? couple.id : null,
         },
         partner,
-        couple: { anniversary: couple ? couple.anniversary : null },
+        couple: {
+          anniversary: couple ? couple.anniversary : null,
+          dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
+        },
         isNew,
       };
     } catch (err) {
@@ -337,7 +345,10 @@ export class AuthService {
         coupleId: couple ? couple.id : null,
       },
       partner,
-      couple: { anniversary: couple ? couple.anniversary : null },
+      couple: {
+        anniversary: couple ? couple.anniversary : null,
+        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
+      },
       isNew,
     };
   }
@@ -425,7 +436,10 @@ export class AuthService {
         coupleId: couple ? couple.id : null,
       },
       partner,
-      couple: { anniversary: couple ? couple.anniversary : null },
+      couple: {
+        anniversary: couple ? couple.anniversary : null,
+        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
+      },
     };
   }
 

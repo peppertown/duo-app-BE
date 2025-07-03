@@ -97,6 +97,7 @@ export const handleRefreshDocs = {
         },
         couple: {
           anniversary: '커플 기념일 | string',
+          dday: '커플 D-Day | number',
         },
       },
     },
@@ -176,7 +177,10 @@ export const verifyGoogleSecurityCodeDocs = {
           profileUlr: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
         },
-        couple: { anniversary: '커플 기념일 | string' },
+        couple: {
+          anniversary: '커플 기념일 | string',
+          dday: '커플 D-Day | number',
+        },
         isNew: '신규 가입 여부 | boolean',
       },
     },
@@ -239,17 +243,21 @@ export const loginDocs = {
         },
         user: {
           id: '유저 아이디 | number',
-          nickname: '유저 닉네임 | string',
-          profileUlr: '유저 프로필 url | string',
+          email: '유저 이메일 | string',
+          nickname: '닉네임 | string',
+          profileUrl: '프로필 URL | string',
           code: '유저 코드 | string',
-          coupleId: '커플 id | number',
+          coupleId: '커플 아이디 | number',
         },
-
-        parter: {
+        partner: {
           id: '상대방 아이디 | number',
           nickname: '상대방 닉네임 | string',
-          profileUlr: '상대방 프로필 url | string',
+          profileUrl: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
+        },
+        couple: {
+          anniversary: '커플 기념일 | string',
+          dday: '커플 D-Day | number',
         },
         jwt: {
           accessToken: '액세스 토큰 | string',
@@ -347,7 +355,10 @@ export const kakaoLoginDocs = {
           profileUrl: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
         },
-        couple: { anniversary: '커플 기념일 | string' },
+        couple: {
+          anniversary: '커플 기념일 | string',
+          dday: '커플 D-Day | number',
+        },
         isNew: '신규 가입 여부 | boolean',
       },
     },
