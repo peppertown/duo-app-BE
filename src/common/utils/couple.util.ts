@@ -22,8 +22,8 @@ export const getPartnerData = async (userId: number, coupleId: number) => {
 
   for (const user in couple) {
     if (couple[user].id !== userId) {
-      const { id, nickname, profileUrl, code } = couple[user];
-      partner = { id, nickname, profileUrl, code };
+      const { id, nickname, profileUrl, code, themeId } = couple[user];
+      partner = { id, nickname, profileUrl, code, themeId };
     }
   }
 

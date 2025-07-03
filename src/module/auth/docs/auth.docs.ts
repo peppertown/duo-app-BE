@@ -87,6 +87,7 @@ export const handleRefreshDocs = {
           nickname: '닉네임 | string',
           profileUrl: '프로필 URL | string',
           code: '유저 코드 | string',
+          themeId: '테마 아이디 | number',
           coupleId: '커플 아이디 | number',
         },
         partner: {
@@ -94,6 +95,7 @@ export const handleRefreshDocs = {
           nickname: '상대방 닉네임 | string',
           profileUrl: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
+          themeId: '테마 아이디 | number',
         },
         couple: {
           anniversary: '커플 기념일 | string',
@@ -169,6 +171,7 @@ export const verifyGoogleSecurityCodeDocs = {
           nickname: '유저 닉네임 | string',
           profileUrl: '프로필 URL | string',
           code: '유저 코드 | string',
+          themeId: '테마 아이디 | number',
           coupleId: '커플 id | number',
         },
         parter: {
@@ -176,6 +179,7 @@ export const verifyGoogleSecurityCodeDocs = {
           nickname: '상대방 닉네임 | string',
           profileUlr: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
+          themeId: '테마 아이디 | number',
         },
         couple: {
           anniversary: '커플 기념일 | string',
@@ -247,6 +251,7 @@ export const loginDocs = {
           nickname: '닉네임 | string',
           profileUrl: '프로필 URL | string',
           code: '유저 코드 | string',
+          themeId: '테마 아이디 | number',
           coupleId: '커플 아이디 | number',
         },
         partner: {
@@ -254,6 +259,7 @@ export const loginDocs = {
           nickname: '상대방 닉네임 | string',
           profileUrl: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
+          themeId: '테마 아이디 | number',
         },
         couple: {
           anniversary: '커플 기념일 | string',
@@ -347,6 +353,7 @@ export const kakaoLoginDocs = {
           nickname: '닉네임 | string',
           profileUrl: '프로필 URL | string',
           code: '유저 코드 | string',
+          themeId: '테마 아이디 | number',
           coupleId: '커플 아이디 | number',
         },
         partner: {
@@ -354,6 +361,7 @@ export const kakaoLoginDocs = {
           nickname: '상대방 닉네임 | string',
           profileUrl: '상대방 프로필 url | string',
           code: '상대방 코드 | string',
+          themeId: '테마 아이디 | number',
         },
         couple: {
           anniversary: '커플 기념일 | string',
