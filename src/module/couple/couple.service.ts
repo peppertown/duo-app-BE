@@ -241,7 +241,6 @@ export class CoupleService {
 
       return {
         message: { code: 200, text: '커플 기념일 조회가 완료되었습니다.' },
-        dday,
         anniv,
       };
     } catch (err) {
