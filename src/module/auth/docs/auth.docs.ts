@@ -62,7 +62,7 @@ export const handleRefreshDocs = {
     schema: {
       type: 'object',
       properties: {
-        code: { type: 'string', example: '기존 리프레시 토큰' },
+        code: { type: 'string', example: '기존 리프레시 토큰 | string' },
       },
     },
   }),
@@ -72,29 +72,31 @@ export const handleRefreshDocs = {
     description: '토큰 재발급 성공',
     schema: {
       type: 'object',
-      properties: {
+      example: {
         message: {
-          type: 'object',
-          properties: {
-            code: { type: 'number', example: 200 },
-            text: {
-              type: 'string',
-              example: '토큰 재발급이 완료되었습니다',
-            },
-          },
+          code: '응답 코드 | number',
+          text: '토큰 재발급이 완료되었습니다 | string',
         },
         jwt: {
-          type: 'object',
-          properties: {
-            accessToken: {
-              type: 'string',
-              example: 'jwt 액세스 토큰',
-            },
-            refreshToken: {
-              type: 'string',
-              example: 'jwt 리프레시 토큰',
-            },
-          },
+          accessToken: 'jwt 액세스 토큰 | string',
+          refreshToken: 'jwt 리프레시 토큰 | string',
+        },
+        user: {
+          id: '유저 아이디 | number',
+          email: '유저 이메일 | string',
+          nickname: '닉네임 | string',
+          profileUrl: '프로필 URL | string',
+          code: '유저 코드 | string',
+          coupleId: '커플 아이디 | number',
+        },
+        partner: {
+          id: '상대방 아이디 | number',
+          nickname: '상대방 닉네임 | string',
+          profileUrl: '상대방 프로필 url | string',
+          code: '상대방 코드 | string',
+        },
+        couple: {
+          anniversary: '커플 기념일 | string',
         },
       },
     },
