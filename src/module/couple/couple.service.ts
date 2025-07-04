@@ -281,9 +281,28 @@ export class CoupleService {
       const bBirth = this.getDaysToNextBirthday(data.b.birthday);
       const anniv = [
         upcoming,
-        { type: `${data.a.nickname}님 생일`, ...aBirth },
-        { type: `${data.b.nickname}님 생일`, ...bBirth },
+        { id: null, type: `${data.a.nickname}님 생일`, ...aBirth },
+        { id: null, type: `${data.b.nickname}님 생일`, ...bBirth },
       ];
+
+      const otherAnniv = await this.prisma.coupleAnniversary.findMany({
+        where: { coupleId },
+        orderBy: { date: 'asc' },
+      });
+
+      if (otherAnniv.length) {
+        otherAnniv.forEach((item) => {
+          const days = this.getDays(item.date);
+          anniv.push({
+            id: item.id,
+            type: item.title,
+            days,
+            date: item.date,
+          });
+        });
+      }
+
+      anniv.sort((a, b) => a.date.getTime() - b.date.getTime());
 
       return {
         message: { code: 200, text: '커플 기념일 조회가 완료되었습니다.' },
@@ -324,12 +343,14 @@ export class CoupleService {
 
     if (hundredDiff < yearDiff) {
       return {
+        id: null,
         type: `${nextHundred}일`,
         days: hundredDiff,
         date: nextHundredDate,
       };
     } else {
       return {
+        id: null,
         type: `${nextYear}주년`,
         days: yearDiff,
         date: nextYearDate,
