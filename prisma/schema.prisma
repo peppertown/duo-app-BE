@@ -54,11 +54,21 @@ model Couple {
   anniversary  DateTime?
   widgetMemoId Int?
 
-  Todo     Todo[]
-  Schedule Schedule[]
-  Memo     Memo[]
-  List     List[]
-  Widget   Widget[]
+  Todo              Todo[]
+  Schedule          Schedule[]
+  Memo              Memo[]
+  List              List[]
+  Widget            Widget[]
+  CoupleAnniversary CoupleAnniversary[]
+}
+
+model CoupleAnniversary {
+  id       Int      @id @default(autoincrement())
+  title    String
+  coupleId Int
+  Date     DateTime
+
+  couple Couple @relation(fields: [coupleId], references: [id])
 }
 
 model Todo {
