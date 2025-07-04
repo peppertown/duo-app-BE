@@ -66,7 +66,7 @@ model CoupleAnniversary {
   id       Int      @id @default(autoincrement())
   title    String
   coupleId Int
-  Date     DateTime
+  date     DateTime
 
   couple Couple @relation(fields: [coupleId], references: [id])
 }
