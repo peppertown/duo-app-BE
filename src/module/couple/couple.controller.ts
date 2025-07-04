@@ -51,6 +51,23 @@ export class CoupleController {
   @Post(':coupleId/anniversary')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  async addAnniversary(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Body('date') date: Date,
+    @Body('title') title: string,
+  ) {
+    return await this.coupleService.addAnniversary(
+      userId,
+      coupleId,
+      title,
+      date,
+    );
+  }
+
+  @Post(':coupleId/anniversary')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @setAnniversaryDocs.operation
   @setAnniversaryDocs.param
   @setAnniversaryDocs.body
