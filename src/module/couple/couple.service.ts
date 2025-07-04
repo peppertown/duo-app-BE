@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { addDays, addYears, differenceInCalendarDays, set } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { S3Service } from 'src/s3/s3.service';
 
@@ -257,34 +258,18 @@ export class CoupleService {
   getDDay(anniversary: Date) {
     // 오늘 날짜 (한국시간)
     const today = new Date();
-    const koreaOffset = 9 * 60; // KST는 UTC+9
-    const todayKST = new Date(
-      today.getTime() + (koreaOffset - today.getTimezoneOffset()) * 60000,
-    );
-
-    const anniv = new Date(anniversary);
-
-    // 두 날짜의 차이 (밀리초)
-    const diffTime = todayKST.getTime() - anniv.getTime();
-
-    // 일 수 계산 (밀리초 → 일)
-    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    return days;
+    return differenceInCalendarDays(today, anniversary);
   }
 
   // 다가오는 기념일 조회
   getUpcommingAnniv(dday: number, anniversary: Date) {
     const nextHundred = Math.ceil(dday / 100) * 100;
     const hundredDiff = nextHundred - dday;
-    const nextHundredDate = new Date(
-      anniversary.getTime() + nextHundred * 24 * 60 * 60 * 1000,
-    );
+    const nextHundredDate = addDays(anniversary, nextHundred);
 
     const nextYear = Math.ceil(dday / 365);
     const yearDiff = nextYear * 365 - dday;
-    const nextYearDate = new Date(anniversary);
-    nextYearDate.setFullYear(anniversary.getFullYear() + nextYear);
+    const nextYearDate = addYears(anniversary, nextYear);
 
     if (hundredDiff < yearDiff) {
       return {
@@ -304,29 +289,21 @@ export class CoupleService {
   // 생일 디데이 조회
   getDaysToNextBirthday(birthday: Date) {
     const today = new Date();
-    const todayKST = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
 
-    // 생일의 월/일만 고려해서 올해의 생일 날짜 객체 생성
-    const birth = new Date(birthday);
-    const nextBirthday = new Date(
-      todayKST.getFullYear(),
-      birth.getMonth(),
-      birth.getDate(),
-    );
+    // 올해 생일 날짜 생성
+    const nextBirthday = set(birthday, {
+      year: today.getFullYear(),
+    });
 
-    // 오늘 생일이면 0, 지났으면 내년으로
-    if (todayKST.getTime() > nextBirthday.getTime()) {
-      nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
-    }
+    // 오늘 이후가 아니면 내년 생일로
+    const finalBirthday =
+      nextBirthday < today ? addYears(nextBirthday, 1) : nextBirthday;
 
-    // 차이 계산 (일 단위)
-    const diff =
-      (nextBirthday.getTime() - todayKST.getTime()) / (1000 * 60 * 60 * 24);
+    const days = differenceInCalendarDays(finalBirthday, today);
 
-    return { days: Math.round(diff), date: nextBirthday };
+    return {
+      days,
+      date: finalBirthday,
+    };
   }
 }
