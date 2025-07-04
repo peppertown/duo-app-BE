@@ -104,6 +104,7 @@ export class AuthService {
     await this.saveServerRefreshToken(user.id, refreshToken);
 
     const { couple, partner } = await this.getUserData(user.id);
+    const formatResponse = this.formatLoginResponse(user, couple, partner);
 
     return {
       success: true,
@@ -111,20 +112,7 @@ export class AuthService {
         code: 200,
         text: '로그인이 완료됐습니다.',
       },
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-        code: user.code,
-        themeId: user.themeId,
-        coupleId: couple ? couple.id : null,
-      },
-      partner,
-      couple: {
-        anniversary: couple ? couple.anniversary : null,
-        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
-      },
+      ...formatResponse,
       jwt: {
         accessToken,
         refreshToken,
@@ -263,6 +251,7 @@ export class AuthService {
       await this.saveServerRefreshToken(user.id, refreshToken);
 
       const { couple, partner } = await this.getUserData(user.id);
+      const formatResponse = this.formatLoginResponse(user, couple, partner);
 
       return {
         message: {
@@ -273,20 +262,7 @@ export class AuthService {
           accessToken,
           refreshToken,
         },
-        user: {
-          id: user.id,
-          email: user.email,
-          nickname: user.nickname,
-          profileUrl: user.profileUrl,
-          code: user.code,
-          themeId: user.themeId,
-          coupleId: couple ? couple.id : null,
-        },
-        partner,
-        couple: {
-          anniversary: couple ? couple.anniversary : null,
-          dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
-        },
+        ...formatResponse,
         isNew,
       };
     } catch (err) {
@@ -328,6 +304,7 @@ export class AuthService {
     await this.saveServerRefreshToken(user.id, jwtRefreshToken);
 
     const { couple, partner } = await this.getUserData(user.id);
+    const formatResponse = this.formatLoginResponse(user, couple, partner);
 
     return {
       message: {
@@ -338,20 +315,7 @@ export class AuthService {
         accessToken: jwtAccessToken,
         refreshToken: jwtRefreshToken,
       },
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-        code: user.code,
-        themeId: user.themeId,
-        coupleId: couple ? couple.id : null,
-      },
-      partner,
-      couple: {
-        anniversary: couple ? couple.anniversary : null,
-        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
-      },
+      formatResponse,
       isNew,
     };
   }
@@ -463,5 +427,24 @@ export class AuthService {
     const partner = await getPartnerData(userId, couple.id);
 
     return { couple, partner };
+  }
+
+  formatLoginResponse(user: any, couple: any, partner: any) {
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileUrl: user.profileUrl,
+        code: user.code,
+        themeId: user.themeId,
+        coupleId: couple ? couple.id : null,
+      },
+      partner,
+      couple: {
+        anniversary: couple ? couple.anniversary : null,
+        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
+      },
+    };
   }
 }
