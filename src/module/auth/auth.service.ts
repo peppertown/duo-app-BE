@@ -98,13 +98,7 @@ export class AuthService {
       throw new BadRequestException('비밀번호가 올바르지 않습니다.');
     }
 
-    const accessToken = await this.generateAccessToken(user.id);
-    const refreshToken = await this.generateRefreshToken(user.id);
-
-    await this.saveServerRefreshToken(user.id, refreshToken);
-
-    const { couple, partner } = await this.getUserData(user.id);
-    const formatResponse = this.formatLoginResponse(user, couple, partner);
+    const response = await this.handleLoginProcess(user);
 
     return {
       success: true,
@@ -112,11 +106,7 @@ export class AuthService {
         code: 200,
         text: '로그인이 완료됐습니다.',
       },
-      ...formatResponse,
-      jwt: {
-        accessToken,
-        refreshToken,
-      },
+      ...response,
     };
   }
 
@@ -243,26 +233,14 @@ export class AuthService {
       const userData = { ...JSON.parse(data), authProvider: 'Google' };
       const { user, isNew } = await this.findOrCreateAccount(userData);
 
-      // 토큰 발급
-      const accessToken = await this.generateAccessToken(user.id);
-      const refreshToken = await this.generateRefreshToken(user.id);
-
-      // 리프레시 토큰 redis 저장
-      await this.saveServerRefreshToken(user.id, refreshToken);
-
-      const { couple, partner } = await this.getUserData(user.id);
-      const formatResponse = this.formatLoginResponse(user, couple, partner);
+      const response = await this.handleLoginProcess(user);
 
       return {
         message: {
           code: 200,
           text: '구글 로그인이 완료되었습니다.',
         },
-        jwt: {
-          accessToken,
-          refreshToken,
-        },
-        ...formatResponse,
+        ...response,
         isNew,
       };
     } catch (err) {
@@ -296,26 +274,14 @@ export class AuthService {
       authProvider: 'Kakao',
     });
 
-    // 토큰 발급
-    const jwtAccessToken = await this.generateAccessToken(user.id);
-    const jwtRefreshToken = await this.generateRefreshToken(user.id);
-
-    // 리프레시 토큰 redis 저장
-    await this.saveServerRefreshToken(user.id, jwtRefreshToken);
-
-    const { couple, partner } = await this.getUserData(user.id);
-    const formatResponse = this.formatLoginResponse(user, couple, partner);
+    const response = await this.handleLoginProcess(user);
 
     return {
       message: {
         code: 200,
         text: '카카오 로그인에 성공했습니다.',
       },
-      jwt: {
-        accessToken: jwtAccessToken,
-        refreshToken: jwtRefreshToken,
-      },
-      formatResponse,
+      ...response,
       isNew,
     };
   }
@@ -445,6 +411,23 @@ export class AuthService {
         anniversary: couple ? couple.anniversary : null,
         dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
       },
+    };
+  }
+
+  async handleLoginProcess(user: any) {
+    // 토큰 발급
+    const jwtAccessToken = await this.generateAccessToken(user.id);
+    const jwtRefreshToken = await this.generateRefreshToken(user.id);
+
+    // 리프레시 토큰 redis 저장
+    await this.saveServerRefreshToken(user.id, jwtRefreshToken);
+
+    const { couple, partner } = await this.getUserData(user.id);
+    const formatResponse = this.formatLoginResponse(user, couple, partner);
+
+    return {
+      ...formatResponse,
+      jwt: { accessToken: jwtAccessToken, refreshToken: jwtRefreshToken },
     };
   }
 }
