@@ -85,6 +85,17 @@ export class CoupleController {
     );
   }
 
+  @Delete(':coupleId/anniversary')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async deleteAnniversary(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Body('id') id: number,
+  ) {
+    return await this.coupleService.deleteAnniversary(userId, coupleId, id);
+  }
+
   @Post(':coupleId/anniversary')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()

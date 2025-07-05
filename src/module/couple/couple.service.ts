@@ -159,6 +159,34 @@ export class CoupleService {
     }
   }
 
+  // 커플 기념일 삭제
+  async deleteAnniversary(userId: number, coupleId: number, annivId: number) {
+    try {
+      const auth = await this.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prisma.coupleAnniversary.delete({
+        where: { id: annivId },
+      });
+
+      return {
+        message: { code: 200, text: '기념일 삭제가 완료되었습니다.' },
+      };
+    } catch (err) {
+      console.error('기념일 삭제 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '기념일 삭제 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   // 커플 이름 설정
   async setCoupleName(userId: number, coupleId: number, name: string) {
     try {
