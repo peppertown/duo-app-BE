@@ -15,6 +15,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+  addAnniversaryDocs,
+  deleteAnniversaryDocs,
   deleteCoupleDocs,
   getCoupleAnniversariesDocs,
   getCoupleDataDocs,
@@ -22,6 +24,7 @@ import {
   setAnniversaryDocs,
   setCoupleNameDocs,
   setCoupleWidgetDocs,
+  updateAnniversaryDocs,
 } from './docs/couple.docs';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -52,6 +55,10 @@ export class CoupleController {
   @Post(':coupleId/anniversary')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @addAnniversaryDocs.operation
+  @addAnniversaryDocs.param
+  @addAnniversaryDocs.body
+  @addAnniversaryDocs.response
   async addAnniversary(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -69,6 +76,10 @@ export class CoupleController {
   @Put(':coupleId/anniversary')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @updateAnniversaryDocs.operation
+  @updateAnniversaryDocs.param
+  @updateAnniversaryDocs.body
+  @updateAnniversaryDocs.response
   async updateAnniversary(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,
@@ -88,6 +99,10 @@ export class CoupleController {
   @Delete(':coupleId/anniversary')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @deleteAnniversaryDocs.operation
+  @deleteAnniversaryDocs.param
+  @deleteAnniversaryDocs.body
+  @deleteAnniversaryDocs.response
   async deleteAnniversary(
     @CurrentUserId() userId: number,
     @Param('coupleId') coupleId: number,

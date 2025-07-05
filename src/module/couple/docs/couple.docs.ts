@@ -3,6 +3,7 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiBody,
+  ApiResponse,
 } from '@nestjs/swagger';
 
 export const getCoupleDataDocs = {
@@ -117,6 +118,146 @@ export const setAnniversaryDocs = {
           id: '커플 id | number',
           name: '커플명 | string',
           anniversary: '기념일(ISO 문자열)',
+        },
+      },
+    },
+  }),
+};
+
+export const addAnniversaryDocs = {
+  operation: ApiOperation({
+    summary: '커플 기념일 등록',
+    description: '커플 ID에 해당하는 기념일을 등록합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          example: '기념일 제목 | string',
+        },
+        date: {
+          type: 'string',
+          format: 'date',
+          example: '기념일 날짜 (yyyy-mm-dd) | string',
+        },
+      },
+      required: ['title', 'date'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '기념일 등록 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '기념일 등록이 완료되었습니다. | string',
+        },
+        anniv: {
+          id: '기념일 ID | number',
+          title: '기념일 제목 | string',
+          date: '기념일 날짜 | string (ISO 8601)',
+          days: 'D+일수 | number',
+        },
+      },
+    },
+  }),
+};
+
+export const updateAnniversaryDocs = {
+  operation: ApiOperation({
+    summary: '기념일 수정',
+    description: '기존에 등록된 기념일의 제목과 날짜를 수정합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'number',
+          example: '기념일 ID | number',
+        },
+        title: {
+          type: 'string',
+          example: '기념일 제목 | string',
+        },
+        date: {
+          type: 'string',
+          format: 'date',
+          example: '기념일 날짜 (yyyy-mm-dd) | string',
+        },
+      },
+      required: ['id', 'title', 'date'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '기념일 수정 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '기념일 수정이 완료되었습니다. | string',
+        },
+        anniv: {
+          id: '기념일 ID | number',
+          title: '기념일 제목 | string',
+          date: '기념일 날짜 | string (ISO 8601)',
+          days: 'D+일수 | number',
+        },
+      },
+    },
+  }),
+};
+
+export const deleteAnniversaryDocs = {
+  operation: ApiOperation({
+    summary: '기념일 삭제',
+    description: '등록된 기념일을 삭제합니다.',
+  }),
+  param: ApiParam({
+    name: 'coupleId',
+    required: true,
+    description: '커플 ID',
+    example: '커플 ID | number',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'number',
+          example: '삭제할 기념일 ID | number',
+        },
+      },
+      required: ['id'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '기념일 삭제 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '기념일 삭제가 완료되었습니다. | string',
         },
       },
     },
