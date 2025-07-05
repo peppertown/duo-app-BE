@@ -34,7 +34,7 @@ export class CoupleService {
     }
   }
 
-  // 기념일 설정
+  // 디데이용 기념일 설정
   async setAnniversary(userId: number, coupleId: number, anniversary: string) {
     try {
       const auth = await this.confirmCoupleAuth(userId, coupleId);
@@ -108,6 +108,52 @@ export class CoupleService {
 
       throw new HttpException(
         '기념일 등록 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 커플 기념일 수정
+  async updateAnniversary(
+    userId: number,
+    coupleId: number,
+    annivId: number,
+    title: string,
+    anniversary: Date,
+  ) {
+    try {
+      const auth = await this.confirmCoupleAuth(userId, coupleId);
+      if (!auth) {
+        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const anniv = await this.prisma.coupleAnniversary.update({
+        where: { id: annivId },
+        data: {
+          title,
+          date: new Date(anniversary),
+        },
+      });
+
+      const days = this.getDays(anniv.date);
+
+      return {
+        message: { code: 200, text: '기념일 수정이 완료되었습니다.' },
+        anniv: {
+          id: anniv.id,
+          title: anniv.title,
+          date: anniv.date,
+          days,
+        },
+      };
+    } catch (err) {
+      console.error('기념일 수정 중 에러 발생', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      throw new HttpException(
+        '기념일 수정 중 오류가 발생했습니다.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

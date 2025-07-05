@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -60,6 +61,25 @@ export class CoupleController {
     return await this.coupleService.addAnniversary(
       userId,
       coupleId,
+      title,
+      date,
+    );
+  }
+
+  @Put(':coupleId/anniversary')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async updateAnniversary(
+    @CurrentUserId() userId: number,
+    @Param('coupleId') coupleId: number,
+    @Body('id') id: number,
+    @Body('date') date: Date,
+    @Body('title') title: string,
+  ) {
+    return await this.coupleService.updateAnniversary(
+      userId,
+      coupleId,
+      id,
       title,
       date,
     );
