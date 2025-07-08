@@ -73,7 +73,7 @@ export class CoupleController {
     );
   }
 
-  @Put(':coupleId/anniversary')
+  @Put(':coupleId/anniversaries')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @updateAnniversaryDocs.operation
@@ -96,7 +96,7 @@ export class CoupleController {
     );
   }
 
-  @Delete(':coupleId/anniversary')
+  @Delete(':coupleId/anniversaries')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @deleteAnniversaryDocs.operation
