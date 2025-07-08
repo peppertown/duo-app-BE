@@ -20,13 +20,9 @@ export class MypageService {
         },
       });
 
-      const user = this.getMypageProfile(data);
-
       if (!data.couplesAsA.length && !data.couplesAsB.length) {
         return {
           message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
-          user,
-          partner: null,
           anniv: null,
         };
       }
@@ -40,7 +36,10 @@ export class MypageService {
         .anniv;
 
       return {
-        message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
+        message: {
+          code: 200,
+          text: '마이페이지 조회가 완료되었습니다.',
+        },
         anniv,
       };
     } catch (err) {
