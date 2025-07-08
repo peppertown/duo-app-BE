@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as dayjs from 'dayjs';
 import { Cron } from '@nestjs/schedule';
+import { subDays } from 'date-fns';
 
 @Injectable()
 export class CronService {
@@ -10,11 +10,11 @@ export class CronService {
   @Cron('0 0 * * *')
   async handleDeleteExpiredTodos() {
     try {
-      const twoDaysAgo = dayjs().subtract(2, 'day').toDate();
+      const aDayAgo = subDays(new Date(), 1);
 
       await this.prisma.todo.deleteMany({
         where: {
-          createdAt: { lt: twoDaysAgo },
+          createdAt: { lt: aDayAgo },
         },
       });
     } catch (error) {
@@ -30,7 +30,7 @@ export class CronService {
   @Cron('0 0 * * *')
   async handleDeleteExpiredNotifications() {
     try {
-      const fiveDaysAgo = dayjs().subtract(5, 'day').toDate();
+      const fiveDaysAgo = subDays(new Date(), 5);
 
       await this.prisma.notification.deleteMany({
         where: {
