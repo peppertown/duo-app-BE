@@ -52,7 +52,7 @@ export class CoupleController {
     return await this.coupleService.getCoupleAnniversaries(coupleId);
   }
 
-  @Post(':coupleId/anniversary')
+  @Post(':coupleId/anniversaries')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @addAnniversaryDocs.operation
