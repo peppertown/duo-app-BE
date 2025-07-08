@@ -50,8 +50,6 @@ export class CoupleService {
       return {
         message: { code: 200, text: '기념일 설정이 완료되었습니다.' },
         couple: {
-          id: couple.id,
-          name: couple.name,
           anniversary: couple.anniversary,
         },
       };
