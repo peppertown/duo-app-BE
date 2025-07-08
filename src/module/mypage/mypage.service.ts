@@ -31,12 +31,6 @@ export class MypageService {
         };
       }
 
-      const partnerData =
-        data.couplesAsA.length > 0
-          ? data.couplesAsA[0].b
-          : data.couplesAsB[0].a;
-      const partner = this.getMypageProfile(partnerData);
-
       const coupleId =
         data.couplesAsA.length > 0
           ? data.couplesAsA[0].id
@@ -47,8 +41,6 @@ export class MypageService {
 
       return {
         message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
-        user,
-        partner,
         anniv,
       };
     } catch (err) {
