@@ -20,7 +20,9 @@ export class SseService {
       res.setHeader('Connection', 'keep-alive');
       res.flushHeaders();
 
-      this.clients.set(userId, res);
+      this.clients.set(Number(userId), res);
+      console.log('SSE 연결됨', userId);
+      console.log(typeof userId);
 
       // 연결 종료 시
       res.on('close', () => {
@@ -52,7 +54,7 @@ export class SseService {
 
       const client = this.clients.get(userId);
       if (client) {
-        client.write(JSON.stringify({ type, payload }));
+        client.write(`data: ${JSON.stringify({ type, payload })}\n\n`);
       }
     } catch (err) {
       console.error('알림 생성 중 에러 발생', err);
