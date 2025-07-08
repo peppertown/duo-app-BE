@@ -20,10 +20,9 @@ model User {
   password     String?
   nickname     String?
   profileUrl   String?
-  bio          String?
   authProvider String?
   code         String    @unique
-  birthday     DateTime?
+  birthday     DateTime? @default(now())
   themeId      Int       @default(1)
 
   couplesAsA Couple[] @relation("CoupleA")
@@ -45,7 +44,6 @@ model Theme {
 
 model Couple {
   id           Int       @id @default(autoincrement())
-  name         String?
   aId          Int
   bId          Int
   a            User      @relation("CoupleA", fields: [aId], references: [id], onDelete: Cascade)
