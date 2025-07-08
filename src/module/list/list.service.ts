@@ -1,13 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CoupleService } from '../couple/couple.service';
+import { SseService } from 'src/sse/sse.service';
 
 @Injectable()
 export class ListService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly coupleService: CoupleService,
+    private readonly sse: SseService,
   ) {}
+
+  private readonly notificationType = 'LIST_TOGGLED';
 
   // 리스트 목록 추가
   async createList(
@@ -80,7 +84,7 @@ export class ListService {
   // 리스트 목록 완료여부 토글
   async listDoneHandler(userId: number, coupleId: number, contentId: number) {
     try {
-      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
@@ -94,6 +98,21 @@ export class ListService {
       const condition = { where: { id: contentId }, data: { isDone: !isDone } };
 
       await this.prisma.listContent.update(condition);
+
+      // 완료시 알림 전송
+      if (!isDone) {
+        const couple = await this.prisma.couple.findUnique({
+          where: { id: coupleId },
+        });
+
+        const partnerId = couple.aId == userId ? couple.bId : couple.aId;
+
+        this.sse.createNofication(
+          partnerId,
+          this.notificationType,
+          `완료된 버킷리스트가 있어요!\b"${listContent.content}"`,
+        );
+      }
 
       return {
         message: { code: 200, text: '리스트 완료 여부 설정이 완료되었습니다.' },
