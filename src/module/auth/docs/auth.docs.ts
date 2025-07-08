@@ -99,7 +99,6 @@ export const handleRefreshDocs = {
         },
         couple: {
           anniversary: '커플 기념일 | string',
-          dday: '커플 D-Day | number',
         },
       },
     },
@@ -183,7 +182,6 @@ export const verifyGoogleSecurityCodeDocs = {
         },
         couple: {
           anniversary: '커플 기념일 | string',
-          dday: '커플 D-Day | number',
         },
         isNew: '신규 가입 여부 | boolean',
       },
@@ -263,7 +261,6 @@ export const loginDocs = {
         },
         couple: {
           anniversary: '커플 기념일 | string',
-          dday: '커플 D-Day | number',
         },
         jwt: {
           accessToken: '액세스 토큰 | string',
@@ -365,7 +362,6 @@ export const kakaoLoginDocs = {
         },
         couple: {
           anniversary: '커플 기념일 | string',
-          dday: '커플 D-Day | number',
         },
         isNew: '신규 가입 여부 | boolean',
       },

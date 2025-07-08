@@ -115,8 +115,6 @@ export const setAnniversaryDocs = {
           text: '기념일 설정이 완료되었습니다.',
         },
         couple: {
-          id: '커플 id | number',
-          name: '커플명 | string',
           anniversary: '기념일(ISO 문자열)',
         },
       },
