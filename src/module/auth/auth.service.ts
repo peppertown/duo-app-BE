@@ -366,7 +366,6 @@ export class AuthService {
         nickname: user.nickname,
         profileUrl: user.profileUrl,
         code: user.code,
-        theme: user.themeId,
         coupleId: couple ? couple.id : null,
       },
       partner,
@@ -402,8 +401,8 @@ export class AuthService {
         nickname: user.nickname,
         profileUrl: user.profileUrl,
         code: user.code,
-        themeId: user.themeId,
         coupleId: couple ? couple.id : null,
+        birthday: user.birthday,
       },
       partner,
       couple: {
