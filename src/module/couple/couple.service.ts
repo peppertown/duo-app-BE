@@ -10,30 +10,6 @@ export class CoupleService {
     private readonly s3: S3Service,
   ) {}
 
-  // 커플 데이터 조회
-  async getCoupleData(coupleId: number) {
-    try {
-      const couple = await this.prisma.couple.findUnique({
-        where: { id: coupleId },
-      });
-
-      return {
-        message: { code: 200, text: '커플 데이터 조회에 성공했습니다.' },
-        couple: {
-          id: couple.id,
-          name: couple.name,
-          anniversary: couple.anniversary,
-        },
-      };
-    } catch (err) {
-      console.error('커플 데이터 조회 중 에러 발생', err);
-      throw new HttpException(
-        '커플 데이터 조회 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   // 디데이용 기념일 설정
   async setAnniversary(userId: number, coupleId: number, anniversary: string) {
     try {
@@ -180,40 +156,6 @@ export class CoupleService {
 
       throw new HttpException(
         '기념일 삭제 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  // 커플 이름 설정
-  async setCoupleName(userId: number, coupleId: number, name: string) {
-    try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
-      const couple = await this.prisma.couple.update({
-        where: { id: coupleId },
-        data: { name },
-      });
-
-      return {
-        message: { code: 200, text: '커플 이름 설정이 완료되었습니다.' },
-        couple: {
-          id: couple.id,
-          name: couple.name,
-          anniversary: couple.anniversary,
-        },
-      };
-    } catch (err) {
-      console.error('커플 이름 설정 중 에러 발생', err);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      throw new HttpException(
-        '커플 이름 설정 중 오류가 발생했습니다',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

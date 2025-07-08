@@ -19,10 +19,8 @@ import {
   deleteAnniversaryDocs,
   deleteCoupleDocs,
   getCoupleAnniversariesDocs,
-  getCoupleDataDocs,
   getCoupleWidgetDocs,
   setAnniversaryDocs,
-  setCoupleNameDocs,
   setCoupleWidgetDocs,
   updateAnniversaryDocs,
 } from './docs/couple.docs';
@@ -32,16 +30,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('couple')
 export class CoupleController {
   constructor(private readonly coupleService: CoupleService) {}
-
-  @Get(':coupleId')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
-  @getCoupleDataDocs.operation
-  @getCoupleDataDocs.param
-  @getCoupleDataDocs.response
-  async getCoupleData(@Param('coupleId') coupleId: number) {
-    return await this.coupleService.getCoupleData(coupleId);
-  }
 
   @Get(':coupleId/anniversary')
   @ApiBearerAuth()
@@ -128,21 +116,6 @@ export class CoupleController {
       coupleId,
       anniversary,
     );
-  }
-
-  @Post(':coupleId/name')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
-  @setCoupleNameDocs.operation
-  @setCoupleNameDocs.param
-  @setCoupleNameDocs.body
-  @setCoupleNameDocs.response
-  async setCoupleName(
-    @CurrentUserId() userId: number,
-    @Param('coupleId') coupleId: number,
-    @Body('name') name: string,
-  ) {
-    return await this.coupleService.setCoupleName(userId, coupleId, name);
   }
 
   @Get(':coupleId/widget')

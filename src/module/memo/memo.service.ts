@@ -44,8 +44,7 @@ export class MemoService {
       });
 
       const partnerId =
-        memo.couple.aId === userId ? memo.couple.bId : memo.couple.aId;
-
+        memo.couple.aId == userId ? memo.couple.bId : memo.couple.aId;
       // 알림 생성 및 전송
       await this.sse.createNofication(
         partnerId,

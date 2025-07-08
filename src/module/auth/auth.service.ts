@@ -372,7 +372,6 @@ export class AuthService {
       partner,
       couple: {
         anniversary: couple ? couple.anniversary : null,
-        dday: couple ? this.coupleService.getDDay(couple.anniversary) : null,
       },
     };
   }

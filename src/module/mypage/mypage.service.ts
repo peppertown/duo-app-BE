@@ -52,31 +52,6 @@ export class MypageService {
     }
   }
 
-  // 프로필 메세지 업데이트
-  async updateProfileBio(userId: number, bio: string) {
-    try {
-      const result = await this.prisma.user.update({
-        where: { id: userId },
-        data: { bio },
-      });
-
-      const user = this.getMypageProfile(result);
-      return {
-        message: {
-          code: 200,
-          text: '프로필 메세지 업데이트가 완료되었습니다.',
-        },
-        user,
-      };
-    } catch (err) {
-      console.error('프로필 메세지 업데이트 중 에러 발생', err);
-      throw new HttpException(
-        '프로필 메세지 업데이트 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   getMypageProfile(user: any) {
     return {
       id: user.id,
