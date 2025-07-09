@@ -245,3 +245,39 @@ export const deleteUserDocs = {
     },
   }),
 };
+
+export const uploadProfileImageDocs = {
+  operation: ApiOperation({
+    summary: '유저 프로필 사진 변경',
+    description: '로그인한 유저의 프로필 사진을 업로드합니다.',
+  }),
+  body: ApiBody({
+    description: '업로드할 이미지 파일',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['file'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '프로필 사진 업로드 완료 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+        user: {
+          profileUrl: '업로드된 이미지 URL | string',
+        },
+      },
+    },
+  }),
+};

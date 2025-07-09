@@ -17,6 +17,7 @@ import {
   matchUserDocs,
   setUserBirthdayDocs,
   setUserNicknameDocs,
+  uploadProfileImageDocs,
 } from './docs/user.docs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -76,6 +77,9 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file'))
   @ApiBearerAuth()
+  @uploadProfileImageDocs.operation
+  @uploadProfileImageDocs.body
+  @uploadProfileImageDocs.response
   async uploadProfileImage(
     @CurrentUserId() userId: number,
     @UploadedFile() file: Express.Multer.File,
