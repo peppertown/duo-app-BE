@@ -1,5 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { addDays, addYears, differenceInCalendarDays, set } from 'date-fns';
+import {
+  addDays,
+  addYears,
+  differenceInCalendarDays,
+  isBefore,
+  set,
+  startOfDay,
+} from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { S3Service } from 'src/s3/s3.service';
 
@@ -16,6 +23,15 @@ export class CoupleService {
       const auth = await this.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const now = startOfDay(new Date());
+      const annivDate = startOfDay(new Date(anniversary));
+      if (isBefore(now, annivDate)) {
+        throw new HttpException(
+          '잘못된 날짜 설정입니다.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const couple = await this.prisma.couple.update({
@@ -53,6 +69,15 @@ export class CoupleService {
       const auth = await this.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const now = startOfDay(new Date());
+      const annivDate = startOfDay(new Date(anniversary));
+      if (isBefore(annivDate, now)) {
+        throw new HttpException(
+          '잘못된 날짜 설정입니다.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const anniv = await this.prisma.coupleAnniversary.create({
@@ -99,6 +124,15 @@ export class CoupleService {
       const auth = await this.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
+      }
+
+      const now = startOfDay(new Date());
+      const annivDate = startOfDay(new Date(anniversary));
+      if (isBefore(annivDate, now)) {
+        throw new HttpException(
+          '잘못된 날짜 설정입니다.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const anniv = await this.prisma.coupleAnniversary.update({
