@@ -93,6 +93,13 @@ export class ListService {
         where: { id: contentId },
       });
 
+      if (!listContent) {
+        throw new HttpException(
+          '리스트 목록을 찾을 수 없습니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       const isDone = listContent.isDone;
 
       const condition = { where: { id: contentId }, data: { isDone: !isDone } };
