@@ -295,8 +295,8 @@ export class CoupleService {
       const bBirth = this.getDaysToNextBirthday(data.b.birthday);
       const anniv = [
         upcoming,
-        { id: null, type: `${data.a.nickname}님 생일`, ...aBirth },
-        { id: null, type: `${data.b.nickname}님 생일`, ...bBirth },
+        { id: 2, type: `${data.a.nickname}님 생일`, ...aBirth },
+        { id: 3, type: `${data.b.nickname}님 생일`, ...bBirth },
       ];
 
       const otherAnniv = await this.prisma.coupleAnniversary.findMany({
@@ -357,14 +357,14 @@ export class CoupleService {
 
     if (hundredDiff < yearDiff) {
       return {
-        id: null,
+        id: 1,
         type: `${nextHundred}일`,
         days: hundredDiff,
         date: nextHundredDate,
       };
     } else {
       return {
-        id: null,
+        id: 1,
         type: `${nextYear}주년`,
         days: yearDiff,
         date: nextYearDate,
