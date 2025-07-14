@@ -26,7 +26,6 @@ export class NotificationService {
       });
 
       return {
-        success: true,
         message: { code: 200, text: '알림 조회가 완료되었습니다.' },
         notifications,
       };
@@ -58,7 +57,6 @@ export class NotificationService {
       });
 
       return {
-        success: true,
         message: { code: 200, text: '알림이 삭제되었습니다.' },
       };
     } catch (error) {
