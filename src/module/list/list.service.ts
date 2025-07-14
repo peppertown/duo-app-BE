@@ -114,11 +114,10 @@ export class ListService {
 
         const partnerId = couple.aId == userId ? couple.bId : couple.aId;
 
-        this.sse.createNofication(
-          partnerId,
-          this.notificationType,
-          `완료된 버킷리스트가 있어요!\b"${listContent.content}"`,
-        );
+        this.sse.createNofication(partnerId, this.notificationType, {
+          memo: { id: listContent.id },
+          content: '새로운 메모가 생성되었습니다.',
+        });
       }
 
       return {

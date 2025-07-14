@@ -41,7 +41,7 @@ export class SseService {
   async createNofication(
     userId: number,
     type: NotificationType,
-    payload: string,
+    payload: object,
   ) {
     try {
       await this.prisma.notification.create({
