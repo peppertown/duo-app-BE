@@ -47,8 +47,8 @@ export class MemoService {
         memo.couple.aId == userId ? memo.couple.bId : memo.couple.aId;
       // 알림 생성 및 전송
       await this.sse.createNofication(partnerId, this.notificationType, {
-        memo: { id: memo.id },
-        content: '새로운 메모가 생성되었습니다.',
+        id: memo.id,
+        message: '새로운 메모가 생성되었습니다.',
       });
       return {
         message: { code: 200, text: '메모가 생성되었습니다.' },
