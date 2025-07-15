@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { RedisModule } from 'src/redis/redis.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { CoupleModule } from '../couple/couple.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CoupleModule } from '../couple/couple.module';
     }),
     RedisModule,
     CoupleModule,
+    NotificationModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

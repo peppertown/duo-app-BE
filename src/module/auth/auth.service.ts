@@ -14,6 +14,7 @@ import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import * as jwt from 'jsonwebtoken';
 import { CoupleService } from '../couple/couple.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly redis: RedisService,
     private readonly coupleService: CoupleService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   private verifyRefreshToken(token: string): any {
@@ -422,9 +424,13 @@ export class AuthService {
     const { couple, partner } = await this.getUserData(user.id);
     const formatResponse = this.formatLoginResponse(user, couple, partner);
 
+    const unreadNotification =
+      await this.notificationService.unreadNotification(user.id);
+
     return {
       ...formatResponse,
       jwt: { accessToken: jwtAccessToken, refreshToken: jwtRefreshToken },
+      unreadNotification,
     };
   }
 }
