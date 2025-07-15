@@ -329,10 +329,10 @@ export class AuthService {
 
   // 토큰 재발급
   async handleRefresh(refreshToken: string) {
-    const userId = this.verifyRefreshToken(refreshToken).userId;
+    const user = this.verifyRefreshToken(refreshToken);
 
     const originRefreshToken = await this.redis.get(
-      `${process.env.REFRESH_KEY_JWT}:${userId}`,
+      `${process.env.REFRESH_KEY_JWT}:${user.id}`,
     );
 
     if (originRefreshToken !== refreshToken) {
@@ -342,38 +342,14 @@ export class AuthService {
       );
     }
 
-    const newAccessToken = await this.generateAccessToken(userId);
-    const newRefreshToken = await this.generateRefreshToken(userId);
-
-    await this.saveServerRefreshToken(userId, newRefreshToken);
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    const { couple, partner } = await this.getUserData(userId);
+    const response = await this.handleLoginProcess(user);
 
     return {
       message: {
         code: 200,
         text: '토큰 재발급이 완료되었습니다',
       },
-      jwt: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      },
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-        code: user.code,
-        coupleId: couple ? couple.id : null,
-      },
-      partner,
-      couple: {
-        anniversary: couple ? couple.anniversary : null,
-      },
+      ...response,
     };
   }
 
