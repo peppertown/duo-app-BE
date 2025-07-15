@@ -329,7 +329,8 @@ export class AuthService {
 
   // 토큰 재발급
   async handleRefresh(refreshToken: string) {
-    const user = this.verifyRefreshToken(refreshToken);
+    const decoded = this.verifyRefreshToken(refreshToken);
+    const user = { id: decoded.userId };
 
     const originRefreshToken = await this.redis.get(
       `${process.env.REFRESH_KEY_JWT}:${user.id}`,
