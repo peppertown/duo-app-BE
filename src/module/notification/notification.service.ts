@@ -59,10 +59,26 @@ export class NotificationService {
       return {
         message: { code: 200, text: '알림이 삭제되었습니다.' },
       };
-    } catch (error) {
-      console.error('알림 삭제 중 에러 발생', error);
+    } catch (err) {
+      console.error('알림 삭제 중 에러 발생', err);
       throw new HttpException(
         '알림 삭제 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 미확인 알림 조회
+  async unreadNotification(userId: number) {
+    try {
+      const notify = await this.prisma.notification.findFirst({
+        where: { userId, isRead: false },
+      });
+      return notify ? true : false;
+    } catch (err) {
+      console.error('미확인 알림 조회 중 에러 발생', err);
+      throw new HttpException(
+        '미확인 알림 조회 중 오류가 발생했습니다..',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
