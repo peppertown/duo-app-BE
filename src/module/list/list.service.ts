@@ -21,7 +21,7 @@ export class ListService {
     content: string,
   ) {
     try {
-      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
@@ -115,7 +115,7 @@ export class ListService {
 
         const partnerId = couple.aId == userId ? couple.bId : couple.aId;
 
-        this.sse.createNofication(partnerId, this.notificationType, {
+        await this.sse.createNofication(partnerId, this.notificationType, {
           id: listContent.id,
           message: `완료된 버킷리스트가 있어요!
 ${listContent.category.name}: ${listContent.content}`,
@@ -139,7 +139,7 @@ ${listContent.category.name}: ${listContent.content}`,
   // 리스트 목록 삭제
   async deleteList(userId: number, coupleId: number, contentId: number) {
     try {
-      const auth = this.coupleService.confirmCoupleAuth(userId, coupleId);
+      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
       if (!auth) {
         throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
       }
