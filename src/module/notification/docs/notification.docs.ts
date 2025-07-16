@@ -57,3 +57,23 @@ export const deleteNotificationDocs = {
     },
   }),
 };
+
+export const deleteAllNotificationDocs = {
+  operation: ApiOperation({
+    summary: '알림 전체 삭제',
+    description: '사용자의 모든 알림을 삭제합니다.',
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: '알림 전체 삭제 응답',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: '결과 메시지 | string',
+        },
+      },
+    },
+  }),
+};

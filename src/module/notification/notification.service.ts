@@ -38,7 +38,7 @@ export class NotificationService {
     }
   }
 
-  // 알림 삭제
+  // 알림 개별 삭제
   async deleteNotification(userId: number, notificationId: number) {
     try {
       const notification = await this.prisma.notification.findUnique({
@@ -63,6 +63,25 @@ export class NotificationService {
       console.error('알림 삭제 중 에러 발생', err);
       throw new HttpException(
         '알림 삭제 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 알림 전체 삭제
+  async deleteAllNotification(userId: number) {
+    try {
+      await this.prisma.notification.deleteMany({
+        where: { userId },
+      });
+
+      return {
+        message: { code: 200, text: '알림 전체 삭제가 완료되었습니다.' },
+      };
+    } catch (err) {
+      console.error('알림 전체 삭제 중 에러 발생', err);
+      throw new HttpException(
+        '알림 전체 삭제 중 오류가 발생했습니다.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

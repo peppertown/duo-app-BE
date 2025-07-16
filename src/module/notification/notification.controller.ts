@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import {
   getNotificationsDocs,
   deleteNotificationDocs,
+  deleteAllNotificationDocs,
 } from './docs/notification.docs';
 import { NotificationService } from './notification.service';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
@@ -20,6 +21,14 @@ export class NotificationController {
   @getNotificationsDocs.response
   async getNotifications(@CurrentUserId() userId: number) {
     return this.notificationService.getNotifications(userId);
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard('jwt'))
+  @deleteAllNotificationDocs.operation
+  @deleteAllNotificationDocs.response
+  async deleteAllNotification(@CurrentUserId() userId: number) {
+    return await this.notificationService.deleteAllNotification(userId);
   }
 
   @Delete(':notificationId')
