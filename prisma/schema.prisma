@@ -85,7 +85,7 @@ model Memo {
   id        Int      @id @default(autoincrement())
   coupleId  Int?
   createdAt DateTime @default(now())
-  content   String?
+  content   String?  @db.Text
   writerId  Int
 
   couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
