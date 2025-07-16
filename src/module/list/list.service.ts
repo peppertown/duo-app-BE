@@ -91,6 +91,7 @@ export class ListService {
 
       const listContent = await this.prisma.listContent.findUnique({
         where: { id: contentId },
+        include: { category: true },
       });
 
       if (!listContent) {
@@ -116,7 +117,8 @@ export class ListService {
 
         this.sse.createNofication(partnerId, this.notificationType, {
           id: listContent.id,
-          message: '완료된 버킷리스트가 있어요!',
+          message: `완료된 버킷리스트가 있어요!
+${listContent.category.name}: ${listContent.content}`,
         });
       }
 
