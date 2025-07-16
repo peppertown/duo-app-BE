@@ -7,7 +7,7 @@ import { subDays } from 'date-fns';
 export class CronService {
   constructor(private readonly prisma: PrismaService) {}
   // 시간 지난 투두 삭제
-  @Cron('0 0 * * *')
+  @Cron('0 0 * * *', { timeZone: 'Asia/Seoul' })
   async handleDeleteExpiredTodos() {
     try {
       const aDayAgo = subDays(new Date(), 1);
