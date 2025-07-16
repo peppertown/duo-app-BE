@@ -13,6 +13,13 @@ export class NotificationService {
         where: { userId },
       });
 
+      if (!result.length) {
+        return {
+          message: { code: 200, text: '알림 조회가 완료되었습니다.' },
+          notifications: [],
+        };
+      }
+
       const notifications = result.map(({ userId, ...rest }) => rest);
 
       // 조회된 알림 읽음 처리
