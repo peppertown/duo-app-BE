@@ -1,13 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CoupleService } from '../couple/couple.service';
 import { SseService } from 'src/sse/sse.service';
 
 @Injectable()
 export class ListService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly coupleService: CoupleService,
     private readonly sse: SseService,
   ) {}
 

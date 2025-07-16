@@ -19,6 +19,7 @@ import {
   setWidgetMemoDocs,
   updateMemoDocs,
 } from './docs/memo.docs';
+import { CoupleAuthGuard } from '../couple/guard/couple-auth-gaurd';
 
 @ApiTags('memo')
 @Controller('memo')
@@ -26,7 +27,7 @@ export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
   @Post(':coupleId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @createMemoDocs.operation
   @createMemoDocs.param
@@ -41,7 +42,7 @@ export class MemoController {
   }
 
   @Get(':coupleId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @getMemoDocs.operation
   @getMemoDocs.param
@@ -54,7 +55,7 @@ export class MemoController {
   }
 
   @Post(':coupleId/widget/:memoId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @setWidgetMemoDocs.operation
   @setWidgetMemoDocs.paramCoupleId
@@ -69,7 +70,7 @@ export class MemoController {
   }
 
   @Delete(':coupleId/:memoId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @deleteMemoDocs.operation
   @deleteMemoDocs.paramCoupleId
@@ -84,7 +85,7 @@ export class MemoController {
   }
 
   @Put(':coupleId/:memoId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @updateMemoDocs.operation
   @updateMemoDocs.paramCoupleId

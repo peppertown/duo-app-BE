@@ -1,13 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CoupleService } from '../couple/couple.service';
 import { SseService } from 'src/sse/sse.service';
 
 @Injectable()
 export class MemoService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly coupleService: CoupleService,
     private readonly sse: SseService, // SSE 서비스 주입
   ) {}
 
@@ -16,11 +14,6 @@ export class MemoService {
   // 메모 생성
   async createMemo(userId: number, coupleId: number, content: string) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const memo = await this.prisma.memo.create({
         data: {
           writerId: userId,
@@ -75,10 +68,6 @@ export class MemoService {
   // 메모 전체 조회
   async getMemo(userId: number, coupleId: number) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
       const widgetMemo = await this.prisma.couple.findUnique({
         where: { id: coupleId },
         select: { widgetMemoId: true },
@@ -122,11 +111,6 @@ export class MemoService {
   // 위젯 메모 설정
   async setWidgetMemo(userId: number, coupleId: number, memoId: number) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const memo = await this.prisma.memo.findUnique({
         where: { id: memoId },
       });
@@ -158,11 +142,6 @@ export class MemoService {
   // 메모 삭제
   async deleteMemo(userId: number, coupleId: number, memoId: number) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const memo = await this.prisma.memo.findUnique({
         where: { id: memoId },
       });
@@ -198,11 +177,6 @@ export class MemoService {
     content: string,
   ) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const memo = await this.prisma.memo.findUnique({
         where: { id: memoId },
       });
