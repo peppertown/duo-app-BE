@@ -18,6 +18,7 @@ import {
   listDoneHandlerDocs,
 } from './docs/list.docs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CoupleAuthGuard } from '../couple/guard/couple-auth-gaurd';
 
 @ApiTags('list')
 @Controller('list')
@@ -25,7 +26,7 @@ export class ListController {
   constructor(private readonly listService: ListService) {}
 
   @Get(':coupleId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @getListDocs.operation
   @getListDocs.param1
@@ -38,7 +39,7 @@ export class ListController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @createListDocs.operation
   @createListDocs.body
@@ -56,7 +57,7 @@ export class ListController {
   }
 
   @Post(':coupleId/:contentId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @listDoneHandlerDocs.operation
   @listDoneHandlerDocs.param1
@@ -71,7 +72,7 @@ export class ListController {
   }
 
   @Delete(':coupleId/:contentId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @deleteListDocs.operation
   @deleteListDocs.param1

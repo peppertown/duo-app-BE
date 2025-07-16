@@ -21,11 +21,6 @@ export class ListService {
     content: string,
   ) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const coupleList = await this.prisma.list.findFirst({
         where: { coupleId },
       });
@@ -48,10 +43,6 @@ export class ListService {
 
   // 리스트 조회
   async getList(userId: number, coupleId: number) {
-    const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-    if (!auth)
-      throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-
     const coupleList = await this.prisma.list.findFirst({
       where: { coupleId },
     });
@@ -84,11 +75,6 @@ export class ListService {
   // 리스트 목록 완료여부 토글
   async listDoneHandler(userId: number, coupleId: number, contentId: number) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const listContent = await this.prisma.listContent.findUnique({
         where: { id: contentId },
         include: { category: true },
@@ -140,11 +126,6 @@ ${listContent.category.name}: ${listContent.content}`,
   // 리스트 목록 삭제
   async deleteList(userId: number, coupleId: number, contentId: number) {
     try {
-      const auth = await this.coupleService.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       await this.prisma.listContent.delete({
         where: { id: contentId },
       });
