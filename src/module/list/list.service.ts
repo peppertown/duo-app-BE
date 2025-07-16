@@ -101,14 +101,15 @@ export class ListService {
         );
       }
 
-      const isDone = listContent.isDone;
-
-      const condition = { where: { id: contentId }, data: { isDone: !isDone } };
+      const condition = {
+        where: { id: contentId },
+        data: { isDone: !listContent.isDone },
+      };
 
       await this.prisma.listContent.update(condition);
 
       // 완료시 알림 전송
-      if (!isDone) {
+      if (!listContent.isDone) {
         const couple = await this.prisma.couple.findUnique({
           where: { id: coupleId },
         });
