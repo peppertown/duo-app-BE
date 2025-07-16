@@ -25,6 +25,7 @@ import {
   updateAnniversaryDocs,
 } from './docs/couple.docs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CoupleAuthGuard } from './guard/couple-auth-gaurd';
 
 @ApiTags('couple')
 @Controller('couple')
@@ -32,6 +33,7 @@ export class CoupleController {
   constructor(private readonly coupleService: CoupleService) {}
 
   @Get(':coupleId/anniversary')
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @getCoupleAnniversariesDocs.operation
   @getCoupleAnniversariesDocs.param
@@ -41,7 +43,7 @@ export class CoupleController {
   }
 
   @Post(':coupleId/anniversaries')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @addAnniversaryDocs.operation
   @addAnniversaryDocs.param
@@ -62,7 +64,7 @@ export class CoupleController {
   }
 
   @Put(':coupleId/anniversaries')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @updateAnniversaryDocs.operation
   @updateAnniversaryDocs.param
@@ -85,7 +87,7 @@ export class CoupleController {
   }
 
   @Delete(':coupleId/anniversaries')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @deleteAnniversaryDocs.operation
   @deleteAnniversaryDocs.param
@@ -100,7 +102,7 @@ export class CoupleController {
   }
 
   @Post(':coupleId/anniversary')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @setAnniversaryDocs.operation
   @setAnniversaryDocs.param
@@ -119,7 +121,7 @@ export class CoupleController {
   }
 
   @Get(':coupleId/widget')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @getCoupleWidgetDocs.operation
   @getCoupleWidgetDocs.param
@@ -132,7 +134,7 @@ export class CoupleController {
   }
 
   @Post(':coupleId/widget')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   @ApiBearerAuth()
   @setCoupleWidgetDocs.operation
@@ -148,7 +150,7 @@ export class CoupleController {
   }
 
   @Delete(':coupleId')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), CoupleAuthGuard)
   @ApiBearerAuth()
   @deleteCoupleDocs.operation
   @deleteCoupleDocs.param

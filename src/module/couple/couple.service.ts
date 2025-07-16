@@ -20,11 +20,6 @@ export class CoupleService {
   // 디데이용 기념일 설정
   async setAnniversary(userId: number, coupleId: number, anniversary: string) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const now = startOfDay(new Date());
       const annivDate = startOfDay(new Date(anniversary));
       if (isBefore(now, annivDate)) {
@@ -66,11 +61,6 @@ export class CoupleService {
     anniversary: Date,
   ) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const now = startOfDay(new Date());
       const annivDate = startOfDay(new Date(anniversary));
       if (isBefore(annivDate, now)) {
@@ -121,11 +111,6 @@ export class CoupleService {
     anniversary: Date,
   ) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const now = startOfDay(new Date());
       const annivDate = startOfDay(new Date(anniversary));
       if (isBefore(annivDate, now)) {
@@ -170,11 +155,6 @@ export class CoupleService {
   // 커플 기념일 삭제
   async deleteAnniversary(userId: number, coupleId: number, annivId: number) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       await this.prisma.coupleAnniversary.delete({
         where: { id: annivId },
       });
@@ -198,11 +178,6 @@ export class CoupleService {
   // 커플 위젯 조회
   async getCoupleWidget(userId: number, coupleId: number) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const widget = await this.prisma.widget.findFirst({
         where: {
           coupleId: coupleId,
@@ -236,11 +211,6 @@ export class CoupleService {
     file: Express.Multer.File,
   ) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       const photo = await this.s3.uploadImageToS3(file, 'widget');
 
       await this.prisma.widget.updateMany({
@@ -268,11 +238,6 @@ export class CoupleService {
   // 커플 연결 해제
   async deleteCouple(userId: number, coupleId: number) {
     try {
-      const auth = await this.confirmCoupleAuth(userId, coupleId);
-      if (!auth) {
-        throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
-      }
-
       await this.prisma.couple.delete({
         where: { id: coupleId },
       });
