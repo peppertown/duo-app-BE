@@ -1,99 +1,62 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+## Our Own : 커플 전용 공유형 라이프 매니저
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+### 우리만의 공간, 우리가 함께 소유한 기록
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+OurOwn은 커플이 함께 쓰는 할 일, 메모, 기념일 등 일상 속 소소한 순간들을 공유하고 기록할 수 있는 앱입니다.
+단순한 메신저나 캘린더를 넘어서, 연인 간의 관계를 더 단단하게 만들어줄 ‘우리만의 공간’을 만드는 것이 목적입니다.
 
-## Description
+## ⚒️ Tech Spec.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 📌 Backend
 
-## Project setup
+- **Language:** TypeScript
+- **Framework:** NestJS
+- **Database / ORM:** MySQL, Prisma
+- **Caching:** Redis
 
-```bash
-$ npm install
-```
+### 📌 ERD
 
-## Compile and run the project
+<img width="1324" height="1315" alt="Image" src="https://github.com/user-attachments/assets/8b4d506d-8958-4227-99cb-0ec62d8b2c09" />
 
-```bash
-# development
-$ npm run start
+## 📱 주요 기능
 
-# watch mode
-$ npm run start:dev
+### OAuth 로그인
 
-# production mode
-$ npm run start:prod
-```
+- 카카오, 구글 OAuth를 통해 간편하게 로그인이 가능합니다.
 
-## Run tests
+### 🏠 Our Own (홈 화면)
 
-```bash
-# unit tests
-$ npm run test
+<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/28ba890e-001e-40c8-bcc4-b39151354cc9" />
 
-# e2e tests
-$ npm run test:e2e
+- 서로의 To-do를 작성하고 실시간으로 공유할 수 있습니다.
+- 위젯 포토와 위젯 메모 기능을 활용해 홈 화면을 나만의 스타일로 꾸밀 수 있습니다.
 
-# test coverage
-$ npm run test:cov
-```
+### 📝 Our List (버킷 리스트)
 
-## Deployment
+<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/cf6363c4-2b87-4573-8922-7f0bee5d440b" />
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- 함께 이루고 싶은 버킷리스트를 작성하고 공유할 수 있습니다.
+- 완료한 항목은 체크하여 함께 성취감을 느낄 수 있습니다.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 📓 Our Memo
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/c75a6fd8-17e3-4a24-8211-c0b768169d94" />
+- 중요한 순간이나 일상을 기록할 수 있는 공유 메모 기능을 제공합니다.
+- 작성한 메모는 커플과 함께 확인하고 수정할 수 있습니다.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 🙋 Our Page
 
-## Resources
+<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/cacf07ab-a71f-4ce3-976f-beb1bb1afbd0" />
+- 닉네임, 프로필 사진, 생일 등 나의 정보를 자유롭게 수정할 수 있습니다.
+- 다가오는 기념일을 확인하고 새로운 기념일도 직접 추가할 수 있습니다.
 
-Check out a few resources that may come in handy when working with NestJS:
+## API 명세
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+https://duo.yeol.store/api
 
-## Support
+## ✅ 향후 계획
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- 전체적인 디자인 개선 및 UI/UX 다듬기
+- EAS 빌드를 통한 모바일 배포 환경 정비 및 백그라운드 알림 기능 도입
+- 앱스토어 정식 출시
+- 커플 공유 캘린더 기능 추가 예정
