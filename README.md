@@ -1,4 +1,4 @@
-## Our Own : 커플 전용 공유형 라이프 매니저
+## 👩‍❤️‍👨 Our Own : 커플 전용 공유형 라이프 매니저
 
 ### 우리만의 공간, 우리가 함께 소유한 기록
 
@@ -26,27 +26,29 @@ OurOwn은 커플이 함께 쓰는 할 일, 메모, 기념일 등 일상 속 소�
 
 ### 🏠 Our Own (홈 화면)
 
-<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/28ba890e-001e-40c8-bcc4-b39151354cc9" />
+<img width="300" alt="홈화면" src="https://github.com/user-attachments/assets/28ba890e-001e-40c8-bcc4-b39151354cc9" />
 
 - 서로의 To-do를 작성하고 실시간으로 공유할 수 있습니다.
 - 위젯 포토와 위젯 메모 기능을 활용해 홈 화면을 나만의 스타일로 꾸밀 수 있습니다.
 
 ### 📝 Our List (버킷 리스트)
 
-<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/cf6363c4-2b87-4573-8922-7f0bee5d440b" />
+<img width="300" alt="버킷 리스트" src="https://github.com/user-attachments/assets/cf6363c4-2b87-4573-8922-7f0bee5d440b" />
 
 - 함께 이루고 싶은 버킷리스트를 작성하고 공유할 수 있습니다.
 - 완료한 항목은 체크하여 함께 성취감을 느낄 수 있습니다.
 
 ### 📓 Our Memo
 
-<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/c75a6fd8-17e3-4a24-8211-c0b768169d94" />
+<img width="300" alt="메모" src="https://github.com/user-attachments/assets/c75a6fd8-17e3-4a24-8211-c0b768169d94" />
+
 - 중요한 순간이나 일상을 기록할 수 있는 공유 메모 기능을 제공합니다.
 - 작성한 메모는 커플과 함께 확인하고 수정할 수 있습니다.
 
 ### 🙋 Our Page
 
-<img width="1290" height="2796" alt="Image" src="https://github.com/user-attachments/assets/cacf07ab-a71f-4ce3-976f-beb1bb1afbd0" />
+<img width="300" alt="마이페이지" src="https://github.com/user-attachments/assets/cacf07ab-a71f-4ce3-976f-beb1bb1afbd0" />
+
 - 닉네임, 프로필 사진, 생일 등 나의 정보를 자유롭게 수정할 수 있습니다.
 - 다가오는 기념일을 확인하고 새로운 기념일도 직접 추가할 수 있습니다.
 
