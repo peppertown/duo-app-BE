@@ -1,4 +1,4 @@
-import { ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 
 export const getNotificationsDocs = {
   operation: ApiOperation({
@@ -72,6 +72,35 @@ export const deleteAllNotificationDocs = {
         message: {
           code: '응답 코드 | number',
           text: '결과 메시지 | string',
+        },
+      },
+    },
+  }),
+};
+
+export const updatePushTokenDocs = {
+  operation: ApiOperation({
+    summary: '유저 push token 업데이트',
+    description: '유저의 기기 push token을 업데이트합니다.',
+  }),
+  body: ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string', example: '기기 push token | string' },
+      },
+      required: ['token'],
+    },
+  }),
+  response: ApiResponse({
+    status: 200,
+    description: 'push token 업데이트 성공',
+    schema: {
+      type: 'object',
+      example: {
+        message: {
+          code: '응답 코드 | number',
+          text: 'push token 업데이트가 완료되었습니다. | string',
         },
       },
     },
