@@ -24,6 +24,7 @@ model User {
   code         String    @unique
   birthday     DateTime? @default(now())
   themeId      Int       @default(1)
+  pushToken    String?
 
   couplesAsA Couple[] @relation("CoupleA")
   couplesAsB Couple[] @relation("CoupleB")
