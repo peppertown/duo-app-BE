@@ -76,47 +76,14 @@ export class AuthService {
     };
   }
 
-  // 구글 로그인 후 보안 코드 생성
+  // 구글 OAuth - 로그인 보안 코드 생성
   async generateGoogleLoginCode(code: string) {
     try {
-      // 1. 구글 토큰 요청
-      const decodedCode = decodeURIComponent(code);
-      const tokenResponse = await axios.post(
-        'https://oauth2.googleapis.com/token',
-        {
-          code: decodedCode,
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-          grant_type: 'authorization_code',
-        },
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
-      );
+      // id token 발급 및 디코딩
+      const decoded = await this.authHelper.decodeGoogleIdToken(code);
 
-      const { id_token } = tokenResponse.data;
-
-      // 2. id_token 디코딩 (검증 포함 가능)
-      const decoded = this.jwt.decode(id_token) as {
-        sub: string;
-        email: string;
-        name: string;
-        picture: string;
-      };
-
-      if (!decoded?.sub) {
-        throw new HttpException(
-          '유효하지 않은 Google ID Token 입니다.',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      // 3. 유저 데이터 추출 및 보안 코드 생성
-      const { sub, email, name, picture } = decoded;
-      const userData = { sub, email, nickname: name, profileUrl: picture };
-      const securityCode = generateRandomString();
-
-      // 4. 보안 코드와 유저 데이터 레디스에 저장
-      await this.redis.set(securityCode, JSON.stringify(userData), 300);
+      // 디코딩된 id token 데이터 파싱 및 로그인 코드 생성
+      const securityCode = await this.authHelper.generateLoginCode(decoded);
 
       return securityCode;
     } catch (err) {
