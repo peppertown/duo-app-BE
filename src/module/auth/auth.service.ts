@@ -1,11 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { RedisService } from 'src/redis/redis.service';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
-import * as jwt from 'jsonwebtoken';
-import { CoupleService } from '../couple/couple.service';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
 
@@ -13,23 +9,9 @@ import { AuthHelper } from './helper/auth.helper';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
   ) {}
-
-  private verifyRefreshToken(token: string): any {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      return decoded;
-    } catch (error) {
-      console.error('리프레시 토큰 검증 실패:', error.message);
-      throw new HttpException(
-        '유효하지 않은 리프레시 토큰입니다.',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-  }
 
   // 회원 가입
   async register(data: { email: string; password: string }) {
@@ -184,19 +166,7 @@ export class AuthService {
 
   // 토큰 재발급
   async handleRefresh(refreshToken: string) {
-    const decoded = this.verifyRefreshToken(refreshToken);
-    const user = { id: decoded.userId };
-
-    const originRefreshToken = await this.redis.get(
-      `${process.env.REFRESH_KEY_JWT}:${user.id}`,
-    );
-
-    if (originRefreshToken !== refreshToken) {
-      throw new HttpException(
-        '잘못된 리프레시 토큰입니다',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    const user = await this.authHelper.validateRefreshToken(refreshToken);
 
     const response = await this.handleLoginProcess(user);
 

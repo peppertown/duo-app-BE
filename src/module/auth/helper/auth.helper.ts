@@ -215,4 +215,22 @@ export class AuthHelper {
       authProvider: 'Kakao',
     };
   }
+
+  async validateRefreshToken(refreshToken: string) {
+    const decoded = this.verifyRefreshToken(refreshToken);
+    const user = { id: decoded.userId };
+
+    const originRefreshToken = await this.redis.get(
+      `${process.env.REFRESH_KEY_JWT}:${user.id}`,
+    );
+
+    if (originRefreshToken !== refreshToken) {
+      throw new HttpException(
+        '잘못된 리프레시 토큰입니다',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return user;
+  }
 }
