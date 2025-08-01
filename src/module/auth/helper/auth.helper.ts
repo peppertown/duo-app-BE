@@ -1,0 +1,52 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+import { generateRandomString } from 'src/common/utils/random.util';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+@Injectable()
+export class AuthHelper {
+  constructor(private readonly prisma: PrismaService) {}
+
+  verifyRefreshToken(token: string): any {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      return decoded;
+    } catch (error) {
+      console.error('리프레시 토큰 검증 실패:', error.message);
+      throw new HttpException(
+        '유효하지 않은 리프레시 토큰입니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  async createNewUser(email: string, password: string) {
+    const nickname = email.split('@')[0];
+
+    // 중복 확인
+    const existingUser = await this.prisma.user.findFirst({
+      where: { email },
+    });
+    if (existingUser) {
+      throw new HttpException(
+        '이미 존재하는 사용자 ID입니다.',
+        HttpStatus.ACCEPTED,
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const randomCode = generateRandomString();
+    const newUser = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        nickname,
+        code: randomCode,
+        profileUrl: process.env.DEFAULT_PROFILE_URL,
+      },
+    });
+
+    return newUser;
+  }
+}
