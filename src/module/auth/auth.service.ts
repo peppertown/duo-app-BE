@@ -39,10 +39,10 @@ export class AuthService {
     const { email, password } = data;
     const newUser = await this.authHelper.createNewUser(email, password);
 
-    const accessToken = await this.generateAccessToken(newUser.id);
-    const refreshToken = await this.generateRefreshToken(newUser.id);
+    const accessToken = await this.authHelper.generateAccessToken(newUser.id);
+    const refreshToken = await this.authHelper.generateRefreshToken(newUser.id);
 
-    await this.saveServerRefreshToken(newUser.id, refreshToken);
+    await this.authHelper.saveServerRefreshToken(newUser.id, refreshToken);
 
     return {
       message: '회원가입 성공',
@@ -99,24 +99,11 @@ export class AuthService {
     }
   }
 
-  // 구글 보안 코드 인증 후 유저 데이터 반환
+  // 구글 OAuth - 로그인 보안 코드 인증 후 유저 데이터 반환
   async verifyGoogleSecurityCode(securityCode: string) {
     try {
-      // redis에서 보안 코드와 일치하는 값 확인
-      const data = await this.redis.get(securityCode);
-
-      if (!data) {
-        throw new HttpException(
-          '유효하지 않은 구글 보안 코드 입니다.',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      // 유저 데이터 확인 후 redis에서 제거
-      await this.redis.del(securityCode);
-
-      // 유저 데이터 파싱 후 DB 저장
-      const userData = { ...JSON.parse(data), authProvider: 'Google' };
+      const userData =
+        await this.authHelper.vaildateGoogleLoginUser(securityCode);
       const { user, isNew } = await this.findOrCreateAccount(userData);
 
       const response = await this.handleLoginProcess(user);

@@ -175,4 +175,25 @@ export class AuthHelper {
 
     return securityCode;
   }
+
+  // 구글 OAuth 헬퍼 - 보안 코드 인증 후 유저 데이터 리턴
+  async vaildateGoogleLoginUser(securityCode: string) {
+    // redis에서 보안 코드와 일치하는 값 확인
+    const data = await this.redis.get(securityCode);
+
+    if (!data) {
+      throw new HttpException(
+        '유효하지 않은 구글 보안 코드 입니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    // 유저 데이터 확인 후 redis에서 제거
+    await this.redis.del(securityCode);
+
+    // 유저 데이터 파싱 후 리턴
+    const userData = { ...JSON.parse(data), authProvider: 'Google' };
+
+    return userData;
+  }
 }
