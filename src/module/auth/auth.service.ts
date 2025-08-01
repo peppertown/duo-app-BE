@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
-import axios from 'axios';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import * as jwt from 'jsonwebtoken';
@@ -14,9 +13,7 @@ import { AuthHelper } from './helper/auth.helper';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
     private readonly redis: RedisService,
-    private readonly coupleService: CoupleService,
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
   ) {}
@@ -131,21 +128,8 @@ export class AuthService {
 
   // 카카오 로그인
   async kakaoLogin(accessToken: string) {
-    const userRes = await axios.get('https://kapi.kakao.com/v2/user/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const kakaoData = userRes.data;
-
-    const { id } = kakaoData;
-    const { nickname, profile_image, email } = kakaoData.properties;
-
-    const { user, isNew } = await this.findOrCreateAccount({
-      sub: id.toString(),
-      email,
-      nickname,
-      profileUrl: profile_image,
-      authProvider: 'Kakao',
-    });
+    const userData = await this.authHelper.fetchKakoUserData(accessToken);
+    const { user, isNew } = await this.findOrCreateAccount(userData);
 
     const response = await this.handleLoginProcess(user);
 

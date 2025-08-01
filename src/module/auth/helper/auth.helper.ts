@@ -196,4 +196,23 @@ export class AuthHelper {
 
     return userData;
   }
+
+  // 카카오 OAuth 헬퍼 - 데이터 페칭 및 파싱 후 리턴
+  async fetchKakoUserData(accessToken: string) {
+    const userRes = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const kakaoData = userRes.data;
+
+    const { id } = kakaoData;
+    const { nickname, profile_image, email } = kakaoData.properties;
+
+    return {
+      sub: id.toString(),
+      email,
+      nickname,
+      profileUrl: profile_image,
+      authProvider: 'Kakao',
+    };
+  }
 }
