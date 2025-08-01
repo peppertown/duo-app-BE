@@ -15,6 +15,7 @@ import { getPartnerData } from 'src/common/utils/couple.util';
 import * as jwt from 'jsonwebtoken';
 import { CoupleService } from '../couple/couple.service';
 import { NotificationService } from '../notification/notification.service';
+import { AuthHelper } from './helper/auth.helper';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
     private readonly redis: RedisService,
     private readonly coupleService: CoupleService,
     private readonly notificationService: NotificationService,
+    private readonly authHelper: AuthHelper,
   ) {}
 
   private verifyRefreshToken(token: string): any {
@@ -39,29 +41,10 @@ export class AuthService {
     }
   }
 
+  // 회원 가입
   async register(data: { email: string; password: string }) {
     const { email, password } = data;
-    const nickname = email.split('@')[0];
-
-    // 중복 확인
-    const existingUser = await this.prisma.user.findFirst({
-      where: { email },
-    });
-    if (existingUser) {
-      throw new BadRequestException('이미 존재하는 사용자 ID입니다.');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const randomCode = generateRandomString();
-    const newUser = await this.prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        nickname,
-        code: randomCode,
-        profileUrl: process.env.DEFAULT_PROFILE_URL,
-      },
-    });
+    const newUser = await this.authHelper.createNewUser(email, password);
 
     const accessToken = await this.generateAccessToken(newUser.id);
     const refreshToken = await this.generateRefreshToken(newUser.id);

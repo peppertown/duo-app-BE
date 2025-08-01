@@ -9,7 +9,7 @@ import {
   verifyGoogleSecurityCodeDocs,
 } from './docs/auth.docs';
 import { Response } from 'express';
-import { buildGoogleOAuthUrl } from './utils/oauth.utils';
+import { buildGoogleOAuthUrl } from './utils/auth.utils';
 
 @ApiTags('auth')
 @Controller('auth')

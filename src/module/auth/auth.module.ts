@@ -6,6 +6,7 @@ import { RedisModule } from 'src/redis/redis.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { CoupleModule } from '../couple/couple.module';
 import { NotificationModule } from '../notification/notification.module';
+import { AuthHelper } from './helper/auth.helper';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { NotificationModule } from '../notification/notification.module';
     NotificationModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, AuthHelper],
   exports: [AuthService],
 })
 export class AuthModule {}

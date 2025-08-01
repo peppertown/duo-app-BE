@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class AuthHelper {
   constructor(private readonly prisma: PrismaService) {}
 
+  // 리프레쉬 토큰 검증
   verifyRefreshToken(token: string): any {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!);
@@ -21,6 +22,7 @@ export class AuthHelper {
     }
   }
 
+  // 회원가입 헬퍼 - 입력된 email password 기반으로 새로운 유저 데이터 생성
   async createNewUser(email: string, password: string) {
     const nickname = email.split('@')[0];
 
