@@ -3,10 +3,16 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthHelper {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+    private readonly redis: RedisService,
+  ) {}
 
   // 리프레쉬 토큰 검증
   verifyRefreshToken(token: string): any {
@@ -18,6 +24,47 @@ export class AuthHelper {
       throw new HttpException(
         '유효하지 않은 리프레시 토큰입니다.',
         HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  // 액세스 토큰 발급
+  async generateAccessToken(userId: number): Promise<string> {
+    try {
+      return await this.jwt.signAsync({ userId }, { expiresIn: '1h' });
+    } catch (err) {
+      console.error('액세스 토큰 생성 실패:', err);
+      throw new HttpException(
+        '액세스 토큰 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 리프레시 토큰 발급
+  async generateRefreshToken(userId: number): Promise<string> {
+    try {
+      return this.jwt.signAsync({ userId }, { expiresIn: '7d' });
+    } catch (err) {
+      console.error('리프레시 토큰 생성 실패:', err);
+      throw new HttpException(
+        '리프레시 토큰 생성 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 리프레시 토큰 저장
+  async saveServerRefreshToken(userId: number, refreshToken: string) {
+    try {
+      const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
+      const ttlSeconds = 7 * 24 * 60 * 60; // 7일
+      await this.redis.set(key, refreshToken, ttlSeconds);
+    } catch (err) {
+      console.error('JWT 리프레시 토큰 레디스 저장 실패', err);
+      throw new HttpException(
+        'JWT 리프레시 토큰 레디스 저장 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

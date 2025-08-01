@@ -76,53 +76,6 @@ export class AuthService {
     };
   }
 
-  // 액세스 토큰 발급
-  async generateAccessToken(userId: number): Promise<string> {
-    try {
-      return await this.jwt.signAsync(
-        { userId },
-        { expiresIn: '1h' }, // 액세스 토큰 1시간
-      );
-    } catch (err) {
-      console.error('액세스 토큰 생성 실패:', err);
-      throw new HttpException(
-        '액세스 토큰 생성 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  // 리프레시 토큰 발급
-  async generateRefreshToken(userId: number): Promise<string> {
-    try {
-      return this.jwt.signAsync(
-        { userId },
-        { expiresIn: '7d' }, // 리프레시 토큰 7일
-      );
-    } catch (err) {
-      console.error('리프레시 토큰 생성 실패:', err);
-      throw new HttpException(
-        '리프레시 토큰 생성 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  // 리프레시 토큰 저장
-  async saveServerRefreshToken(userId: number, refreshToken: string) {
-    try {
-      const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
-      const ttlSeconds = 7 * 24 * 60 * 60; // 7일
-      await this.redis.set(key, refreshToken, ttlSeconds);
-    } catch (err) {
-      console.error('JWT 리프레시 토큰 레디스 저장 실패', err);
-      throw new HttpException(
-        'JWT 리프레시 토큰 레디스 저장 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   // 구글 로그인 후 보안 코드 생성
   async generateGoogleLoginCode(code: string) {
     try {
@@ -356,11 +309,11 @@ export class AuthService {
 
   async handleLoginProcess(user: any) {
     // 토큰 발급
-    const jwtAccessToken = await this.generateAccessToken(user.id);
-    const jwtRefreshToken = await this.generateRefreshToken(user.id);
+    const jwtAccessToken = await this.authHelper.generateAccessToken(user.id);
+    const jwtRefreshToken = await this.authHelper.generateRefreshToken(user.id);
 
     // 리프레시 토큰 redis 저장
-    await this.saveServerRefreshToken(user.id, jwtRefreshToken);
+    await this.authHelper.saveServerRefreshToken(user.id, jwtRefreshToken);
 
     const { couple, partner } = await this.getUserData(user.id);
     const formatResponse = this.formatLoginResponse(user, couple, partner);
