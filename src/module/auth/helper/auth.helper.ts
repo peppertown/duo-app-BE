@@ -51,4 +51,26 @@ export class AuthHelper {
 
     return newUser;
   }
+
+  // 자체 로그인 헬퍼 - 로그인 데이터 vaild 한지 확인 후 DB에 저장된 user 값 리턴
+  async validateUserLogin(email: string, password: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new HttpException(
+        '존재하지 않는 사용자입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new HttpException(
+        '비밀번호가 올바르지 않습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

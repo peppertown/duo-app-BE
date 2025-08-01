@@ -1,12 +1,5 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import axios from 'axios';
@@ -70,19 +63,7 @@ export class AuthService {
   async login(data: { email: string; password: string }) {
     const { email, password } = data;
 
-    const user = await this.prisma.user.findFirst({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundException('존재하지 않는 사용자입니다.');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new BadRequestException('비밀번호가 올바르지 않습니다.');
-    }
-
+    const user = this.authHelper.validateUserLogin(email, password);
     const response = await this.handleLoginProcess(user);
 
     return {
