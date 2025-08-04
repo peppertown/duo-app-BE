@@ -14,6 +14,7 @@ import { CronModule } from './cron/cron.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationModule } from './module/notification/notification.module';
 import { MypageModule } from './module/mypage/mypage.module';
+import { UploaderModule } from './uploader/uploader.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MypageModule } from './module/mypage/mypage.module';
     ScheduleModule.forRoot(),
     NotificationModule,
     MypageModule,
+    UploaderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
