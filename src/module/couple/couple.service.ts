@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   addDays,
   addYears,
@@ -8,13 +8,13 @@ import {
   startOfDay,
 } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { S3Service } from 'src/s3/s3.service';
+import { ImageUploader } from 'src/uploader/uploader.interface';
 
 @Injectable()
 export class CoupleService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3: S3Service,
+    @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
 
   // 디데이용 기념일 설정
@@ -211,7 +211,7 @@ export class CoupleService {
     file: Express.Multer.File,
   ) {
     try {
-      const photo = await this.s3.uploadImageToS3(file, 'widget');
+      const photo = await this.uploader.upload(file, 'widget');
 
       await this.prisma.widget.updateMany({
         where: { coupleId: coupleId },
