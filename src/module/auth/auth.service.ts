@@ -42,7 +42,7 @@ export class AuthService {
   async login(data: { email: string; password: string }) {
     const { email, password } = data;
 
-    const user = this.authHelper.validateUserLogin(email, password);
+    const user = await this.authHelper.validateUserLogin(email, password);
     const response = await this.handleLoginProcess(user);
 
     return {

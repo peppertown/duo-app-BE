@@ -120,6 +120,8 @@ export class AuthHelper {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    return user;
   }
 
   // 구글 OAuth 헬퍼 - 구글에 id 토큰 요청 후 디코딩 데이터 리턴
