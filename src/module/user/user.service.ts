@@ -3,7 +3,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
 import { S3Service } from 'src/s3/s3.service';
 import { AuthService } from '../auth/auth.service';
-import { generateFileName, validateFile } from 'src/common/utils/uploader.util';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 
 @Injectable()
@@ -219,15 +218,7 @@ export class UserService {
   // 프로필 사진 업로드
   async uploadProfileImage(userId: number, file: Express.Multer.File) {
     try {
-      console.log(userId);
-      // 유효성 검사
-      validateFile(file);
-
-      // 파일명 생성
-      const fileName = generateFileName('profile', file);
-
-      // 파일 업로드
-      const result = await this.uploader.upload(file, fileName);
+      const result = await this.uploader.upload(file, 'profile');
 
       await this.prisma.user.update({
         where: { id: userId },
