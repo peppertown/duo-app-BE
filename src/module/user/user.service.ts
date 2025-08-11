@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
-import { S3Service } from 'src/s3/s3.service';
 import { AuthService } from '../auth/auth.service';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 
@@ -9,7 +8,6 @@ import { ImageUploader } from 'src/uploader/uploader.interface';
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3: S3Service,
     private readonly redis: RedisService,
     private readonly authService: AuthService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
