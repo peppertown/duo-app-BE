@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { isBefore, startOfDay } from 'date-fns';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 import { ConfigService } from 'src/config/config.service';
+import { RedisService } from 'src/redis/redis.service';
 import { CoupleRepository } from 'src/common/repositories/couple.repository';
 import {
   getDDay,
@@ -15,6 +16,7 @@ import { formatApiResponse } from 'src/common/utils/response.util';
 export class CoupleService {
   constructor(
     private readonly coupleRepository: CoupleRepository,
+    private readonly redis: RedisService,
     private readonly configService: ConfigService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
@@ -149,14 +151,32 @@ export class CoupleService {
   async deleteCouple(userId: number, coupleId: number) {
     await this.coupleRepository.delete(coupleId);
 
+    // 커플 인증 캐시 무효화
+    const cachePattern = `couple:auth:*:${coupleId}`;
+    await this.redis.delPattern(cachePattern);
+
     return formatApiResponse(200, '커플 연결 해제가 완료되었습니다.');
   }
 
   // 커플 관련 api 권한 확인
   async confirmCoupleAuth(userId: number, coupleId: number) {
-    const coupleIds = await this.coupleRepository.findById(coupleId);
+    const cacheKey = `couple:auth:${userId}:${coupleId}`;
+    const cached = await this.redis.get(cacheKey);
 
-    const isValid = coupleIds.aId == userId || coupleIds.bId == userId;
+    if (cached !== null) {
+      return cached === 'true';
+    }
+
+    const couple = await this.coupleRepository.findById(coupleId);
+    if (!couple) {
+      await this.redis.set(cacheKey, 'false', 3600);
+      return false;
+    }
+
+    const isValid = couple.aId == userId || couple.bId == userId;
+
+    // 1시간 캐싱
+    await this.redis.set(cacheKey, isValid ? 'true' : 'false', 3600);
     return isValid;
   }
 

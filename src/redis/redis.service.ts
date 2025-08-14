@@ -25,4 +25,12 @@ export class RedisService implements OnModuleInit {
   async del(key: string) {
     return await this.client.del(key);
   }
+
+  async delPattern(pattern: string) {
+    const keys = await this.client.keys(pattern);
+    if (keys.length > 0) {
+      return await this.client.del(...keys);
+    }
+    return 0;
+  }
 }
