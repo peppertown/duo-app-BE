@@ -62,10 +62,7 @@ export class UserService {
       });
 
       if (!partner || partner.id == userId) {
-        throw new HttpException(
-          '잘못된 코드 입니다.',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('잘못된 코드 입니다.', HttpStatus.BAD_REQUEST);
       }
 
       couple = await tx.couple.create({
@@ -147,11 +144,6 @@ export class UserService {
       },
       couple: { anniversary: couple.anniversary },
       partner,
-    };
-
-    return {
-      message: { code: 200, text: '커플 매칭 상태 확인이 완료되었습니다.' },
-      isMatched: true,
     };
   }
 
