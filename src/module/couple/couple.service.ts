@@ -7,14 +7,18 @@ import {
   set,
   startOfDay,
 } from 'date-fns';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 import { ConfigService } from 'src/config/config.service';
+import { CoupleRepository } from 'src/common/repositories/couple.repository';
+import { CoupleAnniversaryRepository } from 'src/common/repositories/couple-anniversary.repository';
+import { WidgetRepository } from 'src/common/repositories/widget.repository';
 
 @Injectable()
 export class CoupleService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly coupleRepository: CoupleRepository,
+    private readonly coupleAnniversaryRepository: CoupleAnniversaryRepository,
+    private readonly widgetRepository: WidgetRepository,
     private readonly configService: ConfigService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
@@ -30,9 +34,8 @@ export class CoupleService {
       );
     }
 
-    const couple = await this.prisma.couple.update({
-      where: { id: coupleId },
-      data: { anniversary: new Date(anniversary) },
+    const couple = await this.coupleRepository.update(coupleId, {
+      anniversary: new Date(anniversary),
     });
 
     return {
@@ -59,12 +62,10 @@ export class CoupleService {
       );
     }
 
-    const anniv = await this.prisma.coupleAnniversary.create({
-      data: {
-        title,
-        coupleId,
-        date: new Date(anniversary),
-      },
+    const anniv = await this.coupleAnniversaryRepository.create({
+      title,
+      coupleId,
+      date: new Date(anniversary),
     });
 
     const days = this.getDays(anniv.date);
@@ -97,12 +98,9 @@ export class CoupleService {
       );
     }
 
-    const anniv = await this.prisma.coupleAnniversary.update({
-      where: { id: annivId },
-      data: {
-        title,
-        date: new Date(anniversary),
-      },
+    const anniv = await this.coupleAnniversaryRepository.update(annivId, {
+      title,
+      date: new Date(anniversary),
     });
 
     const days = this.getDays(anniv.date);
@@ -120,9 +118,7 @@ export class CoupleService {
 
   // 커플 기념일 삭제
   async deleteAnniversary(userId: number, coupleId: number, annivId: number) {
-    await this.prisma.coupleAnniversary.delete({
-      where: { id: annivId },
-    });
+    await this.coupleAnniversaryRepository.delete(annivId);
 
     return {
       message: { code: 200, text: '기념일 삭제가 완료되었습니다.' },
@@ -131,11 +127,7 @@ export class CoupleService {
 
   // 커플 위젯 조회
   async getCoupleWidget(userId: number, coupleId: number) {
-    const widget = await this.prisma.widget.findFirst({
-      where: {
-        coupleId: coupleId,
-      },
-    });
+    const widget = await this.widgetRepository.findByCoupleId(coupleId);
 
     const photoUrl = widget.photoUrl
       ? widget.photoUrl
@@ -154,9 +146,8 @@ export class CoupleService {
   ) {
     const photo = await this.uploader.upload(file, 'widget');
 
-    await this.prisma.widget.updateMany({
-      where: { coupleId: coupleId },
-      data: { photoUrl: photo.imageUrl },
+    await this.widgetRepository.updateByCoupleId(coupleId, {
+      photoUrl: photo.imageUrl,
     });
 
     return {
@@ -167,9 +158,7 @@ export class CoupleService {
 
   // 커플 연결 해제
   async deleteCouple(userId: number, coupleId: number) {
-    await this.prisma.couple.delete({
-      where: { id: coupleId },
-    });
+    await this.coupleRepository.delete(coupleId);
 
     return {
       message: { code: 200, text: '커플 연결 해제가 완료되었습니다.' },
@@ -178,9 +167,7 @@ export class CoupleService {
 
   // 커플 관련 api 권한 확인
   async confirmCoupleAuth(userId: number, coupleId: number) {
-    const coupleIds = await this.prisma.couple.findUnique({
-      where: { id: coupleId },
-    });
+    const coupleIds = await this.coupleRepository.findById(coupleId);
 
     const isValid = coupleIds.aId == userId || coupleIds.bId == userId;
     return isValid;
@@ -188,13 +175,7 @@ export class CoupleService {
 
   // 커플 기념일 조회
   async getCoupleAnniversaries(coupleId: number) {
-    const data = await this.prisma.couple.findUnique({
-      where: { id: coupleId },
-      include: {
-        a: { select: { nickname: true, birthday: true } },
-        b: { select: { nickname: true, birthday: true } },
-      },
-    });
+    const data = await this.coupleRepository.findByIdWithUsers(coupleId);
     const dday = this.getDDay(data.anniversary);
 
     const upcoming = this.getUpcommingAnniv(dday, data.anniversary);
@@ -206,10 +187,8 @@ export class CoupleService {
       { id: 3, type: `${data.b.nickname}님 생일`, ...bBirth },
     ];
 
-    const otherAnniv = await this.prisma.coupleAnniversary.findMany({
-      where: { coupleId },
-      orderBy: { date: 'asc' },
-    });
+    const otherAnniv =
+      await this.coupleAnniversaryRepository.findManyByCoupleId(coupleId);
 
     if (otherAnniv.length) {
       otherAnniv.forEach((item) => {
