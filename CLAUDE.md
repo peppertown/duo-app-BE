@@ -101,14 +101,45 @@ npx prisma studio      # Prisma Studio 열기
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`: S3 설정
 - 카카오 및 구글 제공자를 위한 OAuth 자격 증명
 
+### 환경변수 관리
+
+모든 환경변수는 **ConfigService**를 통해 타입 안전하게 관리됩니다:
+- 애플리케이션 시작 시 필수 환경변수 검증
+- 타입 변환 및 유효성 검사 (포트 범위, URL 형식 등)
+- `process.env` 직접 사용 금지, ConfigService getter 사용 필수
+
 ## 코드 구조 및 패턴
+
+### 아키텍처 계층
+
+- **Controller**: 요청/응답 처리 및 검증
+- **Service**: 비즈니스 플로우 조합 (오케스트레이터 역할)
+- **Helper**: OAuth, Redis 등 복잡한 외부 연동 로직
+- **Repository**: 데이터 접근 로직 (Prisma 추상화)
+- **Utils**: 순수함수 기반 재사용 가능한 유틸리티
 
 ### 서비스 레이어
 
 - 모든 서비스는 try-catch 블록 없이 구현되어 있음 (GlobalExceptionFilter가 처리)
 - 비즈니스 로직 예외는 명시적인 HttpException으로 처리
-- Prisma를 직접 사용하여 데이터베이스 작업 수행
+- Repository 패턴을 통해 데이터 접근 로직 분리
 - 복잡한 로직은 Helper 클래스로 분리 (예: AuthHelper)
+
+### Repository 패턴
+
+- **UserRepository**: 사용자 데이터 접근 (전역 사용 가능)
+- **CoupleRepository**: 커플, 기념일, 위젯 테이블 통합 관리
+- 모든 Repository는 `@Global()` RepositoriesModule에서 제공
+- Prisma 직접 사용 대신 Repository를 통한 데이터 접근
+
+### 유틸리티
+
+- **date.util.ts**: 날짜 계산 관련 순수함수들
+  - `getDDay()`: 커플 디데이 계산
+  - `getDays()`: 남은 일수 계산  
+  - `getUpcomingAnniversary()`: 다가오는 기념일 계산
+  - `getDaysToNextBirthday()`: 생일까지 남은 일수 계산
+- **random.util.ts**: 랜덤 문자열 생성 등
 
 ### Guard 시스템
 
@@ -136,7 +167,17 @@ Swagger UI가 `/api` 엔드포인트에서 제공됩니다. OAuth에서 발급�
 
 ### 새로운 모듈 추가 시
 
-1. 서비스는 try-catch 없이 구현
-2. 복잡한 로직은 Helper 클래스로 분리
-3. 커플 권한이 필요하면 CoupleAuthGuard 적용
-4. 파일 업로드가 필요하면 ImageUploader 인터페이스 사용
+1. **데이터 접근**: Repository 패턴 사용, Prisma 직접 호출 금지
+2. **환경변수**: ConfigService 사용, `process.env` 직접 사용 금지  
+3. **서비스**: try-catch 없이 구현 (GlobalExceptionFilter가 처리)
+4. **순수함수**: 계산 로직은 Utils로 분리
+5. **복잡한 로직**: OAuth, Redis 등은 Helper 클래스로 분리
+6. **권한 검사**: 커플 권한 필요시 CoupleAuthGuard 적용
+7. **파일 업로드**: ImageUploader 인터페이스 사용
+
+### 코드 작성 가이드라인
+
+- **Repository**: 데이터베이스 접근은 반드시 Repository를 통해
+- **ConfigService**: 모든 환경변수 접근은 ConfigService getter 사용
+- **Utils vs Helper**: 순수함수는 Utils, 외부 의존성 있는 복잡한 로직은 Helper
+- **에러 처리**: HttpException으로 명시적 비즈니스 에러 처리
