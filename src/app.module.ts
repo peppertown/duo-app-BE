@@ -14,9 +14,11 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationModule } from './module/notification/notification.module';
 import { MypageModule } from './module/mypage/mypage.module';
 import { UploaderModule } from './uploader/uploader.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
+    ConfigModule,
     AuthModule,
     PrismaModule,
     UserModule,
