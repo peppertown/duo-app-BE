@@ -10,11 +10,15 @@ import {
 } from './docs/auth.docs';
 import { Response } from 'express';
 import { buildGoogleOAuthUrl } from './utils/auth.utils';
+import { ConfigService } from 'src/config/config.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('login')
   @loginDocs.operation
@@ -37,7 +41,7 @@ export class AuthController {
 
   @Get('google')
   redirectToGoogle(@Res() res: Response) {
-    const authUrl = buildGoogleOAuthUrl();
+    const authUrl = buildGoogleOAuthUrl(this.configService);
     return res.redirect(authUrl);
   }
 
@@ -47,7 +51,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const securityCode = await this.authService.generateGoogleLoginCode(code);
-    const redirectUrl = `${process.env.DEEPLINK_URL}?securityCode=${securityCode}`;
+    const redirectUrl = `${this.configService.deeplinkUrl}?securityCode=${securityCode}`;
     return res.redirect(redirectUrl);
   }
 

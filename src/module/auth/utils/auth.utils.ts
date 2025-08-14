@@ -1,9 +1,11 @@
+import { ConfigService } from 'src/config/config.service';
+
 // 구글 OAuth 딥링킹 용 url 생성
-export const buildGoogleOAuthUrl = () => {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = encodeURIComponent(process.env.GOOGLE_REDIRECT_URI);
+export const buildGoogleOAuthUrl = (configService: ConfigService) => {
+  const clientId = configService.googleClientId;
+  const redirectUri = encodeURIComponent(configService.googleRedirectUri);
   const scope = encodeURIComponent('profile email');
-  const state = process.env.GOOGLE_SECURE_STATE;
+  const state = configService.googleSecureState;
 
   const authUrl =
     `https://accounts.google.com/o/oauth2/v2/auth` +

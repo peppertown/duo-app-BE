@@ -134,4 +134,25 @@ export class ConfigService {
       'https://example.com/default-widget.png',
     );
   }
+
+  // OAuth Configuration
+  get googleClientId(): string {
+    return this.get('GOOGLE_CLIENT_ID');
+  }
+
+  get googleClientSecret(): string {
+    return this.get('GOOGLE_CLIENT_SECRET');
+  }
+
+  get googleRedirectUri(): string {
+    return this.get('GOOGLE_REDIRECT_URI');
+  }
+
+  get deeplinkUrl(): string {
+    return this.get('DEEPLINK_URL');
+  }
+
+  get googleSecureState(): string {
+    return this.get('GOOGLE_SECURE_STATE');
+  }
 }

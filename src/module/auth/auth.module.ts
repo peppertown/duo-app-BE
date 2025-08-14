@@ -7,11 +7,18 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { CoupleModule } from '../couple/couple.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AuthHelper } from './helper/auth.helper';
+import { ConfigService } from 'src/config/config.service';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.jwtSecret,
+        signOptions: {
+          expiresIn: configService.jwtExpiresIn,
+        },
+      }),
     }),
     RedisModule,
     CoupleModule,

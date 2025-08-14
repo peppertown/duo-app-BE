@@ -4,6 +4,7 @@ import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
+    private readonly configService: ConfigService,
   ) {}
 
   // 회원 가입
@@ -122,7 +124,7 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           ...data,
-          profileUrl: process.env.DEFAULT_PROFILE_URL,
+          profileUrl: this.configService.defaultProfileUrl,
           code: randomCode,
         },
       });

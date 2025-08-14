@@ -5,6 +5,7 @@ import { generateRandomString } from 'src/common/utils/random.util';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
+import { ConfigService } from 'src/config/config.service';
 import axios from 'axios';
 
 @Injectable()
@@ -13,11 +14,12 @@ export class AuthHelper {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly redis: RedisService,
+    private readonly configService: ConfigService,
   ) {}
 
   // 리프레쉬 토큰 검증
   verifyRefreshToken(token: string): any {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, this.configService.jwtSecret);
     if (!decoded) {
       throw new HttpException(
         '유효하지 않은 리프레시 토큰입니다.',
@@ -39,7 +41,7 @@ export class AuthHelper {
 
   // 리프레시 토큰 저장
   async saveServerRefreshToken(userId: number, refreshToken: string) {
-    const key = `${process.env.REFRESH_KEY_JWT}:${userId}`;
+    const key = `${this.configService.refreshKeyJwt}:${userId}`;
     const ttlSeconds = 7 * 24 * 60 * 60; // 7일
     await this.redis.set(key, refreshToken, ttlSeconds);
   }
@@ -67,7 +69,7 @@ export class AuthHelper {
         password: hashedPassword,
         nickname,
         code: randomCode,
-        profileUrl: process.env.DEFAULT_PROFILE_URL,
+        profileUrl: this.configService.defaultProfileUrl,
       },
     });
 
@@ -106,9 +108,9 @@ export class AuthHelper {
       'https://oauth2.googleapis.com/token',
       {
         code: decodedCode,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        client_id: this.configService.googleClientId,
+        client_secret: this.configService.googleClientSecret,
+        redirect_uri: this.configService.googleRedirectUri,
         grant_type: 'authorization_code',
       },
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
@@ -197,7 +199,7 @@ export class AuthHelper {
     const user = { id: decoded.userId };
 
     const originRefreshToken = await this.redis.get(
-      `${process.env.REFRESH_KEY_JWT}:${user.id}`,
+      `${this.configService.refreshKeyJwt}:${user.id}`,
     );
 
     if (originRefreshToken !== refreshToken) {
