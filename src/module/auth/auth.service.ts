@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
@@ -100,7 +99,6 @@ export class AuthService {
       isNew,
     };
   }
-
 
   // 토큰 재발급
   async handleRefresh(refreshToken: string) {
