@@ -18,25 +18,15 @@ export class ListService {
     categoryId: number,
     content: string,
   ) {
-    try {
-      const coupleList = await this.prisma.list.findFirst({
-        where: { coupleId },
-      });
+    const coupleList = await this.prisma.list.findFirst({
+      where: { coupleId },
+    });
 
-      await this.prisma.listContent.create({
-        data: { listId: coupleList.id, writerId: userId, categoryId, content },
-      });
+    await this.prisma.listContent.create({
+      data: { listId: coupleList.id, writerId: userId, categoryId, content },
+    });
 
-      return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
-    } catch (err) {
-      console.error('리스트 목록 생성 중 에러 발생', err);
-      if (err instanceof HttpException) throw err;
-
-      throw new HttpException(
-        '리스트 목록 생성 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
   }
 
   // 리스트 조회
@@ -72,73 +62,53 @@ export class ListService {
 
   // 리스트 목록 완료여부 토글
   async listDoneHandler(userId: number, coupleId: number, contentId: number) {
-    try {
-      const listContent = await this.prisma.listContent.findUnique({
-        where: { id: contentId },
-        include: { category: true },
-      });
+    const listContent = await this.prisma.listContent.findUnique({
+      where: { id: contentId },
+      include: { category: true },
+    });
 
-      if (!listContent) {
-        throw new HttpException(
-          '리스트 목록을 찾을 수 없습니다.',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      const condition = {
-        where: { id: contentId },
-        data: { isDone: !listContent.isDone },
-      };
-
-      await this.prisma.listContent.update(condition);
-
-      // 완료시 알림 전송
-      if (!listContent.isDone) {
-        const couple = await this.prisma.couple.findUnique({
-          where: { id: coupleId },
-        });
-
-        const partnerId = couple.aId == userId ? couple.bId : couple.aId;
-
-        await this.sse.createNofication(partnerId, this.notificationType, {
-          id: listContent.id,
-          message: `완료된 버킷리스트가 있어요!
-${listContent.category.name}: ${listContent.content}`,
-        });
-      }
-
-      return {
-        message: { code: 200, text: '리스트 완료 여부 설정이 완료되었습니다.' },
-      };
-    } catch (err) {
-      console.error('리스트 완료 여부 설정 중 에러 발생', err);
-      if (err instanceof HttpException) throw err;
-
+    if (!listContent) {
       throw new HttpException(
-        '리스트 완료 여부 설정 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        '리스트 목록을 찾을 수 없습니다.',
+        HttpStatus.NOT_FOUND,
       );
     }
+
+    const condition = {
+      where: { id: contentId },
+      data: { isDone: !listContent.isDone },
+    };
+
+    await this.prisma.listContent.update(condition);
+
+    // 완료시 알림 전송
+    if (!listContent.isDone) {
+      const couple = await this.prisma.couple.findUnique({
+        where: { id: coupleId },
+      });
+
+      const partnerId = couple.aId == userId ? couple.bId : couple.aId;
+
+      await this.sse.createNofication(partnerId, this.notificationType, {
+        id: listContent.id,
+        message: `완료된 버킷리스트가 있어요!
+${listContent.category.name}: ${listContent.content}`,
+      });
+    }
+
+    return {
+      message: { code: 200, text: '리스트 완료 여부 설정이 완료되었습니다.' },
+    };
   }
 
   // 리스트 목록 삭제
   async deleteList(userId: number, coupleId: number, contentId: number) {
-    try {
-      await this.prisma.listContent.delete({
-        where: { id: contentId },
-      });
+    await this.prisma.listContent.delete({
+      where: { id: contentId },
+    });
 
-      return {
-        message: { code: 200, text: '리스트 목록이 삭제 삭제되었습니다.' },
-      };
-    } catch (err) {
-      console.error('리스트 목록 삭제 중 에러 발생', err);
-      if (err instanceof HttpException) throw err;
-
-      throw new HttpException(
-        '리스트 목록 삭제 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: { code: 200, text: '리스트 목록이 삭제 삭제되었습니다.' },
+    };
   }
 }
