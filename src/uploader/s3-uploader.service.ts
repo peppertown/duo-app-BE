@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { ImageUploader } from './uploader.interface';
-import { generateFileName, validateFile } from 'src/common/utils/uploader.util';
+import { generateFileName, validateFile } from 'src/uploader/uploader.util';
 
 @Injectable()
 export class S3UploaderService implements ImageUploader {
