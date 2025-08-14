@@ -2,11 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getCoupleUsersData } from 'src/common/utils/couple.util';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TodoRepository } from 'src/common/repositories/todo.repository';
-import {
-  groupTodosByUser,
-  formatSoloTodoData,
-  formatApiResponse,
-} from './utils/todo.util';
+import { groupTodosByUser, formatSoloTodoData } from './utils/todo.util';
+import { formatApiResponse } from 'src/common/utils/response.util';
 
 @Injectable()
 export class TodoService {

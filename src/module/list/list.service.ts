@@ -6,8 +6,8 @@ import { getPartnerId } from 'src/common/utils/couple.util';
 import {
   formatListData,
   createBucketListCompletionMessage,
-  formatApiResponse,
 } from './utils/list.util';
+import { formatApiResponse } from 'src/common/utils/response.util';
 
 @Injectable()
 export class ListService {

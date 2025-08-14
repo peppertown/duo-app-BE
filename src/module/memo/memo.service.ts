@@ -3,11 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SseService } from 'src/sse/sse.service';
 import { MemoRepository } from 'src/common/repositories/memo.repository';
 import { getPartnerId } from 'src/common/utils/couple.util';
-import {
-  formatMemoData,
-  formatSingleMemo,
-  formatApiResponse,
-} from './utils/memo.util';
+import { formatMemoData, formatSingleMemo } from './utils/memo.util';
+import { formatApiResponse } from 'src/common/utils/response.util';
 
 @Injectable()
 export class MemoService {
