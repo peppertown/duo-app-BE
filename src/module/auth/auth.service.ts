@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getPartnerData } from 'src/common/utils/couple.util';
+import { CoupleRepository } from 'src/common/repositories/couple.repository';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
 
@@ -8,6 +8,7 @@ import { AuthHelper } from './helper/auth.helper';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly coupleRepository: CoupleRepository,
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
   ) {}
@@ -128,7 +129,7 @@ export class AuthService {
         partner: null,
       };
     }
-    const partner = await getPartnerData(userId, couple.id);
+    const partner = await this.coupleRepository.findPartnerByUserAndCoupleId(userId, couple.id);
 
     return { couple, partner };
   }

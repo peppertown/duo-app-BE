@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getCoupleUsersData } from 'src/common/utils/couple.util';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TodoRepository } from 'src/common/repositories/todo.repository';
+import { CoupleRepository } from 'src/common/repositories/couple.repository';
 import { groupTodosByUser, formatSoloTodoData } from './utils/todo.util';
 import { formatApiResponse } from 'src/common/utils/response.util';
 
@@ -10,6 +10,7 @@ export class TodoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly todoRepository: TodoRepository,
+    private readonly coupleRepository: CoupleRepository,
   ) {}
 
   async createTodo(userId: number, coupleId: number, content: string) {
@@ -30,7 +31,7 @@ export class TodoService {
 
     const todos = await this.todoRepository.findTodosByCoupleId(coupleId);
 
-    const users = await getCoupleUsersData(coupleId);
+    const users = await this.coupleRepository.findUsersById(coupleId);
     const todosByUser = groupTodosByUser(todos, users);
 
     return formatApiResponse(200, '투두 조회에 성공했습니다.', {

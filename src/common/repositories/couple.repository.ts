@@ -60,6 +60,50 @@ export class CoupleRepository {
     });
   }
 
+  async findUsersById(coupleId: number) {
+    return this.prisma.couple.findUnique({
+      where: { id: coupleId },
+      select: {
+        a: {
+          select: {
+            id: true,
+            nickname: true,
+            profileUrl: true,
+            code: true,
+            birthday: true,
+          },
+        },
+        b: {
+          select: {
+            id: true,
+            nickname: true,
+            profileUrl: true,
+            code: true,
+            birthday: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findPartnerByUserAndCoupleId(userId: number, coupleId: number) {
+    if (!coupleId) return null;
+    
+    const couple = await this.findUsersById(coupleId);
+    if (!couple) return null;
+
+    // userId가 아닌 다른 사용자(파트너) 반환
+    if (couple.a.id !== userId) {
+      const { id, nickname, profileUrl, code, birthday } = couple.a;
+      return { id, nickname, profileUrl, code, birthday };
+    } else if (couple.b.id !== userId) {
+      const { id, nickname, profileUrl, code, birthday } = couple.b;
+      return { id, nickname, profileUrl, code, birthday };
+    }
+
+    return null;
+  }
+
   // CoupleAnniversary 테이블 메서드
   async createAnniversary(data: CreateAnniversaryData) {
     return this.prisma.coupleAnniversary.create({

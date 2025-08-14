@@ -144,9 +144,7 @@ npx prisma studio      # Prisma Studio 열기
   - `getUpcomingAnniversary()`: 다가오는 기념일 계산
   - `getDaysToNextBirthday()`: 생일까지 남은 일수 계산
 - **couple.util.ts**: 커플 관련 유틸 함수들
-  - `getPartnerId()`: 커플에서 파트너 ID 찾기
-  - `getCoupleUsersData()`: 커플 사용자 데이터 조회
-  - `getPartnerData()`: 파트너 데이터 조회
+  - `getPartnerId()`: 커플에서 파트너 ID 찾기 (순수함수)
 - **response.util.ts**: API 응답 포매팅
   - `formatApiResponse()`: 통일된 API 응답 구조 생성
 - **random.util.ts**: 랜덤 문자열 생성 등
