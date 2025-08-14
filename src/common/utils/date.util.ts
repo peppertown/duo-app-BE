@@ -1,9 +1,4 @@
-import {
-  addDays,
-  addYears,
-  differenceInCalendarDays,
-  set,
-} from 'date-fns';
+import { addDays, addYears, differenceInCalendarDays, set } from 'date-fns';
 
 // 커플 디데이 조회 (경과일)
 export function getDDay(anniversary: Date): number {

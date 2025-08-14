@@ -4,7 +4,7 @@ export const groupTodosByUser = (
   users: any,
 ): Record<number, { nickname: string; todos: any[] }> => {
   const todosByUser: Record<number, { nickname: string; todos: any[] }> = {};
-  
+
   for (const key of ['a', 'b']) {
     const user = users[key];
     todosByUser[user.id] = {
@@ -12,7 +12,7 @@ export const groupTodosByUser = (
       todos: todos.filter((todo) => todo.writerId === user.id),
     };
   }
-  
+
   return todosByUser;
 };
 
@@ -25,4 +25,3 @@ export const formatSoloTodoData = (userId: number, user: any, todos: any[]) => {
     },
   };
 };
-

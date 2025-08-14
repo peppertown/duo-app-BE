@@ -7,7 +7,19 @@ import { TodoRepository } from './todo.repository';
 
 @Global()
 @Module({
-  providers: [UserRepository, CoupleRepository, ListRepository, MemoRepository, TodoRepository],
-  exports: [UserRepository, CoupleRepository, ListRepository, MemoRepository, TodoRepository],
+  providers: [
+    UserRepository,
+    CoupleRepository,
+    ListRepository,
+    MemoRepository,
+    TodoRepository,
+  ],
+  exports: [
+    UserRepository,
+    CoupleRepository,
+    ListRepository,
+    MemoRepository,
+    TodoRepository,
+  ],
 })
 export class RepositoriesModule {}

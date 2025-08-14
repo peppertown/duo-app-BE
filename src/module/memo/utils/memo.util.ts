@@ -23,4 +23,3 @@ export const formatSingleMemo = (memo: any, isWidgetMemo: boolean = false) => ({
   user: { id: memo.writer.id, nickname: memo.writer.nickname },
   isWidgetMemo,
 });
-
