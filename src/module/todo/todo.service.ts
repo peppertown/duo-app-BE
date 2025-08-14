@@ -1,20 +1,29 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getCoupleUsersData } from 'src/common/utils/couple.util';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TodoRepository } from 'src/common/repositories/todo.repository';
+import {
+  groupTodosByUser,
+  formatSoloTodoData,
+  formatApiResponse,
+} from './utils/todo.util';
 
 @Injectable()
 export class TodoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly todoRepository: TodoRepository,
+  ) {}
 
   async createTodo(userId: number, coupleId: number, content: string) {
-    const todo = await this.prisma.todo.create({
-      data: { coupleId, writerId: userId, content, isDone: false },
+    const todo = await this.todoRepository.createTodo({
+      coupleId,
+      writerId: userId,
+      content,
+      isDone: false,
     });
 
-    return {
-      message: { code: 200, text: '투두 등록이 완료되었습니다' },
-      todo,
-    };
+    return formatApiResponse(200, '투두 등록이 완료되었습니다', { todo });
   }
 
   async getTodos(userId: number, coupleId: number) {
@@ -22,73 +31,49 @@ export class TodoService {
       return await this.getSoloTodo(userId);
     }
 
-    const todos = await this.prisma.todo.findMany({
-      where: { coupleId },
-    });
+    const todos = await this.todoRepository.findTodosByCoupleId(coupleId);
 
     const users = await getCoupleUsersData(coupleId);
+    const todosByUser = groupTodosByUser(todos, users);
 
-    const todosByUser: Record<number, { nickname: string; todos: any[] }> = {};
-    for (const key of ['a', 'b']) {
-      const user = users[key];
-      todosByUser[user.id] = {
-        nickname: user.nickname,
-        todos: todos.filter((todo) => todo.writerId === user.id),
-      };
-    }
-
-    return {
-      message: { code: 200, text: '투두 조회에 성공했습니다.' },
+    return formatApiResponse(200, '투두 조회에 성공했습니다.', {
       todosByUser,
-    };
+    });
   }
 
   async getSoloTodo(userId: number) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.todoRepository.findUserById(userId);
 
-    const todos = await this.prisma.todo.findMany({
-      where: { writerId: userId },
-    });
+    const todos = await this.todoRepository.findTodosByWriterId(userId);
+    const todosByUser = formatSoloTodoData(userId, user, todos);
 
-    const todosByUser = {
-      [userId]: {
-        nickname: user.nickname,
-        todos,
-      },
-    };
-
-    return {
-      message: { code: 200, text: '투두 조회에 성공했습니다.' },
+    return formatApiResponse(200, '투두 조회에 성공했습니다.', {
       todosByUser,
-    };
+    });
   }
 
   async todoDoneHandler(userId: number, todoId: number) {
     const auth = await this.confirmTodoAuth(userId, todoId);
 
-    const result = await this.prisma.todo.update({
-      where: { id: todoId },
-      data: { isDone: !auth.isDone },
+    const result = await this.todoRepository.updateTodo(todoId, {
+      isDone: !auth.isDone,
     });
 
-    return {
-      message: { code: 200, text: '투두 완료 상태가 변경되었습니다.' },
+    return formatApiResponse(200, '투두 완료 상태가 변경되었습니다.', {
       todo: result,
-    };
+    });
   }
 
   async deleteTodo(userId: number, todoId: number) {
     await this.confirmTodoAuth(userId, todoId);
 
-    await this.prisma.todo.delete({ where: { id: todoId } });
+    await this.todoRepository.deleteTodo(todoId);
 
-    return {
-      message: { code: 200, text: '투두가 삭제되었습니다.' },
-    };
+    return formatApiResponse(200, '투두가 삭제되었습니다.');
   }
 
   async confirmTodoAuth(userId: number, todoId: number) {
-    const todo = await this.prisma.todo.findUnique({ where: { id: todoId } });
+    const todo = await this.todoRepository.findTodoById(todoId);
     if (todo.writerId !== userId) {
       throw new HttpException('잘못된 접근입니다.', HttpStatus.BAD_REQUEST);
     }
