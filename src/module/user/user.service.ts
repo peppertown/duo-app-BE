@@ -7,6 +7,7 @@ import { UserRepository } from 'src/common/repositories/user.repository';
 import { CoupleRepository } from 'src/common/repositories/couple.repository';
 import { ListRepository } from 'src/common/repositories/list.repository';
 import { formatApiResponse } from 'src/common/utils/response.util';
+import { formatMatchUserData, formatUserData } from './utils/user.util';
 
 @Injectable()
 export class UserService {
@@ -22,21 +23,17 @@ export class UserService {
   async setUserNickname(userId: number, nickname: string) {
     await this.userRepository.updateNickname(userId, nickname);
 
-    return formatApiResponse(
-      200,
-      '닉네임 설정이 완료되었습니다',
-      { user: { nickname } }
-    );
+    return formatApiResponse(200, '닉네임 설정이 완료되었습니다', {
+      user: { nickname },
+    });
   }
 
   async setUserBirthDay(userId: number, birthday: string) {
     await this.userRepository.updateBirthday(userId, new Date(birthday));
 
-    return formatApiResponse(
-      200,
-      '유저 생일 설정이 완료되었습니다.',
-      { user: { birthday } }
-    );
+    return formatApiResponse(200, '유저 생일 설정이 완료되었습니다.', {
+      user: { birthday },
+    });
   }
 
   async matchUser(userId: number, code: string) {
@@ -67,25 +64,11 @@ export class UserService {
 
     const user = await this.userRepository.findById(userId);
 
-    return formatApiResponse(200, '커플 연결이 완료되었습니다', {
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-        code: user.code,
-        coupleId: couple.id,
-      },
-      partner: {
-        id: partner.id,
-        nickname: partner.nickname,
-        profileUrl: partner.profileUrl,
-        code: partner.code,
-      },
-      couple: {
-        anniversary: couple.anniversary,
-      },
-    });
+    return formatApiResponse(
+      200,
+      '커플 연결이 완료되었습니다',
+      formatMatchUserData(user, partner, couple),
+    );
   }
 
   async isMatched(userId: number) {
@@ -103,14 +86,7 @@ export class UserService {
     return {
       success: true,
       message: { code: 200, text: '커플 매칭 상태 확인이 완료되었습니다.' },
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileUrl: user.profileUrl,
-        code: user.code,
-        coupleId: couple.id,
-      },
+      user: formatUserData(user, couple.id),
       couple: { anniversary: couple.anniversary },
       partner,
     };
@@ -119,7 +95,7 @@ export class UserService {
   async deleteUser(userId: number) {
     await this.userRepository.delete(userId);
     await this.redis.del(`${this.configService.refreshKeyJwt}:${userId}`);
-    
+
     return formatApiResponse(200, '사용자 삭제가 완료되었습니다.');
   }
 
@@ -127,10 +103,8 @@ export class UserService {
     const result = await this.uploader.upload(file, 'profile');
     await this.userRepository.updateProfileUrl(userId, result.imageUrl);
 
-    return formatApiResponse(
-      200,
-      '프로필 사진 업로드가 완료되었습니다.',
-      { user: { profileUrl: result.imageUrl } }
-    );
+    return formatApiResponse(200, '프로필 사진 업로드가 완료되었습니다.', {
+      user: { profileUrl: result.imageUrl },
+    });
   }
 }
