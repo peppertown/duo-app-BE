@@ -10,15 +10,11 @@ import {
 import { ImageUploader } from 'src/uploader/uploader.interface';
 import { ConfigService } from 'src/config/config.service';
 import { CoupleRepository } from 'src/common/repositories/couple.repository';
-import { CoupleAnniversaryRepository } from 'src/common/repositories/couple-anniversary.repository';
-import { WidgetRepository } from 'src/common/repositories/widget.repository';
 
 @Injectable()
 export class CoupleService {
   constructor(
     private readonly coupleRepository: CoupleRepository,
-    private readonly coupleAnniversaryRepository: CoupleAnniversaryRepository,
-    private readonly widgetRepository: WidgetRepository,
     private readonly configService: ConfigService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
@@ -62,7 +58,7 @@ export class CoupleService {
       );
     }
 
-    const anniv = await this.coupleAnniversaryRepository.create({
+    const anniv = await this.coupleRepository.createAnniversary({
       title,
       coupleId,
       date: new Date(anniversary),
@@ -98,7 +94,7 @@ export class CoupleService {
       );
     }
 
-    const anniv = await this.coupleAnniversaryRepository.update(annivId, {
+    const anniv = await this.coupleRepository.updateAnniversary(annivId, {
       title,
       date: new Date(anniversary),
     });
@@ -118,7 +114,7 @@ export class CoupleService {
 
   // 커플 기념일 삭제
   async deleteAnniversary(userId: number, coupleId: number, annivId: number) {
-    await this.coupleAnniversaryRepository.delete(annivId);
+    await this.coupleRepository.deleteAnniversary(annivId);
 
     return {
       message: { code: 200, text: '기념일 삭제가 완료되었습니다.' },
@@ -127,7 +123,7 @@ export class CoupleService {
 
   // 커플 위젯 조회
   async getCoupleWidget(userId: number, coupleId: number) {
-    const widget = await this.widgetRepository.findByCoupleId(coupleId);
+    const widget = await this.coupleRepository.findWidgetByCoupleId(coupleId);
 
     const photoUrl = widget.photoUrl
       ? widget.photoUrl
@@ -146,7 +142,7 @@ export class CoupleService {
   ) {
     const photo = await this.uploader.upload(file, 'widget');
 
-    await this.widgetRepository.updateByCoupleId(coupleId, {
+    await this.coupleRepository.updateWidgetByCoupleId(coupleId, {
       photoUrl: photo.imageUrl,
     });
 
@@ -188,7 +184,7 @@ export class CoupleService {
     ];
 
     const otherAnniv =
-      await this.coupleAnniversaryRepository.findManyByCoupleId(coupleId);
+      await this.coupleRepository.findAnniversariesByCoupleId(coupleId);
 
     if (otherAnniv.length) {
       otherAnniv.forEach((item) => {
