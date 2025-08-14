@@ -11,44 +11,36 @@ export class MypageService {
 
   // 마이페이지 조회
   async getMypage(userId: number) {
-    try {
-      const data = await this.prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          couplesAsA: { include: { a: true, b: true } },
-          couplesAsB: { include: { a: true, b: true } },
-        },
-      });
+    const data = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        couplesAsA: { include: { a: true, b: true } },
+        couplesAsB: { include: { a: true, b: true } },
+      },
+    });
 
-      if (!data.couplesAsA.length && !data.couplesAsB.length) {
-        return {
-          message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
-          anniv: null,
-        };
-      }
-
-      const coupleId =
-        data.couplesAsA.length > 0
-          ? data.couplesAsA[0].id
-          : data.couplesAsB[0].id;
-
-      const anniv = (await this.coupleService.getCoupleAnniversaries(coupleId))
-        .anniv;
-
+    if (!data.couplesAsA.length && !data.couplesAsB.length) {
       return {
-        message: {
-          code: 200,
-          text: '마이페이지 조회가 완료되었습니다.',
-        },
-        anniv,
+        message: { code: 200, text: '마이페이지 조회가 완료되었습니다.' },
+        anniv: null,
       };
-    } catch (err) {
-      console.error('마이페이지 조회 중 에러 발생', err);
-      throw new HttpException(
-        '마이페이지 조회 중 오류가 발생했습니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
+
+    const coupleId =
+      data.couplesAsA.length > 0
+        ? data.couplesAsA[0].id
+        : data.couplesAsB[0].id;
+
+    const anniv = (await this.coupleService.getCoupleAnniversaries(coupleId))
+      .anniv;
+
+    return {
+      message: {
+        code: 200,
+        text: '마이페이지 조회가 완료되었습니다.',
+      },
+      anniv,
+    };
   }
 
   getMypageProfile(user: any) {
