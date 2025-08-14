@@ -60,13 +60,6 @@ export class ConfigService {
   get jwtSecret(): string {
     const secret = this.get('JWT_SECRET');
 
-    if (secret.length < 32) {
-      throw new HttpException(
-        'JWT_SECRET는 보안을 위해 최소 32자 이상이어야 합니다.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
     return secret;
   }
 
