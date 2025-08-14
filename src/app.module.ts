@@ -15,6 +15,7 @@ import { NotificationModule } from './module/notification/notification.module';
 import { MypageModule } from './module/mypage/mypage.module';
 import { UploaderModule } from './uploader/uploader.module';
 import { ConfigModule } from './config/config.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { ConfigModule } from './config/config.module';
     UploaderModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GlobalExceptionFilter],
 })
 export class AppModule {}

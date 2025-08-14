@@ -83,6 +83,14 @@ npx prisma studio      # Prisma Studio 열기
 - 알림 시스템이 푸시 알림을 통해 오프라인 사용자 처리
 - Redis가 SSE 연결 및 세션 상태 관리
 
+### 에러 핸들링 아키텍처
+
+- **GlobalExceptionFilter**: 모든 예외를 중앙에서 처리하는 통합 에러 핸들링 시스템
+- **에러 추적**: 고유한 에러 ID로 각 예외 추적 가능
+- **환경별 처리**: 개발/프로덕션 환경에 따른 다른 에러 메시지 제공
+- **상세 로깅**: 요청 정보, 스택 트레이스, 사용자 정보 포함한 상세한 에러 로그
+- **자동 변환**: Prisma 에러를 적절한 HTTP 상태 코드로 자동 변환
+
 ## 환경 변수
 
 필수 설정:
@@ -93,6 +101,42 @@ npx prisma studio      # Prisma Studio 열기
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`: S3 설정
 - 카카오 및 구글 제공자를 위한 OAuth 자격 증명
 
+## 코드 구조 및 패턴
+
+### 서비스 레이어
+
+- 모든 서비스는 try-catch 블록 없이 구현되어 있음 (GlobalExceptionFilter가 처리)
+- 비즈니스 로직 예외는 명시적인 HttpException으로 처리
+- Prisma를 직접 사용하여 데이터베이스 작업 수행
+- 복잡한 로직은 Helper 클래스로 분리 (예: AuthHelper)
+
+### Guard 시스템
+
+- **JwtAuthGuard**: JWT 토큰 검증
+- **CoupleAuthGuard**: 커플 관계 검증이 필요한 엔드포인트에 적용
+- `@CurrentUserId()` 데코레이터로 인증된 사용자 ID 추출
+
+### 파일 업로드
+
+- **ImageUploader 인터페이스**: 파일 업로드 추상화
+- **S3UploaderService**: AWS S3 구현체
+- 의존성 주입을 통한 업로더 교체 가능
+
 ## API 문서
 
 Swagger UI가 `/api` 엔드포인트에서 제공됩니다. OAuth에서 발급된 JWT를 사용한 Bearer 토큰 인증을 사용합니다.
+
+## 개발 시 주의사항
+
+### 에러 처리
+
+- 서비스 메서드에서 try-catch 사용 금지 (GlobalExceptionFilter가 처리)
+- 비즈니스 로직 에러는 HttpException으로 명시적 처리
+- 에러 로깅은 GlobalExceptionFilter에서 자동 처리
+
+### 새로운 모듈 추가 시
+
+1. 서비스는 try-catch 없이 구현
+2. 복잡한 로직은 Helper 클래스로 분리
+3. 커플 권한이 필요하면 CoupleAuthGuard 적용
+4. 파일 업로드가 필요하면 ImageUploader 인터페이스 사용

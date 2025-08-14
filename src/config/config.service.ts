@@ -155,4 +155,21 @@ export class ConfigService {
   get googleSecureState(): string {
     return this.get('GOOGLE_SECURE_STATE');
   }
+
+  // S3 Configuration
+  get awsRegion(): string {
+    return this.get('AWS_REGION');
+  }
+
+  get s3AccessKey(): string {
+    return this.get('S3_ACCESS_KEY');
+  }
+
+  get s3SecretAccessKey(): string {
+    return this.get('S3_SECRET_ACCESS_KEY');
+  }
+
+  get awsS3BucketName(): string {
+    return this.get('AWS_S3_BUCKET_NAME');
+  }
 }

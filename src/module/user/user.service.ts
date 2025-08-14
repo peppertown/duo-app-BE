@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
 import { AuthService } from '../auth/auth.service';
 import { ImageUploader } from 'src/uploader/uploader.interface';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class UserService {
@@ -10,6 +11,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
   // 유저 닉네임 설정
@@ -80,7 +82,7 @@ export class UserService {
       await tx.widget.create({
         data: {
           coupleId: couple.id,
-          photoUrl: process.env.DEFAULT_WIDGET_URL,
+          photoUrl: this.configService.defaultWidgetUrl,
         },
       });
     });
@@ -152,7 +154,7 @@ export class UserService {
     await this.prisma.user.delete({
       where: { id: userId },
     });
-    await this.redis.del(`${process.env.REFRESH_KEY_JWT}:${userId}`);
+    await this.redis.del(`${this.configService.refreshKeyJwt}:${userId}`);
     return {
       message: {
         code: 200,

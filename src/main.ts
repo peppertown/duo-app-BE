@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { ConfigService } from './config/config.service';
 import * as crypto from 'crypto';
 
 if (!globalThis.crypto) {
@@ -12,8 +13,12 @@ if (!globalThis.crypto) {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // 글로벌 Exception Filter 적용
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  // ConfigService 인스턴스 얻기
+  const configService = app.get(ConfigService);
+
+  // 글로벌 Exception Filter 적용 (ConfigService 주입)
+  const globalExceptionFilter = app.get(GlobalExceptionFilter);
+  app.useGlobalFilters(globalExceptionFilter);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -33,6 +38,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.port);
 }
 bootstrap();

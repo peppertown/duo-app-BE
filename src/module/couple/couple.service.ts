@@ -9,11 +9,13 @@ import {
 } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ImageUploader } from 'src/uploader/uploader.interface';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class CoupleService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
     @Inject('ImageUploader') private readonly uploader: ImageUploader,
   ) {}
 
@@ -137,7 +139,7 @@ export class CoupleService {
 
     const photoUrl = widget.photoUrl
       ? widget.photoUrl
-      : process.env.DEFAULT_WIDGET_URL;
+      : this.configService.defaultWidgetUrl;
     return {
       message: { code: 200, text: '커플 위젯 조회가 완료되었습니다.' },
       widget: { photoUrl },

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
