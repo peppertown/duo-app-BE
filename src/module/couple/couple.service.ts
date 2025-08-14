@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  addDays,
-  addYears,
-  differenceInCalendarDays,
-  isBefore,
-  set,
-  startOfDay,
-} from 'date-fns';
+import { isBefore, startOfDay } from 'date-fns';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 import { ConfigService } from 'src/config/config.service';
 import { CoupleRepository } from 'src/common/repositories/couple.repository';
+import {
+  getDDay,
+  getDays,
+  getUpcomingAnniversary,
+  getDaysToNextBirthday,
+} from 'src/common/utils/date.util';
 
 @Injectable()
 export class CoupleService {
@@ -64,7 +63,7 @@ export class CoupleService {
       date: new Date(anniversary),
     });
 
-    const days = this.getDays(anniv.date);
+    const days = getDays(anniv.date);
 
     return {
       message: { code: 200, text: '기념일 등록이 완료되었습니다.' },
@@ -99,7 +98,7 @@ export class CoupleService {
       date: new Date(anniversary),
     });
 
-    const days = this.getDays(anniv.date);
+    const days = getDays(anniv.date);
 
     return {
       message: { code: 200, text: '기념일 수정이 완료되었습니다.' },
@@ -172,11 +171,11 @@ export class CoupleService {
   // 커플 기념일 조회
   async getCoupleAnniversaries(coupleId: number) {
     const data = await this.coupleRepository.findByIdWithUsers(coupleId);
-    const dday = this.getDDay(data.anniversary);
+    const dday = getDDay(data.anniversary);
 
-    const upcoming = this.getUpcommingAnniv(dday, data.anniversary);
-    const aBirth = this.getDaysToNextBirthday(data.a.birthday);
-    const bBirth = this.getDaysToNextBirthday(data.b.birthday);
+    const upcoming = getUpcomingAnniversary(dday, data.anniversary);
+    const aBirth = getDaysToNextBirthday(data.a.birthday);
+    const bBirth = getDaysToNextBirthday(data.b.birthday);
     const anniv = [
       upcoming,
       { id: 2, type: `${data.a.nickname}님 생일`, ...aBirth },
@@ -188,7 +187,7 @@ export class CoupleService {
 
     if (otherAnniv.length) {
       otherAnniv.forEach((item) => {
-        const days = this.getDays(item.date);
+        const days = getDays(item.date);
         anniv.push({
           id: item.id,
           type: item.title,
@@ -203,67 +202,6 @@ export class CoupleService {
     return {
       message: { code: 200, text: '커플 기념일 조회가 완료되었습니다.' },
       anniv,
-    };
-  }
-
-  // 커플 디데이 조회 (경과일)
-  getDDay(anniversary: Date) {
-    // 오늘 날짜 (한국시간)
-    const today = new Date();
-    return differenceInCalendarDays(today, anniversary);
-  }
-
-  // 남은 일수 계산
-  getDays(date: Date) {
-    const today = new Date();
-    return differenceInCalendarDays(date, today);
-  }
-
-  // 다가오는 기념일 조회
-  getUpcommingAnniv(dday: number, anniversary: Date) {
-    const nextHundred = Math.ceil(dday / 100) * 100;
-    const hundredDiff = nextHundred - dday;
-    const nextHundredDate = addDays(anniversary, nextHundred);
-
-    const nextYear = Math.ceil(dday / 365);
-    const yearDiff = nextYear * 365 - dday;
-    const nextYearDate = addYears(anniversary, nextYear);
-
-    if (hundredDiff < yearDiff) {
-      return {
-        id: 1,
-        type: `${nextHundred}일`,
-        days: hundredDiff,
-        date: nextHundredDate,
-      };
-    } else {
-      return {
-        id: 1,
-        type: `${nextYear}주년`,
-        days: yearDiff,
-        date: nextYearDate,
-      };
-    }
-  }
-
-  // 생일 디데이 조회
-  getDaysToNextBirthday(birthday: Date) {
-    const today = new Date();
-
-    // 올해 생일 날짜 생성
-    const nextBirthday = set(birthday, {
-      year: today.getFullYear(),
-    });
-
-    // 오늘 이후가 아니면 내년 생일로
-    const finalBirthday =
-      nextBirthday < today ? addYears(nextBirthday, 1) : nextBirthday;
-
-    const days = differenceInCalendarDays(finalBirthday, today);
-
-    return {
-      days,
-      date: finalBirthday,
     };
   }
 }
