@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import * as crypto from 'crypto';
 
 if (!globalThis.crypto) {
@@ -10,6 +11,9 @@ if (!globalThis.crypto) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // 글로벌 Exception Filter 적용
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
