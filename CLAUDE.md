@@ -129,17 +129,33 @@ npx prisma studio      # Prisma Studio 열기
 
 - **UserRepository**: 사용자 데이터 접근 (전역 사용 가능)
 - **CoupleRepository**: 커플, 기념일, 위젯 테이블 통합 관리
+- **ListRepository**: list, listContent 테이블 CRUD 작업
+- **MemoRepository**: memo, couple 테이블 메모 관련 작업
+- **TodoRepository**: todo, user 테이블 할일 관련 작업
 - 모든 Repository는 `@Global()` RepositoriesModule에서 제공
 - Prisma 직접 사용 대신 Repository를 통한 데이터 접근
 
 ### 유틸리티
 
+#### 공통 유틸리티 (src/common/utils/)
 - **date.util.ts**: 날짜 계산 관련 순수함수들
   - `getDDay()`: 커플 디데이 계산
   - `getDays()`: 남은 일수 계산  
   - `getUpcomingAnniversary()`: 다가오는 기념일 계산
   - `getDaysToNextBirthday()`: 생일까지 남은 일수 계산
+- **couple.util.ts**: 커플 관련 유틸 함수들
+  - `getPartnerId()`: 커플에서 파트너 ID 찾기
+  - `getCoupleUsersData()`: 커플 사용자 데이터 조회
+  - `getPartnerData()`: 파트너 데이터 조회
+- **response.util.ts**: API 응답 포매팅
+  - `formatApiResponse()`: 통일된 API 응답 구조 생성
 - **random.util.ts**: 랜덤 문자열 생성 등
+
+#### 모듈별 유틸리티
+- **list/utils/list.util.ts**: List 데이터 포매팅, 알림 메시지 생성
+- **memo/utils/memo.util.ts**: Memo 데이터 포매팅 함수들  
+- **todo/utils/todo.util.ts**: Todo 그룹화, 데이터 포매팅 함수들
+- **auth/utils/auth.utils.ts**: OAuth URL 생성, 로그인 응답 포매팅
 
 ### Guard 시스템
 
@@ -181,3 +197,22 @@ Swagger UI가 `/api` 엔드포인트에서 제공됩니다. OAuth에서 발급�
 - **ConfigService**: 모든 환경변수 접근은 ConfigService getter 사용
 - **Utils vs Helper**: 순수함수는 Utils, 외부 의존성 있는 복잡한 로직은 Helper
 - **에러 처리**: HttpException으로 명시적 비즈니스 에러 처리
+- **API 응답**: `formatApiResponse()` 사용하여 통일된 응답 구조 제공
+- **유틸 조직화**: 
+  - 순수함수(계산 로직)는 common/utils에 배치
+  - 모듈 특화 로직은 해당 모듈의 utils 폴더에 배치
+  - 재사용 가능한 함수는 전역으로, 모듈별 특화 함수는 지역으로
+
+### 리팩토링 완료 모듈
+
+다음 모듈들은 Repository 패턴과 서비스 로직 분리가 완료되었습니다:
+- ✅ **Couple 모듈**: Repository 패턴, formatApiResponse 적용
+- ✅ **List 모듈**: Repository 패턴, 유틸 분리 완료  
+- ✅ **Memo 모듈**: Repository 패턴, 유틸 분리 완료
+- ✅ **Todo 모듈**: Repository 패턴, 유틸 분리 완료
+
+### 향후 리팩토링 예정
+
+- 🔄 **User 모듈**: Repository 패턴 적용 예정
+- 🔄 **Auth 모듈**: 선택적 formatApiResponse 적용 고려
+- 🔄 **Notification 모듈**: Repository 패턴 검토 예정
