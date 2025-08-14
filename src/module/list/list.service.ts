@@ -3,6 +3,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SseService } from 'src/sse/sse.service';
 import { ListRepository } from 'src/common/repositories/list.repository';
 import { getPartnerId } from 'src/common/utils/couple.util';
+import {
+  formatListData,
+  createBucketListCompletionMessage,
+  formatApiResponse,
+} from './utils/list.util';
 
 @Injectable()
 export class ListService {
@@ -30,7 +35,7 @@ export class ListService {
       content,
     });
 
-    return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
+    return formatApiResponse(200, '리스트 목록이 작성되었습니다.');
   }
 
   // 리스트 조회
@@ -47,19 +52,11 @@ export class ListService {
       coupleList.id,
     );
 
-    const list = listData.map((i) => ({
-      id: i.id,
-      isOwn: i.writerId == userId,
-      categoryId: i.categoryId,
-      content: i.content,
-      isDone: i.isDone,
-      createdAt: i.createdAt,
-    }));
+    const list = formatListData(listData, userId);
 
-    return {
-      message: { code: 200, text: '버킷 리스트 조회가 완료되었습니다.' },
+    return formatApiResponse(200, '버킷 리스트 조회가 완료되었습니다.', {
       list,
-    };
+    });
   }
 
   // 리스트 목록 완료여부 토글
@@ -88,22 +85,20 @@ export class ListService {
 
       await this.sse.createNofication(partnerId, this.notificationType, {
         id: listContent.id,
-        message: `완료된 버킷리스트가 있어요!
-${listContent.category.name}: ${listContent.content}`,
+        message: createBucketListCompletionMessage(
+          listContent.category.name,
+          listContent.content,
+        ),
       });
     }
 
-    return {
-      message: { code: 200, text: '리스트 완료 여부 설정이 완료되었습니다.' },
-    };
+    return formatApiResponse(200, '리스트 완료 여부 설정이 완료되었습니다.');
   }
 
   // 리스트 목록 삭제
   async deleteList(userId: number, coupleId: number, contentId: number) {
     await this.listRepository.deleteListContent(contentId);
 
-    return {
-      message: { code: 200, text: '리스트 목록이 삭제 삭제되었습니다.' },
-    };
+    return formatApiResponse(200, '리스트 목록이 삭제 삭제되었습니다.');
   }
 }
