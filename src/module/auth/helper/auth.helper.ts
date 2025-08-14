@@ -205,4 +205,31 @@ export class AuthHelper {
 
     return user;
   }
+
+  // OAuth 계정 조회 or 생성
+  async findOrCreateAccount(data: {
+    sub: string;
+    email: string;
+    nickname: string;
+    profileUrl: string;
+    authProvider: string;
+  }) {
+    const { sub } = data;
+
+    let isNew: boolean = false;
+
+    let user = await this.userRepository.findBySub(sub);
+
+    if (!user) {
+      const randomCode = generateRandomString();
+      user = await this.userRepository.create({
+        ...data,
+        profileUrl: this.configService.defaultProfileUrl,
+        code: randomCode,
+      });
+      isNew = true;
+    }
+
+    return { user, isNew };
+  }
 }

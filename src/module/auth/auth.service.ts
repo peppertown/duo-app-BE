@@ -4,8 +4,6 @@ import { generateRandomString } from 'src/common/utils/random.util';
 import { getPartnerData } from 'src/common/utils/couple.util';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
-import { ConfigService } from 'src/config/config.service';
-import { UserRepository } from 'src/common/repositories/user.repository';
 
 @Injectable()
 export class AuthService {
@@ -13,8 +11,6 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
-    private readonly configService: ConfigService,
-    private readonly userRepository: UserRepository,
   ) {}
 
   // 회원 가입
@@ -74,7 +70,7 @@ export class AuthService {
   async verifyGoogleSecurityCode(securityCode: string) {
     const userData =
       await this.authHelper.vaildateGoogleLoginUser(securityCode);
-    const { user, isNew } = await this.findOrCreateAccount(userData);
+    const { user, isNew } = await this.authHelper.findOrCreateAccount(userData);
 
     const response = await this.handleLoginProcess(user);
 
@@ -91,7 +87,7 @@ export class AuthService {
   // 카카오 로그인
   async kakaoLogin(accessToken: string) {
     const userData = await this.authHelper.fetchKakoUserData(accessToken);
-    const { user, isNew } = await this.findOrCreateAccount(userData);
+    const { user, isNew } = await this.authHelper.findOrCreateAccount(userData);
 
     const response = await this.handleLoginProcess(user);
 
@@ -105,32 +101,6 @@ export class AuthService {
     };
   }
 
-  // 계정 조회 or 생성
-  async findOrCreateAccount(data: {
-    sub: string;
-    email: string;
-    nickname: string;
-    profileUrl: string;
-    authProvider: string;
-  }) {
-    const { sub } = data;
-
-    let isNew: boolean = false;
-
-    let user = await this.userRepository.findBySub(sub);
-
-    if (!user) {
-      const randomCode = generateRandomString();
-      user = await this.userRepository.create({
-        ...data,
-        profileUrl: this.configService.defaultProfileUrl,
-        code: randomCode,
-      });
-      isNew = true;
-    }
-
-    return { user, isNew };
-  }
 
   // 토큰 재발급
   async handleRefresh(refreshToken: string) {
