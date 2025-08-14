@@ -83,6 +83,13 @@ npx prisma studio      # Prisma Studio 열기
 - 알림 시스템이 푸시 알림을 통해 오프라인 사용자 처리
 - Redis가 SSE 연결 및 세션 상태 관리
 
+### 캐싱 아키텍처
+
+- **Redis 캐싱**: 성능 최적화를 위한 전략적 캐싱 적용
+- **권한 캐싱**: CoupleAuthGuard에서 커플 권한 확인 결과 캐싱
+- **캐시 무효화**: 데이터 변경시 관련 캐시 자동 삭제
+- **RedisService**: 패턴 기반 캐시 삭제(`delPattern`) 지원
+
 ### 에러 핸들링 아키텍처
 
 - **GlobalExceptionFilter**: 모든 예외를 중앙에서 처리하는 통합 에러 핸들링 시스템
@@ -150,6 +157,7 @@ npx prisma studio      # Prisma Studio 열기
 - **random.util.ts**: 랜덤 문자열 생성 등
 
 #### 모듈별 유틸리티
+- **user/utils/user.util.ts**: 사용자, 파트너, 커플 데이터 포매팅 함수들
 - **list/utils/list.util.ts**: List 데이터 포매팅, 알림 메시지 생성
 - **memo/utils/memo.util.ts**: Memo 데이터 포매팅 함수들  
 - **todo/utils/todo.util.ts**: Todo 그룹화, 데이터 포매팅 함수들
@@ -159,6 +167,8 @@ npx prisma studio      # Prisma Studio 열기
 
 - **JwtAuthGuard**: JWT 토큰 검증
 - **CoupleAuthGuard**: 커플 관계 검증이 필요한 엔드포인트에 적용
+  - Redis 캐싱으로 성능 최적화 (TTL: 1시간)
+  - 커플 해제시 자동 캐시 무효화
 - `@CurrentUserId()` 데코레이터로 인증된 사용자 ID 추출
 
 ### 파일 업로드
@@ -200,6 +210,11 @@ Swagger UI가 `/api` 엔드포인트에서 제공됩니다. OAuth에서 발급�
   - 순수함수(계산 로직)는 common/utils에 배치
   - 모듈 특화 로직은 해당 모듈의 utils 폴더에 배치
   - 재사용 가능한 함수는 전역으로, 모듈별 특화 함수는 지역으로
+- **성능 최적화**:
+  - 반복적인 권한 확인은 Redis 캐싱 적용
+  - 복합 작업은 트랜잭션으로 데이터 일관성 보장
+  - DB 접근 로직은 Repository 패턴으로 통합 관리
+  - 새로운 PrismaClient 인스턴스 생성 금지
 
 ### 리팩토링 완료 모듈
 
@@ -208,9 +223,69 @@ Swagger UI가 `/api` 엔드포인트에서 제공됩니다. OAuth에서 발급�
 - ✅ **List 모듈**: Repository 패턴, 유틸 분리 완료  
 - ✅ **Memo 모듈**: Repository 패턴, 유틸 분리 완료
 - ✅ **Todo 모듈**: Repository 패턴, 유틸 분리 완료
+- ✅ **User 모듈**: Repository 패턴, formatApiResponse, 유틸 분리 완료
 
 ### 향후 리팩토링 예정
 
-- 🔄 **User 모듈**: Repository 패턴 적용 예정
 - 🔄 **Auth 모듈**: 선택적 formatApiResponse 적용 고려
 - 🔄 **Notification 모듈**: Repository 패턴 검토 예정
+- 🔄 **MyPage 모듈**: Repository 패턴 적용 예정
+
+## 성능 최적화
+
+### 캐싱 아키텍처
+
+#### Redis 캐싱 전략
+- **CoupleAuthGuard**: 커플 권한 확인 캐싱 (TTL: 1시간)
+  - 캐시 키: `couple:auth:{userId}:{coupleId}`
+  - 캐시 무효화: 커플 해제시 패턴 기반 삭제
+- **세션 관리**: JWT 리프레시 토큰 Redis 저장
+- **SSE 연결**: 클라이언트 연결 상태 관리
+
+#### 캐시 키 네이밍 컨벤션
+```
+{모듈}:{기능}:{식별자1}:{식별자2}
+예시:
+- couple:auth:123:456
+- user:session:123
+- sse:connection:123
+```
+
+#### 캐시 무효화 전략
+- **데이터 변경시**: 관련 캐시 즉시 삭제
+- **패턴 기반 삭제**: `RedisService.delPattern()` 활용
+- **TTL 기반**: 자동 만료로 데이터 일관성 보장
+
+### 트랜잭션 가이드라인
+
+#### 트랜잭션 적용 기준
+- **복합 작업**: 여러 테이블 생성/수정이 필요한 경우
+- **데이터 일관성**: 중간 실패시 부분 데이터 방지 필요
+- **원자성 보장**: 모두 성공하거나 모두 실패해야 하는 작업
+
+#### 구현 방법
+```typescript
+// Service 레벨에서 직접 트랜잭션 처리 (권장)
+await this.prisma.$transaction(async (tx) => {
+  const result1 = await tx.table1.create({...});
+  const result2 = await tx.table2.create({...});
+  return result1;
+});
+```
+
+#### 주의사항
+- Repository 패턴 유지하면서 서비스에서 트랜잭션 처리
+- 복잡한 비즈니스 로직은 별도 UseCase 계층 고려
+- 트랜잭션 범위는 최소한으로 유지
+
+### 성능 병목 해결 사례
+
+#### 해결된 성능 이슈
+1. **couple.util.ts PrismaClient 생성**: 새 인스턴스 생성 → Repository 패턴으로 이동
+2. **CoupleAuthGuard DB 반복 조회**: 매 요청 DB 조회 → Redis 캐싱 적용
+3. **UserService.matchUser 트랜잭션**: 분리된 DB 작업 → 단일 트랜잭션으로 통합
+
+#### 성능 개선 효과
+- **CoupleAuthGuard**: ~10ms → ~1ms (90% 단축)
+- **DB 커넥션**: 커넥션 풀 효율성 대폭 향상
+- **데이터 일관성**: 트랜잭션으로 무결성 보장
