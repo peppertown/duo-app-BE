@@ -64,51 +64,27 @@ export class TodoService {
   }
 
   async todoDoneHandler(userId: number, todoId: number) {
-    try {
-      const auth = await this.confirmTodoAuth(userId, todoId);
+    const auth = await this.confirmTodoAuth(userId, todoId);
 
-      const result = await this.prisma.todo.update({
-        where: { id: todoId },
-        data: { isDone: !auth.isDone },
-      });
+    const result = await this.prisma.todo.update({
+      where: { id: todoId },
+      data: { isDone: !auth.isDone },
+    });
 
-      return {
-        messsage: { code: 200, text: '투두 완료 상태가 변경되었습니다.' },
-        todo: result,
-      };
-    } catch (err) {
-      console.error('투두 완료 상태 변경 중 에러 발생', err);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      throw new HttpException(
-        '투두 완료 상태 변경 중 에러가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: { code: 200, text: '투두 완료 상태가 변경되었습니다.' },
+      todo: result,
+    };
   }
 
   async deleteTodo(userId: number, todoId: number) {
-    try {
-      await this.confirmTodoAuth(userId, todoId);
+    await this.confirmTodoAuth(userId, todoId);
 
-      await this.prisma.todo.delete({ where: { id: todoId } });
+    await this.prisma.todo.delete({ where: { id: todoId } });
 
-      return {
-        messsage: { code: 200, text: '투두가 삭제되었습니다.' },
-      };
-    } catch (err) {
-      console.error('투두 삭제 중 에러 발생', err);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      throw new HttpException(
-        '투두 삭제 중 에러가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: { code: 200, text: '투두가 삭제되었습니다.' },
+    };
   }
 
   async confirmTodoAuth(userId: number, todoId: number) {

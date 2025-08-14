@@ -8,22 +8,14 @@ export class NotificationService {
 
   // 유저 push token 업데이트
   async updatePushToken(userId: number, pushToken: string) {
-    try {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { pushToken },
-      });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { pushToken },
+    });
 
-      return {
-        message: { code: 200, text: 'push token 업데이트가 완료되었습니다.' },
-      };
-    } catch (err) {
-      console.error('push token 업데이트 중 에러 발생', err);
-      throw new HttpException(
-        'push token 업데이트 중 오류가 발생했습니다..',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: { code: 200, text: 'push token 업데이트가 완료되었습니다.' },
+    };
   }
 
   // 알림 조회

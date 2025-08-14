@@ -57,55 +57,31 @@ export class AuthService {
 
   // 구글 OAuth - 로그인 보안 코드 생성
   async generateGoogleLoginCode(code: string) {
-    try {
-      // id token 발급 및 디코딩
-      const decoded = await this.authHelper.decodeGoogleIdToken(code);
+    // id token 발급 및 디코딩
+    const decoded = await this.authHelper.decodeGoogleIdToken(code);
 
-      // 디코딩된 id token 데이터 파싱 및 로그인 코드 생성
-      const securityCode = await this.authHelper.generateLoginCode(decoded);
+    // 디코딩된 id token 데이터 파싱 및 로그인 코드 생성
+    const securityCode = await this.authHelper.generateLoginCode(decoded);
 
-      return securityCode;
-    } catch (err) {
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      console.error('구글 로그인 보안 코드 생성 중 에러 발생', err);
-      throw new HttpException(
-        '구글 로그인 보안 코드 생성 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return securityCode;
   }
 
   // 구글 OAuth - 로그인 보안 코드 인증 후 유저 데이터 반환
   async verifyGoogleSecurityCode(securityCode: string) {
-    try {
-      const userData =
-        await this.authHelper.vaildateGoogleLoginUser(securityCode);
-      const { user, isNew } = await this.findOrCreateAccount(userData);
+    const userData =
+      await this.authHelper.vaildateGoogleLoginUser(securityCode);
+    const { user, isNew } = await this.findOrCreateAccount(userData);
 
-      const response = await this.handleLoginProcess(user);
+    const response = await this.handleLoginProcess(user);
 
-      return {
-        message: {
-          code: 200,
-          text: '구글 로그인이 완료되었습니다.',
-        },
-        ...response,
-        isNew,
-      };
-    } catch (err) {
-      if (err instanceof HttpException) {
-        throw err;
-      }
-
-      console.error('구글 보안 코드 인증 중 에러 발생', err);
-      throw new HttpException(
-        '구글 보안 코드 인증 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: {
+        code: 200,
+        text: '구글 로그인이 완료되었습니다.',
+      },
+      ...response,
+      isNew,
+    };
   }
 
   // 카카오 로그인
@@ -133,35 +109,27 @@ export class AuthService {
     profileUrl: string;
     authProvider: string;
   }) {
-    try {
-      const { sub } = data;
+    const { sub } = data;
 
-      let isNew: boolean = false;
+    let isNew: boolean = false;
 
-      let user = await this.prisma.user.findUnique({
-        where: { sub },
+    let user = await this.prisma.user.findUnique({
+      where: { sub },
+    });
+
+    if (!user) {
+      const randomCode = generateRandomString();
+      user = await this.prisma.user.create({
+        data: {
+          ...data,
+          profileUrl: process.env.DEFAULT_PROFILE_URL,
+          code: randomCode,
+        },
       });
-
-      if (!user) {
-        const randomCode = generateRandomString();
-        user = await this.prisma.user.create({
-          data: {
-            ...data,
-            profileUrl: process.env.DEFAULT_PROFILE_URL,
-            code: randomCode,
-          },
-        });
-        isNew = true;
-      }
-
-      return { user, isNew };
-    } catch (err) {
-      console.error('계정 조회 및 생성 중 에러 발생', err);
-      throw new HttpException(
-        '계정 조회 및 생성 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      isNew = true;
     }
+
+    return { user, isNew };
   }
 
   // 토큰 재발급
