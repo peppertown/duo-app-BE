@@ -1,20 +1,20 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
 import { AuthService } from '../auth/auth.service';
 import { ImageUploader } from 'src/uploader/uploader.interface';
 import { ConfigService } from 'src/config/config.service';
 import { UserRepository } from 'src/common/repositories/user.repository';
 import { CoupleRepository } from 'src/common/repositories/couple.repository';
-import { ListRepository } from 'src/common/repositories/list.repository';
 import { formatApiResponse } from 'src/common/utils/response.util';
 import { formatMatchUserData, formatUserData } from './utils/user.util';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly prisma: PrismaService,
     private readonly userRepository: UserRepository,
     private readonly coupleRepository: CoupleRepository,
-    private readonly listRepository: ListRepository,
     private readonly redis: RedisService,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
@@ -50,17 +50,27 @@ export class UserService {
       throw new HttpException('잘못된 코드 입니다.', HttpStatus.BAD_REQUEST);
     }
 
-    const couple = await this.coupleRepository.create({
-      aId: userId,
-      bId: partner.id,
-      anniversary: new Date(),
-    });
+    let couple: any;
+    await this.prisma.$transaction(async (tx) => {
+      couple = await tx.couple.create({
+        data: {
+          aId: userId,
+          bId: partner.id,
+          anniversary: new Date(),
+        },
+      });
 
-    await this.listRepository.createList(couple.id);
-    await this.coupleRepository.createWidget(
-      couple.id,
-      this.configService.defaultWidgetUrl,
-    );
+      await tx.list.create({
+        data: { coupleId: couple.id },
+      });
+
+      await tx.widget.create({
+        data: {
+          coupleId: couple.id,
+          photoUrl: this.configService.defaultWidgetUrl,
+        },
+      });
+    });
 
     const user = await this.userRepository.findById(userId);
 
