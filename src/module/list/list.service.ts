@@ -1,12 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SseService } from 'src/sse/sse.service';
+import { ListRepository } from 'src/common/repositories/list.repository';
+import { getPartnerId } from 'src/common/utils/couple.util';
 
 @Injectable()
 export class ListService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sse: SseService,
+    private readonly listRepository: ListRepository,
   ) {}
 
   private readonly notificationType = 'LIST_TOGGLED';
@@ -18,12 +21,13 @@ export class ListService {
     categoryId: number,
     content: string,
   ) {
-    const coupleList = await this.prisma.list.findFirst({
-      where: { coupleId },
-    });
+    const coupleList = await this.listRepository.findListByCoupleId(coupleId);
 
-    await this.prisma.listContent.create({
-      data: { listId: coupleList.id, writerId: userId, categoryId, content },
+    await this.listRepository.createListContent({
+      listId: coupleList.id,
+      writerId: userId,
+      categoryId,
+      content,
     });
 
     return { message: { code: 200, text: '리스트 목록이 작성되었습니다.' } };
@@ -31,9 +35,7 @@ export class ListService {
 
   // 리스트 조회
   async getList(userId: number, coupleId: number) {
-    const coupleList = await this.prisma.list.findFirst({
-      where: { coupleId },
-    });
+    const coupleList = await this.listRepository.findListByCoupleId(coupleId);
 
     if (!coupleList)
       throw new HttpException(
@@ -41,9 +43,9 @@ export class ListService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const listData = await this.prisma.listContent.findMany({
-      where: { listId: coupleList.id },
-    });
+    const listData = await this.listRepository.findListContentsByListId(
+      coupleList.id,
+    );
 
     const list = listData.map((i) => ({
       id: i.id,
@@ -62,10 +64,8 @@ export class ListService {
 
   // 리스트 목록 완료여부 토글
   async listDoneHandler(userId: number, coupleId: number, contentId: number) {
-    const listContent = await this.prisma.listContent.findUnique({
-      where: { id: contentId },
-      include: { category: true },
-    });
+    const listContent =
+      await this.listRepository.findListContentById(contentId);
 
     if (!listContent) {
       throw new HttpException(
@@ -74,12 +74,9 @@ export class ListService {
       );
     }
 
-    const condition = {
-      where: { id: contentId },
-      data: { isDone: !listContent.isDone },
-    };
-
-    await this.prisma.listContent.update(condition);
+    await this.listRepository.updateListContent(contentId, {
+      isDone: !listContent.isDone,
+    });
 
     // 완료시 알림 전송
     if (!listContent.isDone) {
@@ -87,7 +84,7 @@ export class ListService {
         where: { id: coupleId },
       });
 
-      const partnerId = couple.aId == userId ? couple.bId : couple.aId;
+      const partnerId = getPartnerId(couple, userId);
 
       await this.sse.createNofication(partnerId, this.notificationType, {
         id: listContent.id,
@@ -103,9 +100,7 @@ ${listContent.category.name}: ${listContent.content}`,
 
   // 리스트 목록 삭제
   async deleteList(userId: number, coupleId: number, contentId: number) {
-    await this.prisma.listContent.delete({
-      where: { id: contentId },
-    });
+    await this.listRepository.deleteListContent(contentId);
 
     return {
       message: { code: 200, text: '리스트 목록이 삭제 삭제되었습니다.' },
