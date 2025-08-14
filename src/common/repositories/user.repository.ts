@@ -52,4 +52,31 @@ export class UserRepository {
       where: { id },
     });
   }
+
+  async findByCode(code: string) {
+    return this.prisma.user.findUnique({
+      where: { code },
+    });
+  }
+
+  async updateNickname(id: number, nickname: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { nickname },
+    });
+  }
+
+  async updateBirthday(id: number, birthday: Date) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { birthday },
+    });
+  }
+
+  async updateProfileUrl(id: number, profileUrl: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { profileUrl },
+    });
+  }
 }

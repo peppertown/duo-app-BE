@@ -23,6 +23,20 @@ export class CoupleRepository {
     });
   }
 
+  async findByUserId(userId: number) {
+    return this.prisma.couple.findFirst({
+      where: {
+        OR: [{ aId: userId }, { bId: userId }],
+      },
+    });
+  }
+
+  async create(data: { aId: number; bId: number; anniversary: Date }) {
+    return this.prisma.couple.create({
+      data,
+    });
+  }
+
   async update(id: number, data: { anniversary?: Date }) {
     return this.prisma.couple.update({
       where: { id },
@@ -74,6 +88,15 @@ export class CoupleRepository {
   }
 
   // Widget 테이블 메서드
+  async createWidget(coupleId: number, photoUrl: string) {
+    return this.prisma.widget.create({
+      data: {
+        coupleId,
+        photoUrl,
+      },
+    });
+  }
+
   async findWidgetByCoupleId(coupleId: number) {
     return this.prisma.widget.findFirst({
       where: { coupleId },

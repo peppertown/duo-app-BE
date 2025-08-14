@@ -13,6 +13,12 @@ export class ListRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   // List 테이블 메서드
+  async createList(coupleId: number) {
+    return this.prisma.list.create({
+      data: { coupleId },
+    });
+  }
+
   async findListByCoupleId(coupleId: number) {
     return this.prisma.list.findFirst({
       where: { coupleId },
