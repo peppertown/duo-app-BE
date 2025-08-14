@@ -22,20 +22,12 @@ export class NotificationHelper {
     type: NotificationType,
     payload: { title: string; body: string },
   ) {
-    try {
-      await this.prisma.notification.create({
-        data: {
-          userId,
-          type,
-          payload: JSON.stringify(payload),
-        },
-      });
-    } catch (err) {
-      console.error('알림 DB 저장 중 에러 발생', err);
-      throw new HttpException(
-        '알림 DB 저장 중 오류가 발생했습니다',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.prisma.notification.create({
+      data: {
+        userId,
+        type,
+        payload: JSON.stringify(payload),
+      },
+    });
   }
 }
