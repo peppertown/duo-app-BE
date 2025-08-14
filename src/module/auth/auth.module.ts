@@ -8,7 +8,6 @@ import { CoupleModule } from '../couple/couple.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AuthHelper } from './helper/auth.helper';
 import { ConfigService } from 'src/config/config.service';
-
 @Module({
   imports: [
     JwtModule.registerAsync({

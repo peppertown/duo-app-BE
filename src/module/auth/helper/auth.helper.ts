@@ -2,16 +2,16 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { generateRandomString } from 'src/common/utils/random.util';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import { ConfigService } from 'src/config/config.service';
+import { UserRepository } from 'src/common/repositories/user.repository';
 import axios from 'axios';
 
 @Injectable()
 export class AuthHelper {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
     private readonly jwt: JwtService,
     private readonly redis: RedisService,
     private readonly configService: ConfigService,
@@ -51,9 +51,7 @@ export class AuthHelper {
     const nickname = email.split('@')[0];
 
     // 중복 확인
-    const existingUser = await this.prisma.user.findFirst({
-      where: { email },
-    });
+    const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new HttpException(
         '이미 존재하는 사용자 ID입니다.',
@@ -63,14 +61,12 @@ export class AuthHelper {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const randomCode = generateRandomString();
-    const newUser = await this.prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        nickname,
-        code: randomCode,
-        profileUrl: this.configService.defaultProfileUrl,
-      },
+    const newUser = await this.userRepository.create({
+      email,
+      password: hashedPassword,
+      nickname,
+      code: randomCode,
+      profileUrl: this.configService.defaultProfileUrl,
     });
 
     return newUser;
@@ -78,9 +74,7 @@ export class AuthHelper {
 
   // 자체 로그인 헬퍼 - 로그인 데이터 vaild 한지 확인 후 DB에 저장된 user 값 리턴
   async validateUserLogin(email: string, password: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { email },
-    });
+    const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
       throw new HttpException(

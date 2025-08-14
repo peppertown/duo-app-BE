@@ -5,6 +5,7 @@ import { getPartnerData } from 'src/common/utils/couple.util';
 import { NotificationService } from '../notification/notification.service';
 import { AuthHelper } from './helper/auth.helper';
 import { ConfigService } from 'src/config/config.service';
+import { UserRepository } from 'src/common/repositories/user.repository';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly notificationService: NotificationService,
     private readonly authHelper: AuthHelper,
     private readonly configService: ConfigService,
+    private readonly userRepository: UserRepository,
   ) {}
 
   // 회원 가입
@@ -115,18 +117,14 @@ export class AuthService {
 
     let isNew: boolean = false;
 
-    let user = await this.prisma.user.findUnique({
-      where: { sub },
-    });
+    let user = await this.userRepository.findBySub(sub);
 
     if (!user) {
       const randomCode = generateRandomString();
-      user = await this.prisma.user.create({
-        data: {
-          ...data,
-          profileUrl: this.configService.defaultProfileUrl,
-          code: randomCode,
-        },
+      user = await this.userRepository.create({
+        ...data,
+        profileUrl: this.configService.defaultProfileUrl,
+        code: randomCode,
       });
       isNew = true;
     }

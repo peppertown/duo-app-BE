@@ -16,10 +16,12 @@ import { MypageModule } from './module/mypage/mypage.module';
 import { UploaderModule } from './uploader/uploader.module';
 import { ConfigModule } from './config/config.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { RepositoriesModule } from './common/repositories/repositories.module';
 
 @Module({
   imports: [
     ConfigModule,
+    RepositoriesModule,
     AuthModule,
     PrismaModule,
     UserModule,
