@@ -284,8 +284,10 @@ await this.prisma.$transaction(async (tx) => {
 1. **couple.util.ts PrismaClient 생성**: 새 인스턴스 생성 → Repository 패턴으로 이동
 2. **CoupleAuthGuard DB 반복 조회**: 매 요청 DB 조회 → Redis 캐싱 적용
 3. **UserService.matchUser 트랜잭션**: 분리된 DB 작업 → 단일 트랜잭션으로 통합
+4. **ListService.listDoneHandler 쿼리**: 전체 couple 객체 조회 → 필요한 필드만 select
 
 #### 성능 개선 효과
 - **CoupleAuthGuard**: ~10ms → ~1ms (90% 단축)
 - **DB 커넥션**: 커넥션 풀 효율성 대폭 향상
 - **데이터 일관성**: 트랜잭션으로 무결성 보장
+- **쿼리 최적화**: 불필요한 데이터 전송 제거, 네트워크 트래픽 감소
