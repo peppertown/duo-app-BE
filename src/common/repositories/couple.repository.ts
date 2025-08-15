@@ -88,7 +88,7 @@ export class CoupleRepository {
 
   async findPartnerByUserAndCoupleId(userId: number, coupleId: number) {
     if (!coupleId) return null;
-    
+
     const couple = await this.findUsersById(coupleId);
     if (!couple) return null;
 
@@ -102,6 +102,20 @@ export class CoupleRepository {
     }
 
     return null;
+  }
+
+  async findPartnerIdByUserAndCoupleId(
+    userId: number,
+    coupleId: number,
+  ): Promise<number | null> {
+    const couple = await this.prisma.couple.findUnique({
+      where: { id: coupleId },
+      select: { aId: true, bId: true },
+    });
+
+    if (!couple) return null;
+
+    return couple.aId === userId ? couple.bId : couple.aId;
   }
 
   // CoupleAnniversary 테이블 메서드

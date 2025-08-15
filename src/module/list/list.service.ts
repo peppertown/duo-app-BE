@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { SseService } from 'src/sse/sse.service';
 import { ListRepository } from 'src/common/repositories/list.repository';
-import { getPartnerId } from 'src/common/utils/couple.util';
+import { CoupleRepository } from 'src/common/repositories/couple.repository';
 import {
   formatListData,
   createBucketListCompletionMessage,
@@ -12,9 +11,9 @@ import { formatApiResponse } from 'src/common/utils/response.util';
 @Injectable()
 export class ListService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly sse: SseService,
     private readonly listRepository: ListRepository,
+    private readonly coupleRepository: CoupleRepository,
   ) {}
 
   private readonly notificationType = 'LIST_TOGGLED';
@@ -77,19 +76,21 @@ export class ListService {
 
     // 완료시 알림 전송
     if (!listContent.isDone) {
-      const couple = await this.prisma.couple.findUnique({
-        where: { id: coupleId },
-      });
+      const partnerId =
+        await this.coupleRepository.findPartnerIdByUserAndCoupleId(
+          userId,
+          coupleId,
+        );
 
-      const partnerId = getPartnerId(couple, userId);
-
-      await this.sse.createNofication(partnerId, this.notificationType, {
-        id: listContent.id,
-        message: createBucketListCompletionMessage(
-          listContent.category.name,
-          listContent.content,
-        ),
-      });
+      if (partnerId) {
+        await this.sse.createNofication(partnerId, this.notificationType, {
+          id: listContent.id,
+          message: createBucketListCompletionMessage(
+            listContent.category.name,
+            listContent.content,
+          ),
+        });
+      }
     }
 
     return formatApiResponse(200, '리스트 완료 여부 설정이 완료되었습니다.');
