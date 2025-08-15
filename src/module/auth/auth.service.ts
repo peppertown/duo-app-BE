@@ -129,7 +129,10 @@ export class AuthService {
         partner: null,
       };
     }
-    const partner = await this.coupleRepository.findPartnerByUserAndCoupleId(userId, couple.id);
+    const partner = await this.coupleRepository.findPartnerByUserAndCoupleId(
+      userId,
+      couple.id,
+    );
 
     return { couple, partner };
   }
